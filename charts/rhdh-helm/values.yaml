@@ -2,6 +2,7 @@
 #helm repo update
 #oc project backstage
 #helm install backstage backstage/backstage --values values.yaml
+namespace: backstage
 redhat-developer-hub:
   global:
     auth:
