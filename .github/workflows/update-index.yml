@@ -23,10 +23,17 @@ jobs:
           git config user.name "root"
           git config user.email "root@users.noreply.github.com"
 
-      # - name: Install Helm
-      #   uses: azure/setup-helm@v4
-      #   env:
-      #     GITHUB_TOKEN: "${{ secrets.HELM }}"
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        env:
+          GITHUB_TOKEN: "${{ secrets.HELM }}"
+      
+      - name: Add Helm repositories
+        run: |
+          helm repo add openshift-charts https://charts.openshift.io
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
+      
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:

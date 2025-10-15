@@ -1,0 +1,15 @@
+annotations:
+  charts.openshift.io/name: serverless-logic-operator
+apiVersion: v2
+name: orcheserverless-logic-operator
+description: >
+  Helm chart to deploy the serverless logic operator
+maintainers:
+  - name: Paul Foster
+type: application
+dependencies:
+  - name: helper-status-checker
+    version: 4.3.7
+    repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    condition: helper-status-checker.enabled
+version: 1.0.0

@@ -1,0 +1,9 @@
+dependencies:
+- name: helper-status-checker
+  repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+  version: 4.3.7
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.12.10
+digest: sha256:ea45c85586b789336b516cd1396de60fbeb6ca1166f5a1d4a43a0d6af3706d6c
+generated: "2025-10-15T20:22:16.594386+11:00"

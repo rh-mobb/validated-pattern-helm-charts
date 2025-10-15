@@ -1,0 +1,21 @@
+annotations:
+  charts.openshift.io/name: Orchestrator Infrastructure for Red Hat Developer Hub
+apiVersion: v2
+name: orchestrator-operator
+description: >
+  Helm chart to deploy the Orchestrator solution's 
+maintainers:
+  - name: Paul Foster
+    url: https://github.com/redhat-developer/rhdh-chart
+type: application
+sources:
+  - https://github.com/redhat-developer/rhdh-chart
+dependencies:
+  - name: helper-status-checker
+    version: 4.3.7
+    repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    condition: helper-status-checker.enabled
+  - name: postgresql
+    version: "12.12.10"
+    repository: https://charts.bitnami.com/bitnami
+version: 1.0.0
