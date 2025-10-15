@@ -1,0 +1,7 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: rhdh-platform-domains
+spec:
+  type: url
+  target: ./domains/**/*.yaml

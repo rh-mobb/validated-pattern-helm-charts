@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: rhdh-platform-entities
+spec:
+  targets: 
+    - ./location.domains.yaml
+    - ./location.systems.yaml
+    - ./location.resources.yaml
+    - ./location.components.yaml
+    - ./location.apis.yaml
