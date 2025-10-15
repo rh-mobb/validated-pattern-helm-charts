@@ -1,6 +1,6 @@
 namespace: sonataflow-infra
 
-peratorName: orchestrator-operator
+operatorName: orchestrator-operator
 operatorNamespace: openshift-operators
 operatorSourceNamespace: openshift-marketplace
 operatorChannel: stable
