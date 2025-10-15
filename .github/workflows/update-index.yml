@@ -32,7 +32,7 @@ jobs:
         run: |
           helm repo add openshift-charts https://charts.openshift.io
           helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add helm repositoryhttps://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+          helm repo add helm-repository https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
           helm repo update
       
       - name: Run chart-releaser
