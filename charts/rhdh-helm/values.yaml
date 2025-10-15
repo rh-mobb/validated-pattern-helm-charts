@@ -139,7 +139,7 @@ redhat-developer-hub:
               name: keycloak-client-secret-backstage
         - name: LOG_LEVEL
           value: debug
-      extraContainers:
+      #xtraContainers: 
         # - name: oauth2-proxy
         #   env:
         #     - name: OAUTH2_PROXY_CLIENT_ID
