@@ -1,5 +1,5 @@
 apiVersion: v2
-name: redhat-developer-hub
+name: rhdh-helm
 description: Master chart to deploy developer hub
 version: 1.0.2
 home: https://github.com/rosa-hcp-dedicated-vpc/helm-repository
