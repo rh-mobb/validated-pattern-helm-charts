@@ -2,6 +2,8 @@ apiVersion: sonataflow.org/v1alpha08
 kind: SonataFlow
 metadata:
   annotations:
+    argocd.argoproj.io/sync-wave: "{{ add .Values.syncwave 3 }}"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
     sonataflow.org/description: YAML based greeting workflow
     sonataflow.org/expressionLang: jq
     sonataflow.org/profile: gitops
