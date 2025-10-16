@@ -10,8 +10,8 @@ kubeVersion: '>= 1.25.0-0'
 maintainers:
 - name: Red Hat Developer Hub Team
   url: https://github.com/redhat-developer/rhdh-chart
-name: redhat-developer-hub-orchestrator-infra
+name: rhdh-orchestrator-infra
 sources:
 - https://github.com/redhat-developer/rhdh-chart
 type: application
-version: 9.2.3
+version: 0.2.3
