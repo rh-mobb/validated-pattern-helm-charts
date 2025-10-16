@@ -1,0 +1,8 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: backstage-dynamic-plugins-npmrc
+stringData:
+  .npmrc: |
+    @redhat:registry=https://npm.registry.redhat.com
+type: Opaque
