@@ -41,3 +41,20 @@ tests:
   enabled: true
   # -- Test pod image
   image: bitnami/kubectl:latest
+
+helper-status-checker:
+  enabled: true
+  approver: true
+  checks:
+    - operatorName: serverless-operator
+      subscriptionName: serverless-operator
+      namespace:
+        name: openshift-serverless
+      serviceAccount:
+        name: "rhods-serverless-install-check"
+    - operatorName: logic-operator-rhel8
+      subscriptionName: logic-operator-rhel8
+      namespace:
+        name: openshift-serverless-logic
+      serviceAccount:
+        name: "logic-operator-rhel8-install-check"

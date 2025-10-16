@@ -14,4 +14,10 @@ name: rhdh-orchestrator-infra
 sources:
 - https://github.com/redhat-developer/rhdh-chart
 type: application
-version: 0.2.3
+# based on versioon - version: 0.2.3
+version: 2.0.0
+dependencies:
+  - name: helper-status-checker
+    version: 4.3.7
+    repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    condition: helper-status-checker.enabled

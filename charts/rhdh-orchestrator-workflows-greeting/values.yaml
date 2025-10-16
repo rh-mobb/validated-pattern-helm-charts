@@ -17,7 +17,7 @@ image:
 
 helper-status-checker:
   enabled: true
-  approver: true 
+  approver: false
   checks:
     - operatorName: serverless-operator
       approver: false
