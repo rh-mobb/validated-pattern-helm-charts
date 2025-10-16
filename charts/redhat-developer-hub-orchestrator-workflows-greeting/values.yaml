@@ -1,0 +1,28 @@
+syncwave: 1
+persistence:
+  postgresql:
+    secretRef:
+      name: backstage-postgresql-svcbind-postgres
+      userKey: username
+      passwordKey: password
+    serviceRef:
+      name: backstage-postgresql
+      port: 5432
+      databaseName: sonataflow
+      databaseSchema: greeting
+
+image: 
+  repository: quay.io/orchestrator/serverless-workflow-greeting
+  tag: aed62dee57d8b9f52caa01fd1283e161c3c89614
+
+helper-status-checker:
+  enabled: true
+  approver: true 
+  checks:
+    - operatorName: serverless-operator
+      approver: false
+      subscriptionName: serverless-operator
+      namespace:
+        name: openshift-serverless
+      serviceAccount:
+        name: "rhods-serverless-install-check"

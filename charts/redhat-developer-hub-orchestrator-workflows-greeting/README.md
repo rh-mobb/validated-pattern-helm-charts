@@ -1,0 +1,1 @@
+See [documentation for the workflow](https://github.com/rhdhorchestrator/serverless-workflows/blob/main/deploy/docs/main/greeting/README.md)

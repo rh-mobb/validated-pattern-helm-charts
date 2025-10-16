@@ -1,0 +1,11 @@
+{{- $unmanagedNamespaceExists := include "unmanaged-resource-exists" (list "v1" "Namespace" "" .Values.serverlessOperator.subscription.namespace .Release.Name .Capabilities.APIVersions) }}
+{{- if and (eq $unmanagedNamespaceExists "false") .Values.serverlessOperator.enabled }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.serverlessOperator.subscription.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+{{- end }}
+
