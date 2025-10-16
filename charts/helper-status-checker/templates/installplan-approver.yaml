@@ -51,7 +51,7 @@ spec:
                 printf "\nAttempt $((retry_count + 1))/$max_retries: Getting InstallPlan for subscription '$subscription'\n"
                 
                 # Try to get the InstallPlan name
-                installplan=$(oc get subscription ${subscription} -o jsonpath='{.status.installPlanRef.name}' 2>/dev/null || echo "")
+                installplan=$(oc get sub ${subscription} -o jsonpath='{.status.installPlanRef.name}' 2>/dev/null || echo "")
                 
                 if [ -z "$installplan" ]; then
                   printf "No InstallPlan found yet, waiting 10 seconds before retry...\n"
