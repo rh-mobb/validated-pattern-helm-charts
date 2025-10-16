@@ -25,4 +25,4 @@ helper-status-checker:
       namespace:
         name: openshift-serverless
       serviceAccount:
-        name: "rhods-serverless-install-check"
+        name: "rhods-serverless-greeting-install-check"
