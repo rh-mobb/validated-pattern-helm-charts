@@ -14,4 +14,4 @@ name: redhat-developer-hub-orchestrator-infra
 sources:
 - https://github.com/redhat-developer/rhdh-chart
 type: application
-version: 0.2.3
+version: 9.2.3
