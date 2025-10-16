@@ -1,6 +1,0 @@
-dependencies:
-- name: helper-status-checker
-  repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
-  version: 4.3.7
-digest: sha256:0eb51060fbdd8b09e99549cecb8caea2bcf30ebe7b715b7e2c494e49d76657ea
-generated: "2025-10-16T14:35:30.255427+11:00"
