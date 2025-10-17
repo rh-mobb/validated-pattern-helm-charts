@@ -21,4 +21,4 @@ spec:
     implicitFlowEnabled: false
     publicClient: false
     redirectUris:
-{{- range $item := $.Values.client.redirectUri }}
+      - {{ .Values.client.redirectUri }}
