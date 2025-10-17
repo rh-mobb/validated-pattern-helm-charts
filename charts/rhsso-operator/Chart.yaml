@@ -1,5 +1,5 @@
 apiVersion: v2
-name: rhsso-janus
+name: rhsso-operator
 description: A Helm chart to deploy RHSSO for Janus-IDP-Demo on Kubernetes
 type: application
 
