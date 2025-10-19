@@ -11,8 +11,6 @@ realm:
   identityProviders:
     - alias: GitHub
       providerId: github
-      clientId: YOv23lihJrjwjEqOqltyW
-      clientSecret: c014c1de0cda7397010c421930393866b1a649e6
       syncMode: IMPORT
 client:
   redirectUri:
