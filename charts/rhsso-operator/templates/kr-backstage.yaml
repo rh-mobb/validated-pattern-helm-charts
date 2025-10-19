@@ -23,8 +23,8 @@ spec:
     identityProviders:
       - alias: GitHub
         providerId: github
-        clientId: <clientId>
-        clientSecret: <clientSecret>
+        clientId: <path:aws-sm/{{ .Values.clientSecret}}#clientId>
+        clientSecret: <path:aws-sm/{{ .Values.clientSecret}}#clientSecret>
         syncMode: IMPORT
     type: Opaque
 
