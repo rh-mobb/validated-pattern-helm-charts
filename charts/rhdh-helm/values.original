@@ -1,5 +1,6 @@
 namespace: backstage
 redhat-developer-hub:
+  
   #helm repo add backstage https://janus-idp.github.io/helm-backstage
   #helm repo update
   #oc project backstage
@@ -8,7 +9,7 @@ redhat-developer-hub:
     auth:
       backend:
         enabled: true
-    clusterRouterBase: holder
+    clusterRouterBase: apps.cluster-str8b.dynamic.redhatworkshops.io
     dynamic:
       includes:
         - dynamic-plugins.default.yaml
@@ -139,12 +140,44 @@ redhat-developer-hub:
               name: keycloak-client-secret-backstage
         - name: LOG_LEVEL
           value: debug
-      
+      extraContainers:
+        - name: oauth2-proxy
+          env:
+            - name: OAUTH2_PROXY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: CLIENT_ID
+                  name: keycloak-client-secret-backstage
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: CLIENT_SECRET
+                  name: keycloak-client-secret-backstage
+            - name: OAUTH2_PROXY_COOKIE_SECRET
+              value: "{{ randAlpha 32 | lower | b64enc }}"
+            - name: OAUTH2_PROXY_OIDC_ISSUER_URL
+              value: https://keycloak-rhsso.apps.cluster-str8b.dynamic.redhatworkshops.io/auth/realms/backstage
+            - name: OAUTH2_PROXY_SSL_INSECURE_SKIP_VERIFY
+              value: 'true'
+          ports:
+            - name: oauth2-proxy
+              containerPort: 4180
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          image: 'quay.io/oauth2-proxy/oauth2-proxy:latest'
+          args:
+            - '--provider=oidc'
+            - '--email-domain=*'
+            - '--upstream=http://localhost:7007'
+            - '--http-address=0.0.0.0:4180'
+            - '--skip-provider-button'
+            - '--insecure-oidc-allow-unverified-email=true'
+  
       appConfig:
         app:
-          baseUrl: holder
+          baseUrl: https://backstage-backstage.apps.cluster-str8b.dynamic.redhatworkshops.io
         backend:
-          baseUrl: holder
+          baseUrl: https://backstage-backstage.apps.cluster-str8b.dynamic.redhatworkshops.io
           listen:
             port: 7007
             host: 0.0.0.0
@@ -154,7 +187,7 @@ redhat-developer-hub:
             img-src: ["'self'", 'data:']
             connect-src: ["'self'", 'http:', 'https:', 'data:']
           cors:
-            origin: holder
+            origin: https://backstage-backstage.apps.cluster-str8b.dynamic.redhatworkshops.io
             methods: [GET, POST, PUT, DELETE]
             credentials: true
           database:
@@ -167,37 +200,36 @@ redhat-developer-hub:
               password: "${POSTGRES_ADMIN_PASSWORD}"
           reading:
             allow:
-              - host: holder
+              - host: '*.apps.cluster-str8b.dynamic.redhatworkshops.io'
   
         integrations:
-        ######### COMMENTED OUT ##########
-          # gitlab:
-          # - host: gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io
-          #   baseUrl: https://gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io
-          #   apiBaseUrl: https://gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io/api/v4
-          #   token: null
+          gitlab:
+          - host: gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io
+            baseUrl: https://gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io
+            apiBaseUrl: https://gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io/api/v4
+            token: null
   
-        # proxy:
-        #   endpoints:
-        #     '/quay/api':
-        #       target: {{ .Values.quay.apiUrl }}
-        #       headers:
-        #         X-Requested-With: 'XMLHttpRequest'
-        #         # Uncomment the following line to access a private Quay Repository using a token
-        #         Authorization: 'Bearer 1LOQ7ZNVEUDIALE4WNL3ZBNPKBCR5D4F9UNISVAW'
-        #       changeOrigin: true
-        #       # Change to "false" in case of using self hosted quay instance with a self-signed certificate
-        #       secure: false
-        #     '/developer-hub':
-        #       target: {{ .Values.github.baseUrl }}/
-        #       pathRewrite:
-        #         '^/api/proxy/developer-hub/tech-radar': /gitops/janus-idp-gitops/-/raw/main/config/tech-radar.json
-        #       changeOrigin: true
-        #       secure: false
+        proxy:
+          endpoints:
+            '/quay/api':
+              target: 'https://quay-str8b-1.apps.cluster-str8b.dynamic.redhatworkshops.io'
+              headers:
+                X-Requested-With: 'XMLHttpRequest'
+                # Uncomment the following line to access a private Quay Repository using a token
+                Authorization: ''
+              changeOrigin: true
+              # Change to "false" in case of using self hosted quay instance with a self-signed certificate
+              secure: false
+            '/developer-hub':
+              target: https://gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io/
+              pathRewrite:
+                '^/api/proxy/developer-hub/tech-radar': /gitops/janus-idp-gitops/-/raw/main/config/tech-radar.json
+              changeOrigin: true
+              secure: false
   
-        # quay:
-        #   # The UI url for Quay, used to generate the link to Quay
-        #   uiUrl: {{ .Values.quay.uiUrl }}
+        quay:
+          # The UI url for Quay, used to generate the link to Quay
+          uiUrl: 'https://quay-str8b-1.apps.cluster-str8b.dynamic.redhatworkshops.io'
   
         techdocs:
           builder: local
@@ -209,17 +241,12 @@ redhat-developer-hub:
         auth:
           environment: production
           providers:
-            oidc:
-              production:
-                metadataUrl: holder
-                clientId: backstage
-                clientSecret: ${KEYCLOAK_CLIENT_SECRET}
-                prompt: auto
+            oauth2Proxy: {}
           session:
             secret:
               $env: 'BACKEND_SECRET'
   
-        signInPage: oidc
+        signInPage: oauth2Proxy
   
         scaffolder:
           # see https://backstage.io/docs/features/software-templates/configuration for software template options
@@ -228,31 +255,31 @@ redhat-developer-hub:
           rules:
             - allow: [Domain, Component, System, API, Resource, Location, Template]
           locations:
-            - target: holder
+            - target: https://gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io/rhdh/developer-hub-software-templates/blob/main/showcase-templates.yaml
               type: url
               rules:
                 - allow: [Template]
-            - target: holder
+            - target: https://gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io/rhdh/developer-hub-software-templates/blob/main/org.yaml
               type: url
               rules:
                 - allow: [Group, User]
-            - target: holder
+            - target: https://gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io/summit-lab/backstage-workshop/blob/master/showcase-templates.yaml
               type: url
               rules:
                 - allow: [Template]
-            - target: holder
+            - target: https://gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io/rhdh-entities/rhdh-demo-entities/blob/main/locations.yaml
               type: url
               rules:
                 - allow: [Domain, Component, System, API, Resource, Location]
           providers:
-            # gitlab:
-            #   selfHosted:
-            #     host: gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io
-            #     schedule: # optional; same options as in TaskScheduleDefinition
-            #       # supports cron, ISO duration, "human duration" as used in code
-            #       frequency: { seconds: 10 }
-            #       # supports ISO duration, "human duration" as used in code
-            #       timeout: { seconds: 60 }
+            gitlab:
+              selfHosted:
+                host: gitlab-gitlab.apps.cluster-str8b.dynamic.redhatworkshops.io
+                schedule: # optional; same options as in TaskScheduleDefinition
+                  # supports cron, ISO duration, "human duration" as used in code
+                  frequency: { seconds: 10 }
+                  # supports ISO duration, "human duration" as used in code
+                  timeout: { seconds: 60 }
             ocm:
               default:
                 name: multiclusterhub
@@ -265,20 +292,20 @@ redhat-developer-hub:
                 owner: group:rhdh
             keycloakOrg:
               default:
-                baseUrl: holder
+                baseUrl: keycloak-rhsso.apps.cluster-str8b.dynamic.redhatworkshops.io/auth
                 loginRealm: backstage
                 realm: backstage
                 clientId: ${KEYCLOAK_CLIENT_ID}
                 clientSecret: ${KEYCLOAK_CLIENT_SECRET}
   
-        # argocd:
-        #   appLocatorMethods:
-        #     - type: 'config'
-        #       instances:
-        #         - name: main
-        #           url: {{ .Values.argocd.serverUrl }}
-        #           username: admin
-        #           password: Mjc2NDk2
+        argocd:
+          appLocatorMethods:
+            - type: 'config'
+              instances:
+                - name: main
+                  url: 	https://argocd-server-janus-argocd.apps.cluster-str8b.dynamic.redhatworkshops.io
+                  username: admin
+                  password: MzIzMTQ4
   
         kubernetes:
           serviceLocatorMethod:
@@ -287,10 +314,10 @@ redhat-developer-hub:
             - type: "config"
               clusters:
                 - name: dev-cluster-infra
-                  url: holder
+                  url: https://api.cluster-str8b.dynamic.redhatworkshops.io:6443
                   authProvider: "serviceAccount"
                   skipTLSVerify: true
-                  serviceAccountToken: eyJhbGciOiJSUzI1NiIsImtpZCI6IkUzc2IzTlZ3OUhpSDVfbEExMDdLRHl2TEdaemVOSWh0T0JHLVhUbXFCTzgifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImFkYWZiMDA5LTU5YTMtNGZiMC1hMDVlLTM0MGUwMWYxN2FiMiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.dTK1gr0dO259c3Me5WhogSrJdu2pK_RN-Gb4BIFTklx7ldZuYdC87fDTA-OFQroD51l1bytNy01qs7dS6F0qYBc8q3T5qVTTTdMw_6IhsKLNrq7fr2M5ZjdD5d7EcGurOBIbz4qkKct75UvisfsfXGu6aAUCLriX5AU5F2arLXSBk__D73oXvHoNlei6Ewf3iyvTcdchLklbGsjXGCJc4MmUIeylkFeJ5EAEGS3hKw3-sen6sATavdvDTut-WPY4m2ZrDRfbd0rulPGYyneiMxSMYAhDfwKa7ef4EwHT6kNvJcECuGwbFWto8NNnAm8EmKm4CpDGnKU2FVAJHHGNAVmrtbeTd91k0sVnDv8mcPFXndbt2e2tcbro4Q_MLvAANuaQtNPGLfj8vnywbW09DpE_yUXMvUq2ZNUQft41bJ47xHSRl64_VR346ak7Tr_XIPVdo_l2ZM0zyZ8s61y6xO12xftc34QZFwDuCCcxGev22WOL6fgK6JPL3bGpQxVlWlDcqZ2nKfSpDnKvCB2efoGYjiw64U8n0rdMrMJmjht8n5BQnz-Mcw3Ba-4zqV8iEXa9SsCYWwq7NsshwR9x5bA49pvyO3PlHcWsAJyOm_yICdlTnFNPooGjfTOdgxUTbS2MrD13Uau-EN2RwtiaeWhO-e1XGmh3P2f6ldwU3L0
+                  serviceAccountToken: eyJhbGciOiJSUzI1NiIsImtpZCI6IkFfVHZpekNfUGt1cDROVU53bV8yMVFRNHZHMGExZmszbzNFYjlNMS1tVFkifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6Ijg5ODQ2N2VmLTM0ZDctNDU4Zi1iMGZkLTYyNTE1ZGQwM2U3OCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.AAaOIRtOQyFqbJh9cNUjHwgnL8rnk2DfJb7PkdQDdYV9XgpNePZXZvHdMwaOm3HUoksKOocYY9BmX14utGvoHidgk_-rTgi8vZNp30T2wiw8mdX7P6FLFYYMG2Mlo12FzZZjCybDMjXnKZCDZADSGzVGm12PQu6RwdM-I0nNWmI86tvM9MESvZQLsAx50mNN6ZASRbprn5ikfszAPLjdtUb6gn_TdKRzFqvRR9d4Edwq7ZTLy_x4Ssr2Zq0hfA5Li9zNJJuExy1dmzRYtislYSyLtxXLOUjMx69AK9sB1l1eMBzOI4faAJ34Hw7lhazP9KLnEBbXcLxuLZWpB7oPbMibOsaPttcukgO2Nceylin03SwCuc53AHxPuWNmXws3tSktrj2NJokQ6bUfkEvuR0Q_zj58bVCPZiQlgOYgR5w8VDmT4u0NUASeabjRkUPaeWZGT8u5eYPIOWAKR8QlwRB-xz6BqaAYEqKGxhp8tTxu8J3TI9lJQPU7qp29CSQzfa51L3a8gpnD-ZAtW-MDCy2rrqj6qX9FdTH-Y_u3Cjuuq6lzGeKv3dIoOi5eCilp3GsxlF1xoYxYx4BpHzKIUCc0lNKtWvDEtgy0CNaJYd7E7DS8FNKp296Z7ZE9sdhYq6vuMMydOv9yiA_fKrgUzLF8jIiecWwm5T7_A4yh-M8
           customResources:
             - group: 'tekton.dev'
               apiVersion: 'v1beta1'
@@ -312,29 +339,30 @@ redhat-developer-hub:
           sonarqube: false
           keycloak: true
           ocm: true
-          github: true
+          github: false
           githubOrg: false
+          gitlab: true
           jenkins: false
           permission: false
   
     postgresql:
       auth:
         username: bn_backstage
-        password: Mjc2NDk2
+        password: MzIzMTQ4
         database: postgres
   
         # Admin user (superuser)
         postgresUser: postgres
-        postgresPassword: Mjc2NDk2
+        postgresPassword: MzIzMTQ4
   
     service:
       ports:
-        backend: 7007
-        targetPort: backend
+        backend: 4180
+        targetPort: oauth2-proxy
   
   route:
     enabled: true
-    host: holder
+    host: backstage-backstage.apps.cluster-str8b.dynamic.redhatworkshops.io
     tls:
       enabled: true
       termination: "edge"
