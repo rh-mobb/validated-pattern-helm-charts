@@ -25,6 +25,9 @@ spec:
       - alias: GitHub
         providerId: github
         clientId: <path:{{ .Values.clientSecret }}#clientId>
-        clientSecret: <path:{{ .Values.clientSecret }}#clientSecret>
+        clientSecret:
+          secretKeyRef:
+            name: github-oauth-credentials
+            key: clientSecret
         syncMode: IMPORT
 
