@@ -24,10 +24,10 @@ spec:
     identityProviders:
       - alias: GitHub
         providerId: github
-        clientId: <path:{{ .Values.clientSecret }}#clientId>
-        clientSecret:
-          secretKeyRef:
-            name: github-oauth-credentials
-            key: clientSecret
+        config: 
+          clientId: <path:{{ .Values.clientSecret }}#clientId>
+          clientSecret: <path:{{ .Values.clientSecret }}#clientSecret>
+          defaultScopes: openid profile email
         syncMode: IMPORT
+
 
