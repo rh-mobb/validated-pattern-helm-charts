@@ -20,6 +20,7 @@ spec:
     displayName: Backstage Authentication Realm
     enabled: true
     id: backstage
+    realm: backstage
     identityProviders:
       - alias: GitHub
         providerId: github
