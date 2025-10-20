@@ -10,6 +10,11 @@ metadata:
     app.kubernetes.io/name: rhsso-backstage
   name: backstage
 spec:
+  realmSelector:
+    matchLabels:
+      app: rhsso-backstage
+      app.kubernetes.io/instance: rhsso-backstage
+      app.kubernetes.io/name: rhsso-backstage
   client:
     clientAuthenticatorType: client-secret
     clientId: backstage
@@ -21,4 +26,6 @@ spec:
     implicitFlowEnabled: false
     publicClient: false
     redirectUris:
-      - {{ .Values.client.redirectUri }}
+{{- range .Values.client.redirectUri }}
+      - {{ . | quote }}
+{{- end }}
