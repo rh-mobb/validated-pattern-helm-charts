@@ -35,12 +35,12 @@ redhat-developer-hub:
                           allOf:
                             - isTektonCIAvailable
           disabled: false
-        - package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab-backend-dynamic
-          disabled: false
-        - package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab
-          disabled: false
+        # - package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab-backend-dynamic
+        #   disabled: false
+        # - package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab
+        #   disabled: false
         - disabled: false
-          package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
+          #package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
         - package: ./dynamic-plugins/dist/backstage-community-plugin-quay
           disabled: false
         - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
