@@ -14,7 +14,7 @@ realm:
       syncMode: IMPORT
 client:
   redirectUri:
-  - https://cluster-config.backstage-backstage.apps.rosa.np-hub.8rzd.p3.openshiftapps.com/oauth2/callback
+  - holder
 
 
 helper-status-checker:
