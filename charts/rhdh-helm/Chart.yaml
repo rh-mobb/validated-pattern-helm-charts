@@ -5,8 +5,7 @@ version: 1.1.6
 home: https://github.com/rosa-hcp-dedicated-vpc/helm-repository
 dependencies:
   - name: redhat-developer-hub
-    version: 9.7.1
-    #repository: https://charts.openshift.io
+    version: 9.7.3
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
 maintainers:
   - name: Paul Foster
