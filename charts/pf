@@ -1,0 +1,1199 @@
+---
+# Source: rhdh-helm/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backstage
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/network-policies.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: release-name-allow-infra-ns-to-workflow-ns
+  # Sonataflow and Workflows are using the RHDH target namespace.
+  namespace: "backstage"
+spec:
+  podSelector: {}
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            # Allow knative events to be delivered to workflows.
+            kubernetes.io/metadata.name: knative-eventing
+      - namespaceSelector:
+          matchLabels:
+            # Allow auxiliary knative function for workflow (such as m2k-save-transformation)
+            kubernetes.io/metadata.name: knative-serving
+      - namespaceSelector:
+          matchLabels:
+            # Allow communication between the serverless logic operator and the workflow namespace.
+            kubernetes.io/metadata.name: openshift-serverless-logic
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/network-policies.yaml
+# NetworkPolicy to unblock incoming traffic to the namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: release-name-allow-external-communication
+  namespace: "backstage"
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            # Allow knative events to be delivered to workflows.
+            policy-group.network.openshift.io/ingress: ""
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/network-policies.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: release-name-allow-intra-network
+  namespace: "backstage"
+spec:
+  # Apply this policy to all pods in the namespace
+  podSelector: {}
+  # Specify policy type as 'Ingress' to control incoming traffic rules
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      # Allow ingress from any pod within the same namespace
+      - podSelector: {}
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/network-policies.yaml
+# NetworkPolicy to allow openshift-user-workload-monitoring pods to access all pods within the workflow's namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: release-name-allow-monitoring-to-sonataflow-and-workflows
+  namespace: "backstage"
+spec:
+  # Apply this policy to all pods in the namespace
+  podSelector: {}
+  # Specify policy type as 'Ingress' to control incoming traffic rules
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            # Allow openshift-user-workload-monitoring pods to access the workflow.
+            kubernetes.io/metadata.name: openshift-user-workload-monitoring
+---
+# Source: rhdh-helm/templates/secret-keycloak-client.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: keycloak-secret-copier
+  namespace: backstage
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/charts/postgresql/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-postgresql
+  namespace: "backstage"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 15.4.0
+    helm.sh/chart: postgresql-12.10.0
+type: Opaque
+data:
+  postgres-password: "TWpjMk5EazI="
+  password: "TWpjMk5EazI="
+  # We don't auto-generate LDAP password when it's not provided as we do for other passwords
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/charts/postgresql/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-postgresql-svcbind-postgres
+  namespace: "backstage"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 15.4.0
+    helm.sh/chart: postgresql-12.10.0
+type: servicebinding.io/postgresql
+data:
+  provider: "Yml0bmFtaQ=="
+  type: "cG9zdGdyZXNxbA=="
+  host: "cmVsZWFzZS1uYW1lLXBvc3RncmVzcWw="
+  port: "NTQzMg=="
+  username: "cG9zdGdyZXM="
+  database: "cG9zdGdyZXM="
+  password: "TWpjMk5EazI="
+  uri: "cG9zdGdyZXNxbDovL3Bvc3RncmVzOk1qYzJORGsyQHJlbGVhc2UtbmFtZS1wb3N0Z3Jlc3FsOjU0MzIvcG9zdGdyZXM="
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/charts/postgresql/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-postgresql-svcbind-custom-user
+  namespace: "backstage"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 15.4.0
+    helm.sh/chart: postgresql-12.10.0
+type: servicebinding.io/postgresql
+data:
+  provider: "Yml0bmFtaQ=="
+  type: "cG9zdGdyZXNxbA=="
+  host: "cmVsZWFzZS1uYW1lLXBvc3RncmVzcWw="
+  port: "NTQzMg=="
+  username: "Ym5fYmFja3N0YWdl"
+  password: "TWpjMk5EazI="
+  database: "cG9zdGdyZXM="
+  uri: "cG9zdGdyZXNxbDovL2JuX2JhY2tzdGFnZTpNamMyTkRrMkByZWxlYXNlLW5hbWUtcG9zdGdyZXNxbDo1NDMyL3Bvc3RncmVz"
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-auth
+  namespace: "backstage"
+  labels:
+    app.kubernetes.io/name: developer-hub
+    helm.sh/chart: redhat-developer-hub-1.7.1
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "1.7.1"
+    app.kubernetes.io/component: backstage
+  annotations:
+type: Opaque
+data:
+  backend-secret: "QVZHRE11VThHYlhzWVRtSjZSdzd4Mkpm"
+---
+# Source: rhdh-helm/templates/backstage-dynamic-plugins-npmrc.yaml
+kind: Secret
+apiVersion: v1
+metadata:
+  name: cluster-config-rhdh-helm-backstage-dynamic-plugins-npmrc
+stringData:
+  .npmrc: |
+    @redhat:registry=https://npm.registry.redhat.com
+type: Opaque
+---
+# Source: rhdh-helm/templates/backstage-postgresq-secret.yaml
+apiVersion: v1
+data:
+  postgres-password: cGFzc3dvcmQK
+kind: Secret
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+  labels:
+    app.kubernetes.io/instance: backstage
+    app.kubernetes.io/name: backstage-postgres
+    rht-gitops.com/openshift-gitops: backstage-gitops
+  name: backstage-postgresql
+  namespace: backstage
+type: Opaque
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/templates/app-config-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-developer-hub-app-config
+  namespace: "backstage"
+data:
+  app-config.yaml: |
+    app:
+      baseUrl: https://backstage-backstage.apps.rosa.np-hub.8rzd.p3.openshiftapps.com
+    auth:
+      environment: production
+      providers:
+        oidc:
+          production:
+            clientId: backstage
+            clientSecret: ${KEYCLOAK_CLIENT_SECRET}
+            metadataUrl: https://keycloak-rhsso-operator.apps.rosa.np-hub.8rzd.p3.openshiftapps.com/auth/realms/backstage/.well-known/openid_configuration
+            prompt: auto
+      session:
+        secret:
+          $env: BACKEND_SECRET
+    backend:
+      auth:
+        externalAccess:
+        - options:
+            secret: ${BACKEND_SECRET}
+            subject: legacy-default-config
+          type: legacy
+      baseUrl: https://backstage-backstage.apps.rosa.np-hub.8rzd.p3.openshiftapps.com
+      cors:
+        credentials: true
+        methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        origin: https://backstage-backstage.apps.rosa.np-hub.8rzd.p3.openshiftapps.com
+      csp:
+        connect-src:
+        - '''self'''
+        - 'http:'
+        - 'https:'
+        - 'data:'
+        img-src:
+        - '''self'''
+        - 'data:'
+        script-src:
+        - '''self'''
+        - '''unsafe-inline'''
+        - '''unsafe-eval'''
+        script-src-elem:
+        - '''self'''
+        - '''unsafe-inline'''
+        - '''unsafe-eval'''
+      database:
+        client: pg
+        connection:
+          database: postgres
+          host: ${POSTGRES_HOST}
+          password: ${POSTGRES_ADMIN_PASSWORD}
+          port: ${POSTGRES_PORT}
+          user: postgres
+      listen:
+        host: 0.0.0.0
+        port: 7007
+      reading:
+        allow:
+        - host: '*.apps.rosa.np-hub.8rzd.p3.openshiftapps.com'
+    catalog:
+      locations:
+      - target: https://github.com/rosa-hcp-dedicated-vpc/helm-repository/tree/main/charts/rhdh-helm/files/showcase-templates.yaml
+      - target: https://github.com/rosa-hcp-dedicated-vpc/helm-repository/tree/main/charts/rhdh-helm/files/org.yaml
+      - target: https://github.com/rosa-hcp-dedicated-vpc/helm-repository/tree/main/charts/rhdh-helm/files/showcase-templates.yaml
+      - target: https://github.com/rosa-hcp-dedicated-vpc/helm-repository/tree/main/charts/rhdh-helmfiles/locations.yaml
+      providers:
+        keycloakOrg:
+          default:
+            baseUrl: keycloak-rhsso-operator.apps.rosa.np-hub.8rzd.p3.openshiftapps.com/auth
+            clientId: ${KEYCLOAK_CLIENT_ID}
+            clientSecret: ${KEYCLOAK_CLIENT_SECRET}
+            loginRealm: backstage
+            realm: backstage
+        ocm:
+          default:
+            kubernetesPluginRef: dev-cluster-infra
+            name: multiclusterhub
+            owner: group:rhdh
+            schedule:
+              frequency:
+                seconds: 10
+              timeout:
+                seconds: 60
+      rules:
+      - allow:
+        - Domain
+        - Component
+        - System
+        - API
+        - Resource
+        - Location
+        - Template
+    enabled:
+      argocd: true
+      github: true
+      githubOrg: false
+      jenkins: false
+      keycloak: true
+      kubernetes: true
+      ocm: true
+      permission: false
+      sonarqube: false
+      techdocs: true
+    integrations: null
+    kubernetes:
+      clusterLocatorMethods:
+      - clusters:
+        - url: https://api.rosa.np-hub.8rzd.p3.openshiftapps.com:6443
+      customResources:
+      - apiVersion: v1beta1
+        group: tekton.dev
+        plural: pipelineruns
+      - apiVersion: v1beta1
+        group: tekton.dev
+        plural: taskruns
+      - apiVersion: v1
+        group: route.openshift.io
+        plural: routes
+      serviceLocatorMethod:
+        type: multiTenant
+    permission:
+      enabled: false
+    scaffolder: null
+    signInPage: oidc
+    techdocs:
+      builder: local
+      generator:
+        runIn: local
+      publisher:
+        type: local
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/dynamic-plugins-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-dynamic-plugins
+data:
+  dynamic-plugins.yaml: |
+    includes:
+    - dynamic-plugins.default.yaml
+    plugins:
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-community-plugin-redhat-argocd
+    - disabled: false
+      package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-community-plugin-tekton
+      pluginConfig:
+        dynamicPlugins:
+          frontend:
+            backstage-community.plugin-tekton:
+              mountPoints:
+              - config:
+                  if:
+                    allOf:
+                    - isTektonCIAvailable
+                  layout:
+                    gridColumn: 1 / -1
+                    gridRowStart: 1
+                importName: TektonCI
+                mountPoint: entity.page.ci/cards
+    - disabled: false
+      package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab-backend-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-community-plugin-quay
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-community-plugin-topology
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-techdocs
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-community-plugin-catalog-backend-module-keycloak-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-community-plugin-ocm
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-community-plugin-ocm-backend-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-community-plugin-tech-radar
+    - disabled: false
+      integrity: sha512-9cXbedr0lC7ns7SNqARrWSQI4JGcZFw5xpfpUzA1tJaMMUjzAdPHTXqljf62/fs4hYBK8TJsWJ2KJkGVMzbrHQ==
+      package: '@redhat/backstage-plugin-orchestrator-backend-dynamic@1.7.1'
+      pluginConfig:
+        orchestrator:
+          dataIndexService:
+            url: http://sonataflow-platform-data-index-service
+    - disabled: false
+      integrity: sha512-Cqu9EQwVQ4mpdgWTUA0MW89Gul0IklhvkkqVoO3CloQ1dnAj1XyXikCphzH5TmNDDd9K66dOpaKKCaW9KeJ4WA==
+      package: '@redhat/backstage-plugin-orchestrator@1.7.1'
+      pluginConfig:
+        dynamicPlugins:
+          frontend:
+            red-hat-developer-hub.backstage-plugin-orchestrator:
+              appIcons:
+              - importName: OrchestratorIcon
+                name: orchestratorIcon
+              dynamicRoutes:
+              - importName: OrchestratorPage
+                menuItem:
+                  icon: orchestratorIcon
+                  text: Orchestrator
+                path: /orchestrator
+    - disabled: false
+      integrity: sha512-J1sTjA5kj6DphG8D65go9KlpIfKyLN/wq+XlY5Cb5djEo8mvF3wn3Haf60OGFo5cP4OfRSWqFwT7LM5/dNVwAg==
+      package: '@redhat/backstage-plugin-scaffolder-backend-module-orchestrator-dynamic@1.7.1'
+      pluginConfig:
+        orchestrator:
+          dataIndexService:
+            url: http://sonataflow-platform-data-index-service
+    - disabled: false
+      integrity: sha512-0KIXrZoJ+O4xNNzN/zB4+VMuaRPuiUviAmM+fIhTo/P9aLA36F9aIlyMbUbki49uaJ0zd8KXMBvmJSHZNrYkGQ==
+      package: '@redhat/backstage-plugin-orchestrator-form-widgets@1.7.1'
+      pluginConfig:
+        dynamicPlugins:
+          frontend:
+            red-hat-developer-hub.backstage-plugin-orchestrator-form-widgets: {}
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-notifications
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-signals
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-notifications-backend-dynamic
+    - disabled: false
+      package: ./dynamic-plugins/dist/backstage-plugin-signals-backend-dynamic
+---
+# Source: rhdh-helm/templates/secret-keycloak-client.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keycloak-secret-copier
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "create", "update", "patch"]
+---
+# Source: rhdh-helm/templates/secret-keycloak-client.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: keycloak-secret-copier-backstage
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+subjects:
+- kind: ServiceAccount
+  name: keycloak-secret-copier
+  namespace: backstage
+roleRef:
+  kind: ClusterRole
+  name: keycloak-secret-copier
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/charts/postgresql/templates/primary/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-postgresql-hl
+  namespace: "backstage"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 15.4.0
+    helm.sh/chart: postgresql-12.10.0
+    app.kubernetes.io/component: primary
+  annotations:
+    # Use this annotation in addition to the actual publishNotReadyAddresses
+    # field below because the annotation will stop being respected soon but the
+    # field is broken in some versions of Kubernetes:
+    # https://github.com/kubernetes/kubernetes/issues/58662
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  # We want all pods in the StatefulSet to have their addresses published for
+  # the sake of the other Postgresql pods even before they're ready, since they
+  # have to be able to talk to each other in order to become ready.
+  publishNotReadyAddresses: true
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/component: primary
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/charts/postgresql/templates/primary/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-postgresql
+  namespace: "backstage"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 15.4.0
+    helm.sh/chart: postgresql-12.10.0
+    app.kubernetes.io/component: primary
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/component: primary
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-developer-hub
+  namespace: "backstage" 
+  labels:
+    app.kubernetes.io/name: developer-hub
+    helm.sh/chart: upstream-2.6.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: backstage
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: http-backend
+      port: 7007
+      targetPort: backend
+      protocol: TCP
+      nodePort: null
+    - name: http-metrics
+      port: 9464
+      targetPort: 9464  
+  selector:
+    app.kubernetes.io/name: developer-hub
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/component: backstage
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/templates/backstage-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-developer-hub
+  namespace: "backstage"
+  labels: 
+    app.kubernetes.io/name: developer-hub
+    helm.sh/chart: upstream-2.6.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: backstage
+  annotations:
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: developer-hub
+      app.kubernetes.io/instance: release-name
+      app.kubernetes.io/component: backstage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: developer-hub
+        helm.sh/chart: upstream-2.6.0
+        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: backstage
+      annotations:
+        checksum/app-config: eb430deab350178bc2741535116d8e0ffc6f41b2d5206d2ce730e98933d70c8d
+        checksum/dynamic-plugins: '3f15786f04019f733df7c95cb790fa8d9f5759d37e5dcaccca1140fdf926a1b8'
+    spec:
+      serviceAccountName: default
+      volumes:
+        - ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 5Gi
+          name: dynamic-plugins-root
+        - configMap:
+            defaultMode: 420
+            name: 'release-name-dynamic-plugins'
+            optional: true
+          name: dynamic-plugins
+        - name: dynamic-plugins-npmrc
+          secret:
+            defaultMode: 420
+            optional: true
+            secretName: 'release-name-dynamic-plugins-npmrc'
+        - name: dynamic-plugins-registry-auth
+          secret:
+            defaultMode: 416
+            optional: true
+            secretName: 'release-name-dynamic-plugins-registry-auth'
+        - emptyDir: {}
+          name: npmcacache
+        - emptyDir: {}
+          name: temp
+        - name: backstage-app-config
+          configMap:
+            name: release-name-developer-hub-app-config
+      imagePullSecrets:
+        - name: redhat-gpte-devhub-pull-secret
+      initContainers:
+        - command:
+          - ./install-dynamic-plugins.sh
+          - /dynamic-plugins-root
+          env:
+          - name: NPM_CONFIG_USERCONFIG
+            value: /opt/app-root/src/.npmrc.dynamic-plugins
+          - name: MAX_ENTRY_SIZE
+            value: "30000000"
+          image: 'quay.io/rhdh/rhdh-hub-rhel9:1.7-154'
+          imagePullPolicy: Always
+          name: install-dynamic-plugins
+          resources:
+            limits:
+              cpu: 1000m
+              ephemeral-storage: 5Gi
+              memory: 2.5Gi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+          - mountPath: /dynamic-plugins-root
+            name: dynamic-plugins-root
+          - mountPath: /opt/app-root/src/dynamic-plugins.yaml
+            name: dynamic-plugins
+            readOnly: true
+            subPath: dynamic-plugins.yaml
+          - mountPath: /opt/app-root/src/.npmrc.dynamic-plugins
+            name: dynamic-plugins-npmrc
+            readOnly: true
+            subPath: .npmrc
+          - mountPath: /opt/app-root/src/.config/containers
+            name: dynamic-plugins-registry-auth
+            readOnly: true
+          - mountPath: /opt/app-root/src/.npm/_cacache
+            name: npmcacache
+          - mountPath: /tmp
+            name: temp
+          workingDir: /opt/app-root/src
+      containers:
+        - name: backstage-backend
+          image: quay.io/rhdh/rhdh-hub-rhel9:1.7-154
+          imagePullPolicy: "Always"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          args:
+            - "--config"
+            - "dynamic-plugins-root/app-config.dynamic-plugins.yaml"
+            - "--config"
+            - "/opt/app-root/src/app-config-from-configmap.yaml"
+          resources:
+            limits:
+              cpu: 1000m
+              ephemeral-storage: 5Gi
+              memory: 2.5Gi
+            requests:
+              cpu: 250m
+              memory: 1Gi
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /.backstage/health/v1/readiness
+              port: backend
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 2
+            timeoutSeconds: 4
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /.backstage/health/v1/liveness
+              port: backend
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 4
+          startupProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /.backstage/health/v1/liveness
+              port: backend
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 4
+          env:
+            - name: APP_CONFIG_backend_listen_port
+              value: "7007"
+            - name: POSTGRES_HOST
+              value: release-name-postgresql
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: bn_backstage
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: release-name-postgresql
+                  key: password
+            - name: NODE_OPTIONS
+              value: --no-node-snapshot
+            - name: BACKEND_SECRET
+              value: 'dFNwV09QOFFVa241cWhFT2JERDltSFY5'
+            - name: POSTGRES_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-password
+                  name: backstage-postgresql
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "0"
+            - name: KEYCLOAK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: CLIENT_ID
+                  name: keycloak-client-secret-backstage
+            - name: KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: CLIENT_SECRET
+                  name: keycloak-client-secret-backstage
+            - name: LOG_LEVEL
+              value: debug
+          ports:
+            - name: backend
+              containerPort: 7007
+              protocol: TCP
+          volumeMounts:
+            - name: backstage-app-config
+              mountPath: "/opt/app-root/src/app-config-from-configmap.yaml"
+              subPath: app-config.yaml
+            - mountPath: /opt/app-root/src/dynamic-plugins-root
+              name: dynamic-plugins-root
+            - mountPath: /tmp
+              name: temp
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/charts/postgresql/templates/primary/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: release-name-postgresql
+  namespace: "backstage"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 15.4.0
+    helm.sh/chart: postgresql-12.10.0
+    app.kubernetes.io/component: primary
+spec:
+  replicas: 1
+  serviceName: release-name-postgresql-hl
+  updateStrategy:
+    rollingUpdate: {}
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: release-name
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/component: primary
+  template:
+    metadata:
+      name: release-name-postgresql
+      labels:
+        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: postgresql
+        app.kubernetes.io/version: 15.4.0
+        helm.sh/chart: postgresql-12.10.0
+        app.kubernetes.io/component: primary
+    spec:
+      serviceAccountName: default
+      
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: release-name
+                    app.kubernetes.io/name: postgresql
+                    app.kubernetes.io/component: primary
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      hostNetwork: false
+      hostIPC: false
+      containers:
+        - name: postgresql
+          image: registry.redhat.io/rhel9/postgresql-15@sha256:4d707fc04f13c271b455f7b56c1fda9e232a62214ffc6213c02e41177dd4a13f
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/var/lib/pgsql/data"
+            - name: PGDATA
+              value: "/var/lib/pgsql/data/userdata"
+            # Authentication
+            - name: POSTGRES_USER
+              value: "bn_backstage"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: release-name-postgresql
+                  key: password
+            - name: POSTGRES_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: release-name-postgresql
+                  key: postgres-password
+            - name: POSTGRES_DATABASE
+              value: "postgres"
+            # Replication
+            # Initdb
+            # Standby
+            # LDAP
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+            # TLS
+            - name: POSTGRESQL_ENABLE_TLS
+              value: "no"
+            # Audit
+            - name: POSTGRESQL_LOG_HOSTNAME
+              value: "false"
+            - name: POSTGRESQL_LOG_CONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_LOG_DISCONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+              value: "off"
+            # Others
+            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+              value: "error"
+            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+              value: "pgaudit"
+            - name: POSTGRESQL_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-password
+                  name: 'release-name-postgresql'
+          ports:
+            - name: tcp-postgresql
+              containerPort: 5432
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "bn_backstage" -d "dbname=postgres" -h 127.0.0.1 -p 5432
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  exec pg_isready -U "bn_backstage" -d "dbname=postgres" -h 127.0.0.1 -p 5432
+          resources:
+            limits:
+              cpu: 250m
+              ephemeral-storage: 20Mi
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            - name: data
+              mountPath: /var/lib/pgsql/data
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/sonataflows.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: release-name-create-sonataflow-database
+  namespace: backstage
+spec:
+  activeDeadlineSeconds: 120
+  template:
+    spec:
+      initContainers:
+        - name: wait-for-db
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          image: "registry.redhat.io/rhel9/postgresql-15@sha256:4d707fc04f13c271b455f7b56c1fda9e232a62214ffc6213c02e41177dd4a13f"
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
+          command:
+            - bash
+            - -c
+            - |
+              dbHost="release-name-postgresql"
+              dbPort="5432"
+              until timeout 2 bash -c ">/dev/tcp/$dbHost/$dbPort"; do
+                echo 'Waiting for DB...'
+                sleep 2
+              done
+              echo 'Connection made!'
+      containers:
+      - name: psql
+        image: "registry.redhat.io/rhel9/postgresql-15@sha256:4d707fc04f13c271b455f7b56c1fda9e232a62214ffc6213c02e41177dd4a13f"
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: release-name-postgresql-svcbind-postgres
+              key: password
+        command: [ "sh", "-c" ]
+        args:
+          - "psql -h release-name-postgresql -p 5432 -U postgres -c 'CREATE DATABASE sonataflow;' || echo WARNING: Could not create database"
+      restartPolicy: Never
+  backoffLimit: 2
+---
+# Source: rhdh-helm/templates/secret-keycloak-client.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: copy-keycloak-secret-1
+  namespace: backstage
+  labels:
+    app: release-name
+    app.kubernetes.io/name: rhdh-helm
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  template:
+    spec:
+      serviceAccountName: keycloak-secret-copier
+      restartPolicy: Never
+      containers:
+      - name: secret-copier
+        image: registry.redhat.io/ubi8/ubi-minimal:latest
+        command:
+        - /bin/bash
+        - -c
+        - |
+          # Install oc client
+          curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz | tar xz
+          chmod +x oc
+          
+          # Wait for the Keycloak client secret to be created by RHSSO operator
+          echo "Waiting for keycloak-client-secret-backstage to be created in rhsso-operator namespace..."
+          TIMEOUT=300  # 5 minutes timeout
+          COUNTER=0
+          
+          while [ $COUNTER -lt $TIMEOUT ]; do
+            if ./oc get secret keycloak-client-secret-backstage -n rhsso-operator >/dev/null 2>&1; then
+              echo "Secret found! Proceeding with copy..."
+              break
+            else
+              echo "Secret not found yet. Waiting... ($COUNTER/$TIMEOUT seconds)"
+              sleep 10
+              COUNTER=$((COUNTER + 10))
+            fi
+          done
+          
+          if [ $COUNTER -ge $TIMEOUT ]; then
+            echo "ERROR: Timeout waiting for keycloak-client-secret-backstage secret in rhsso-operator namespace"
+            exit 1
+          fi
+          
+          # Copy secret from rhsso-operator namespace to backstage namespace
+          echo "Copying secret from rhsso-operator to backstage namespace..."
+          ./oc get secret keycloak-client-secret-backstage -n rhsso-operator -o yaml | \
+          sed 's/namespace: rhsso-operator/namespace: backstage/' | \
+          sed '/resourceVersion:/d' | \
+          sed '/uid:/d' | \
+          sed '/creationTimestamp:/d' | \
+          sed '/ownerReferences:/,+10d' | \
+          ./oc apply -f -
+          
+          echo "Secret successfully copied to backstage namespace!"
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/tests/test-secret.yaml
+# RHDHBUGS-1893: test-only option to inject a user-provided dynamic plugins npmrc secret.
+# Doing it this way because the secret name is dynamic and depends on the release name.
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/route.yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: release-name-developer-hub
+  namespace: "backstage"
+  labels:
+    app.kubernetes.io/name: developer-hub
+    helm.sh/chart: redhat-developer-hub-1.7.1
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "1.7.1"
+    app.kubernetes.io/component: backstage
+spec:
+  host: backstage-backstage.apps.rosa.np-hub.8rzd.p3.openshiftapps.com
+  path: /
+  port:
+    targetPort: http-backend
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: release-name-developer-hub
+    weight: 100
+  wildcardPolicy: None
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/sonataflows.yaml
+apiVersion: sonataflow.org/v1alpha08
+kind: SonataFlowPlatform
+metadata:
+  name: sonataflow-platform
+  namespace: backstage
+spec:
+  monitoring:
+    enabled: true
+  build:
+    template:
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 250m
+        limits:
+          memory: 1Gi
+          cpu: 500m
+  services:
+    dataIndex:
+      enabled: true
+      persistence:
+        postgresql:
+          secretRef:
+            name: release-name-postgresql-svcbind-postgres
+            userKey: username
+            passwordKey: password
+          serviceRef:
+            name: release-name-postgresql
+            namespace: backstage
+            databaseName: sonataflow
+    jobService:
+      enabled: true
+      persistence:
+        postgresql:
+          secretRef:
+            name: release-name-postgresql-svcbind-postgres
+            userKey: username
+            passwordKey: password
+          serviceRef:
+            name: release-name-postgresql
+            namespace: backstage
+            databaseName: sonataflow
+---
+# Source: rhdh-helm/charts/redhat-developer-hub/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "release-name-developer-hub-test-connection"
+  labels:
+    app.kubernetes.io/name: developer-hub
+    helm.sh/chart: redhat-developer-hub-1.7.1
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "1.7.1"
+    app.kubernetes.io/component: backstage
+  annotations:
+    helm.sh/hook: test
+spec:
+  containers:
+    - name: curl
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
+      resources:
+        requests:
+          cpu: 10m
+          memory: 20Mi
+        limits:
+          cpu: 10m
+          memory: 20Mi
+      livenessProbe:
+        exec:
+          command:
+          - ls
+          - /usr/bin/curl
+      image: "quay.io/curl/curl:latest"
+      imagePullPolicy: Always
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          curl --connect-timeout 5 --max-time 20 --retry 20 --retry-delay 10 --retry-max-time 60 --retry-all-errors release-name-developer-hub:7007
+  restartPolicy: Never
