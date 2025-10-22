@@ -167,21 +167,21 @@ metadata:
   namespace: "backstage"
   labels:
     app.kubernetes.io/name: developer-hub
-    helm.sh/chart: redhat-developer-hub-1.7.1
+    helm.sh/chart: redhat-developer-hub-9.7.3
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "1.7.1"
+    app.kubernetes.io/version: "9.7.3"
     app.kubernetes.io/component: backstage
   annotations:
 type: Opaque
 data:
-  backend-secret: "QVZHRE11VThHYlhzWVRtSjZSdzd4Mkpm"
+  backend-secret: "NE5DV2hzV05YRjdyV0RnTEZoRFh1blAx"
 ---
 # Source: rhdh-helm/templates/backstage-dynamic-plugins-npmrc.yaml
 kind: Secret
 apiVersion: v1
 metadata:
-  name: cluster-config-rhdh-helm-backstage-dynamic-plugins-npmrc
+  name: cluster-config-rhdh-helm-dynamic-plugins-npmrc
 stringData:
   .npmrc: |
     @redhat:registry=https://npm.registry.redhat.com
@@ -190,7 +190,7 @@ type: Opaque
 # Source: rhdh-helm/templates/backstage-postgresq-secret.yaml
 apiVersion: v1
 data:
-  postgres-password: cGFzc3dvcmQK
+  postgres-password: TWpjMk5EazIK
 kind: Secret
 metadata:
   annotations:
@@ -216,12 +216,10 @@ data:
     auth:
       environment: production
       providers:
+        oauth2Proxy: {}
         oidc:
           production:
-            clientId: backstage
-            clientSecret: ${KEYCLOAK_CLIENT_SECRET}
             metadataUrl: https://keycloak-rhsso-operator.apps.rosa.np-hub.8rzd.p3.openshiftapps.com/auth/realms/backstage/.well-known/openid_configuration
-            prompt: auto
       session:
         secret:
           $env: BACKEND_SECRET
@@ -457,8 +455,8 @@ metadata:
     argocd.argoproj.io/sync-wave: "-1"
 rules:
 - apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get", "create", "update", "patch"]
+  resources: ["secrets", "namespaces"]
+  verbs: ["get", "list", "create", "update", "patch"]
 ---
 # Source: rhdh-helm/templates/secret-keycloak-client.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -596,7 +594,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: backstage
       annotations:
-        checksum/app-config: eb430deab350178bc2741535116d8e0ffc6f41b2d5206d2ce730e98933d70c8d
+        checksum/app-config: 29843312756fde33a21e1e6696a890933ae65a3fa1718bbf64a635271ac6e638
         checksum/dynamic-plugins: '3f15786f04019f733df7c95cb790fa8d9f5759d37e5dcaccca1140fdf926a1b8'
     spec:
       serviceAccountName: default
@@ -753,7 +751,7 @@ spec:
             - name: NODE_OPTIONS
               value: --no-node-snapshot
             - name: BACKEND_SECRET
-              value: 'dFNwV09QOFFVa241cWhFT2JERDltSFY5'
+              value: 'dGZtY0RacjB5NjNrRU9GOHUwMjZsdlRO'
             - name: POSTGRES_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -785,6 +783,37 @@ spec:
               name: dynamic-plugins-root
             - mountPath: /tmp
               name: temp
+        - args:
+          - --provider=oidc
+          - --email-domain=*
+          - --upstream=http://localhost:7007
+          - --http-address=0.0.0.0:4180
+          - --skip-provider-button
+          - --insecure-oidc-allow-unverified-email=true
+          env:
+          - name: OAUTH2_PROXY_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                key: CLIENT_ID
+                name: keycloak-client-secret-backstage
+          - name: OAUTH2_PROXY_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: CLIENT_SECRET
+                name: keycloak-client-secret-backstage
+          - name: OAUTH2_PROXY_COOKIE_SECRET
+            value: 'eHRiamhuc3N5eWpuZHF3YWNweW5ieHplbmdxZHp1eGk='
+          - name: OAUTH2_PROXY_OIDC_ISSUER_URL
+            value: holder
+          - name: OAUTH2_PROXY_SSL_INSECURE_SKIP_VERIFY
+            value: "true"
+          image: quay.io/oauth2-proxy/oauth2-proxy:latest
+          imagePullPolicy: IfNotPresent
+          name: oauth2-proxy
+          ports:
+          - containerPort: 4180
+            name: oauth2-proxy
+            protocol: TCP
 ---
 # Source: rhdh-helm/charts/redhat-developer-hub/charts/upstream/charts/postgresql/templates/primary/statefulset.yaml
 apiVersion: apps/v1
@@ -1031,7 +1060,7 @@ metadata:
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/managed-by: Helm
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   template:
     spec:
@@ -1039,14 +1068,11 @@ spec:
       restartPolicy: Never
       containers:
       - name: secret-copier
-        image: registry.redhat.io/ubi8/ubi-minimal:latest
+        image: registry.redhat.io/openshift4/ose-cli:latest
         command:
         - /bin/bash
         - -c
         - |
-          # Install oc client
-          curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz | tar xz
-          chmod +x oc
           
           # Wait for the Keycloak client secret to be created by RHSSO operator
           echo "Waiting for keycloak-client-secret-backstage to be created in rhsso-operator namespace..."
@@ -1054,7 +1080,7 @@ spec:
           COUNTER=0
           
           while [ $COUNTER -lt $TIMEOUT ]; do
-            if ./oc get secret keycloak-client-secret-backstage -n rhsso-operator >/dev/null 2>&1; then
+            if oc get secret keycloak-client-secret-backstage -n rhsso-operator >/dev/null 2>&1; then
               echo "Secret found! Proceeding with copy..."
               break
             else
@@ -1071,13 +1097,13 @@ spec:
           
           # Copy secret from rhsso-operator namespace to backstage namespace
           echo "Copying secret from rhsso-operator to backstage namespace..."
-          ./oc get secret keycloak-client-secret-backstage -n rhsso-operator -o yaml | \
+          oc get secret keycloak-client-secret-backstage -n rhsso-operator -o yaml | \
           sed 's/namespace: rhsso-operator/namespace: backstage/' | \
           sed '/resourceVersion:/d' | \
           sed '/uid:/d' | \
           sed '/creationTimestamp:/d' | \
           sed '/ownerReferences:/,+10d' | \
-          ./oc apply -f -
+          oc apply -f -
           
           echo "Secret successfully copied to backstage namespace!"
 ---
@@ -1093,10 +1119,10 @@ metadata:
   namespace: "backstage"
   labels:
     app.kubernetes.io/name: developer-hub
-    helm.sh/chart: redhat-developer-hub-1.7.1
+    helm.sh/chart: redhat-developer-hub-9.7.3
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "1.7.1"
+    app.kubernetes.io/version: "9.7.3"
     app.kubernetes.io/component: backstage
 spec:
   host: backstage-backstage.apps.rosa.np-hub.8rzd.p3.openshiftapps.com
@@ -1118,6 +1144,9 @@ kind: SonataFlowPlatform
 metadata:
   name: sonataflow-platform
   namespace: backstage
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
 spec:
   monitoring:
     enabled: true
@@ -1163,10 +1192,10 @@ metadata:
   name: "release-name-developer-hub-test-connection"
   labels:
     app.kubernetes.io/name: developer-hub
-    helm.sh/chart: redhat-developer-hub-1.7.1
+    helm.sh/chart: redhat-developer-hub-9.7.3
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "1.7.1"
+    app.kubernetes.io/version: "9.7.3"
     app.kubernetes.io/component: backstage
   annotations:
     helm.sh/hook: test

@@ -155,7 +155,7 @@ redhat-developer-hub:
             - name: OAUTH2_PROXY_COOKIE_SECRET
               value: "{{ randAlpha 32 | lower | b64enc }}"
             - name: OAUTH2_PROXY_OIDC_ISSUER_URL
-              value: https://keycloak-rhsso.apps.cluster-str8b.dynamic.redhatworkshops.io/auth/realms/backstage
+              value: holder
             - name: OAUTH2_PROXY_SSL_INSECURE_SKIP_VERIFY
               value: 'true'
           ports:
