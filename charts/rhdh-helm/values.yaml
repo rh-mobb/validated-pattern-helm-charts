@@ -297,14 +297,14 @@ redhat-developer-hub:
                 clientId: ${KEYCLOAK_CLIENT_ID}
                 clientSecret: ${KEYCLOAK_CLIENT_SECRET}
   
-        # argocd:
-        #   appLocatorMethods:
-        #     - type: 'config'
-        #       instances:
-        #         - name: main
-        #           url: {{ .Values.argocd.serverUrl }}
-        #           username: admin
-        #           password: Mjc2NDk2
+        argocd:
+          appLocatorMethods:
+            - type: 'config'
+              instances:
+                - name: main
+                  url: holder
+                  username: admin
+                  password: Mjc2NDk2
   
         kubernetes:
           serviceLocatorMethod:

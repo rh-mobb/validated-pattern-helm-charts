@@ -36,6 +36,9 @@ kind: KnativeEventing
 metadata:
   name: knative-eventing
   namespace: knative-eventing
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
 spec:
   Registry:
 {{- end }}
@@ -48,6 +51,9 @@ kind: KnativeServing
 metadata:
   name: knative-serving
   namespace: knative-serving
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
 spec:
   controller-custom-certs:
     name: ""
