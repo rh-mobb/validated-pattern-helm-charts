@@ -9,6 +9,9 @@ kind: SonataFlowPlatform
 metadata:
   name: sonataflow-platform
   namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
 spec:
   monitoring:
     enabled: {{ .Values.orchestrator.sonataflowPlatform.monitoring.enabled }}

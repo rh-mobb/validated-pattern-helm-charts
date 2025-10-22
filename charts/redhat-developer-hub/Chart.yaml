@@ -18,7 +18,7 @@ annotations:
   charts.openshift.io/supportedOpenShiftVersions: '>=4.14'
   charts.openshift.io/testedOpenShiftVersion: N/A
 apiVersion: v2
-appVersion: 1.7.1
+appVersion: 1.7.1.1
 dependencies:
 - name: common
   repository: https://charts.bitnami.com/bitnami
