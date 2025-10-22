@@ -25,6 +25,7 @@ spec:
     directAccessGrantsEnabled: true
     implicitFlowEnabled: false
     publicClient: false
+    standardFlowEnabled: true
     redirectUris:
 {{- range .Values.client.redirectUri }}
       - {{ . | quote }}
