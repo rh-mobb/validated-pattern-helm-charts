@@ -35,6 +35,15 @@ jobs:
           helm repo add backstage https://backstage.github.io/charts
           helm repo add helm-repository https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
           helm repo update
+
+      - name: Update chart dependencies
+        run: |
+          for chart in charts/*/; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              echo "Updating dependencies for $chart"
+              helm dependency update "$chart" || echo "No dependencies or failed to update for $chart"
+            fi
+          done
       
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
