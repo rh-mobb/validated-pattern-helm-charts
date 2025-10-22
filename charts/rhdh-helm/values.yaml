@@ -39,8 +39,8 @@ redhat-developer-hub:
         #   disabled: false
         # - package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab
         #   disabled: false
-        - disabled: false
-          #package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
+        # - disabled: false
+        #   package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
         - package: ./dynamic-plugins/dist/backstage-community-plugin-quay
           disabled: false
         - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic

@@ -175,7 +175,7 @@ metadata:
   annotations:
 type: Opaque
 data:
-  backend-secret: "NE5DV2hzV05YRjdyV0RnTEZoRFh1blAx"
+  backend-secret: "YjhCU2RpZ0lSeTdnWGk0YWFQQjM2WWtY"
 ---
 # Source: rhdh-helm/templates/backstage-dynamic-plugins-npmrc.yaml
 kind: Secret
@@ -374,12 +374,6 @@ data:
                     gridRowStart: 1
                 importName: TektonCI
                 mountPoint: entity.page.ci/cards
-    - disabled: false
-      package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab-backend-dynamic
-    - disabled: false
-      package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab
-    - disabled: false
-      package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
     - disabled: false
       package: ./dynamic-plugins/dist/backstage-community-plugin-quay
     - disabled: false
@@ -595,7 +589,7 @@ spec:
         app.kubernetes.io/component: backstage
       annotations:
         checksum/app-config: 29843312756fde33a21e1e6696a890933ae65a3fa1718bbf64a635271ac6e638
-        checksum/dynamic-plugins: '3f15786f04019f733df7c95cb790fa8d9f5759d37e5dcaccca1140fdf926a1b8'
+        checksum/dynamic-plugins: '2d4b7e5111ec0aecccce2e874404b85557829661ce7ebbd5052b4d6b3a173bc7'
     spec:
       serviceAccountName: default
       volumes:
@@ -751,7 +745,7 @@ spec:
             - name: NODE_OPTIONS
               value: --no-node-snapshot
             - name: BACKEND_SECRET
-              value: 'dGZtY0RacjB5NjNrRU9GOHUwMjZsdlRO'
+              value: 'aEs2bk9ybWxBTENVN1dyUFgyc0dlU2Zh'
             - name: POSTGRES_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -802,7 +796,7 @@ spec:
                 key: CLIENT_SECRET
                 name: keycloak-client-secret-backstage
           - name: OAUTH2_PROXY_COOKIE_SECRET
-            value: 'eHRiamhuc3N5eWpuZHF3YWNweW5ieHplbmdxZHp1eGk='
+            value: 'd2V2dG5lc3BqZmN0ZW5xbHNjcnNjcWlya3NwcXFsY3o='
           - name: OAUTH2_PROXY_OIDC_ISSUER_URL
             value: holder
           - name: OAUTH2_PROXY_SSL_INSECURE_SKIP_VERIFY
