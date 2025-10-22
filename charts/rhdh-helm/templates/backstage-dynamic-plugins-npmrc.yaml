@@ -1,7 +1,7 @@
 kind: Secret
 apiVersion: v1
 metadata:
-  name: cluster-config-rhdh-helm-backstage-dynamic-plugins-npmrc
+  name: cluster-config-rhdh-helm-dynamic-plugins-npmrc
 stringData:
   .npmrc: |
     @redhat:registry=https://npm.registry.redhat.com
