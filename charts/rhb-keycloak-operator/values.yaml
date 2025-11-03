@@ -1,0 +1,30 @@
+namespace: keycloak-operator
+clientSecret: "holding"
+subscription:
+  channel: stable
+  installPlanApproval: Manual
+  name: keycloak-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  # startingCSV: keycloak-operator.v24.0.7-opr.1
+realm:
+  identityProviders:
+    - alias: GitHub
+      providerId: github
+      syncMode: IMPORT
+client:
+  redirectUri:
+  - holder
+
+
+helper-status-checker:
+  enabled: true
+  approver: true
+  checks:
+    - operatorName: keycloak-operator
+      subscriptionName: keycloak-operator
+      namespace:
+        name: keycloak-operator
+      serviceAccount:
+        name: "keycloak-status-checker"
+ 
