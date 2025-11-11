@@ -13,3 +13,12 @@ spec:
   instances: 1
   hostname:
     hostname: keycloak-{{ .Values.namespace }}.{{ .Values.clusterDomain | default "apps.example.com" }}
+  http:
+    httpEnabled: true
+  additionalOptions:
+    - name: proxy-headers
+      value: "forwarded"
+    - name: hostname-strict
+      value: "false"
+    - name: hostname-strict-https
+      value: "false"
