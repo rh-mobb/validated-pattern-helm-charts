@@ -1,4 +1,4 @@
-namespace: keycloak-operator
+namespace: rhbk-operator
 clientSecret: "holder"
 clusterDomain: "holder"
 subscription:
