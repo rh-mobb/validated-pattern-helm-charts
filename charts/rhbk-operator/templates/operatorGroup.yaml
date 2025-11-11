@@ -4,8 +4,8 @@ kind: OperatorGroup
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
-  name: og-{{ .Release.Namespace }}
+  name: "og-{{ .Values.namespace }}"
 spec:
   targetNamespaces:
-    - {{ .Release.Namespace }}
+    - {{ .Values.namespace }}
   upgradeStrategy: Default
