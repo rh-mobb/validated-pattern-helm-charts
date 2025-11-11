@@ -3,7 +3,7 @@ name: rhbk-operator
 description: A Helm chart to deploy Red Hat Build of Keycloak (RHBK) operator for Janus-IDP-Demo on Kubernetes
 type: application
 
-version: 0.1.1
+version: 0.1.2
 appVersion: 26.4.2-opr.1
 dependencies:
   - name: helper-status-checker

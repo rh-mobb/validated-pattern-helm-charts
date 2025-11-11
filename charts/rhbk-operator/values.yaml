@@ -25,7 +25,7 @@ helper-status-checker:
     - operatorName: rhbk-operator
       subscriptionName: rhbk-operator
       namespace:
-        name: keycloak-operator
+        name: rhbk-operator
       serviceAccount:
         name: "keycloak-status-checker"
  
