@@ -1,13 +1,13 @@
 namespace: keycloak-operator
-clientSecret: "holding"
+clientSecret: "holder"
 clusterDomain: "holder"
 subscription:
   channel: stable
   installPlanApproval: Manual
-  name: keycloak-operator
+  name: rhbk-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  # startingCSV: keycloak-operator.v24.0.7-opr.1
+  startingCSV: "holder"
 realm:
   identityProviders:
     - alias: GitHub
@@ -22,8 +22,8 @@ helper-status-checker:
   enabled: true
   approver: true
   checks:
-    - operatorName: keycloak-operator
-      subscriptionName: keycloak-operator
+    - operatorName: rhbk-operator
+      subscriptionName: rhbk-operator
       namespace:
         name: keycloak-operator
       serviceAccount:

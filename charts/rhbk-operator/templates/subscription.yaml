@@ -3,7 +3,7 @@ kind: Subscription
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-  name: rhsso-operator
+  name: {{ $.Values.subscription.name }}
 spec:
   channel: {{ $.Values.subscription.channel }}
   installPlanApproval: {{ $.Values.subscription.installPlanApproval }}
