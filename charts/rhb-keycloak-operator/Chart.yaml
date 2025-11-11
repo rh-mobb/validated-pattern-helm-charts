@@ -3,7 +3,7 @@ name: rhb-keycloak-operator
 description: A Helm chart to deploy Red Hat Build of Keycloak operator for Janus-IDP-Demo on Kubernetes
 type: application
 
-version: 0.1.0
+version: 0.1.1
 appVersion: 1.0.0
 dependencies:
   - name: helper-status-checker
