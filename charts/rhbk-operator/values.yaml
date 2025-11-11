@@ -2,7 +2,7 @@ namespace: rhbk-operator
 clientSecret: "holder"
 clusterDomain: "holder"
 subscription:
-  channel: stable
+  channel: stable-v26.4
   installPlanApproval: Manual
   name: rhbk-operator
   source: redhat-operators
