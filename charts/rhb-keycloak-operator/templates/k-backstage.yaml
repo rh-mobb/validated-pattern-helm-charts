@@ -1,15 +1,17 @@
-apiVersion: keycloak.org/v1alpha1
+apiVersion: k8s.keycloak.org/v2alpha1
 kind: Keycloak
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
-    app: rhsso-backstage
-    app.kubernetes.io/instance: rhsso-backstage
-    app.kubernetes.io/name: rhsso-backstage
-  name: rhsso-backstage
+    app: keycloak-backstage
+    app.kubernetes.io/instance: keycloak-backstage
+    app.kubernetes.io/name: keycloak-backstage
+  name: keycloak-backstage
 spec:
-  externalAccess:
-    enabled: true
   instances: 1
+  hostname:
+    hostname: keycloak-{{ .Values.namespace }}.{{ .Values.clusterDomain | default "apps.example.com" }}
+  http:
+    tlsSecret: keycloak-tls-secret

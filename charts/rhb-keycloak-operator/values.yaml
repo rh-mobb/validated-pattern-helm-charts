@@ -1,5 +1,6 @@
 namespace: keycloak-operator
 clientSecret: "holding"
+clusterDomain: "holder"
 subscription:
   channel: stable
   installPlanApproval: Manual

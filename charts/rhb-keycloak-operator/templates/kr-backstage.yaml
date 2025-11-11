@@ -1,5 +1,5 @@
-apiVersion: keycloak.org/v1alpha1
-kind: KeycloakRealm
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: KeycloakRealmImport
 metadata:
   name: backstage
   labels:
@@ -11,22 +11,36 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  instanceSelector:
-    matchLabels:
-      app: rhsso-backstage
-      app.kubernetes.io/instance: rhsso-backstage
-      app.kubernetes.io/name: rhsso-backstage
+  keycloakCRName: keycloak-backstage
   realm:
+    realm: backstage
     displayName: Backstage Authentication Realm
     enabled: true
-    id: backstage
-    realm: backstage
     identityProviders:
-      - alias: GitHub
+      - alias: github
         providerId: github
-        config: 
+        config:
           clientId: <path:{{ .Values.clientSecret }}#clientId>
           clientSecret: <path:{{ .Values.clientSecret }}#clientSecret>
-          defaultScopes: user:email read:user
+          defaultScope: "user:email read:user"
+    clients:
+      - clientId: backstage
+        name: backstage
+        description: Backstage OIDC Client
+        enabled: true
+        clientAuthenticatorType: client-secret
+        standardFlowEnabled: true
+        directAccessGrantsEnabled: true
+        implicitFlowEnabled: false
+        publicClient: false
+        protocol: openid-connect
+        defaultClientScopes:
+          - profile
+          - email
+          - roles
+        redirectUris:
+{{- range .Values.client.redirectUri }}
+          - {{ . | quote }}
+{{- end }}
 
 
