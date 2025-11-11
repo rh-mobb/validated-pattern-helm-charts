@@ -3,13 +3,14 @@ kind: KeycloakRealmImport
 metadata:
   name: backstage
   labels:
-    app: rhsso-backstage
-    app.kubernetes.io/instance: rhsso-backstage
-    app.kubernetes.io/name: rhsso-backstage
+    app: keycloak-backstage
+    app.kubernetes.io/instance: keycloak-backstage
+    app.kubernetes.io/name: keycloak-backstage
   annotations:
     avp.kubernetes.io/path: "{{ .Values.clientSecret }}"
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    kubectl.kubernetes.io/restartedAt: "{{ now | date "2006-01-02T15:04:05Z" }}"
 spec:
   keycloakCRName: keycloak-backstage
   realm:
