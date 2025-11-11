@@ -13,5 +13,3 @@ spec:
   instances: 1
   hostname:
     hostname: keycloak-{{ .Values.namespace }}.{{ .Values.clusterDomain | default "apps.example.com" }}
-  http:
-    tlsSecret: keycloak-tls-secret
