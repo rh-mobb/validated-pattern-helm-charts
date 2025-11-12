@@ -15,6 +15,16 @@ spec:
     hostname: keycloak-{{ .Values.namespace }}.{{ .Values.clusterDomain | default "apps.example.com" }}
   http:
     httpEnabled: true
+  db:
+    vendor: postgres
+    host: postgresql
+    database: keycloak
+    usernameSecret:
+      name: keycloak-db-secret
+      key: username
+    passwordSecret:
+      name: keycloak-db-secret
+      key: password
   additionalOptions:
     - name: proxy-headers
       value: "forwarded"
