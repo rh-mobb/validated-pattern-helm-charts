@@ -18,7 +18,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: ""  # Use default storage class
+  storageClassName: gp3-csi-kms  # Use default storage class
   resources:
     requests:
       storage: 5Gi
