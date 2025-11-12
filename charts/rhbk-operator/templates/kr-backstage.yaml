@@ -11,6 +11,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     kubectl.kubernetes.io/restartedAt: "{{ now | date "2006-01-02T15:04:05Z" }}"
+    keycloak.org/force-import: "true"
 spec:
   keycloakCRName: keycloak-backstage
   realm:
