@@ -3,5 +3,5 @@ kind: Location
 metadata:
   name: rhdh-platform-resources
 spec:
-  type: url
-  target: ./resources/**/*.yaml
+  targets: []
+  # No resources defined yet - placeholder for future resource entities

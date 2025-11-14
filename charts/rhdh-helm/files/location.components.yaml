@@ -3,5 +3,5 @@ kind: Location
 metadata:
   name: rhdh-platform-components
 spec:
-  type: url
-  target: ./components/**/*.yaml
+  targets: []
+  # No components defined yet - placeholder for future component entities

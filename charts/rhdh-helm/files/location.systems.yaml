@@ -3,5 +3,5 @@ kind: Location
 metadata:
   name: rhdh-platform-systems
 spec:
-  type: url
-  target: ./systems/**/*.yaml
+  targets: []
+  # No systems defined yet - placeholder for future system entities

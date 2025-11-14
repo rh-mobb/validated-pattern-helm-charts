@@ -3,5 +3,5 @@ kind: Location
 metadata:
   name: rhdh-platform-apis
 spec:
-  type: url
-  target: ./apis/**/*.yaml
+  targets: []
+  # No APIs defined yet - placeholder for future API entities

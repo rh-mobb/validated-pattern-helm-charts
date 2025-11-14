@@ -3,5 +3,5 @@ kind: Location
 metadata:
   name: rhdh-platform-domains
 spec:
-  type: url
-  target: ./domains/**/*.yaml
+  targets: []
+  # No domains defined yet - placeholder for future domain entities
