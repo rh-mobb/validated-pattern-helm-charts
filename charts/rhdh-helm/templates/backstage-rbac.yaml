@@ -23,7 +23,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-3"
 rules:
 # Kubernetes core resources
 - apiGroups: [""]
@@ -107,26 +107,15 @@ spec:
         - -c
         - |
           echo "Generating service account token..."
+          sleep 2
           
-          # Wait for service account to be ready
-          TIMEOUT=300
-          COUNTER=0
-          
-          while [ $COUNTER -lt $TIMEOUT ]; do
-            if oc get sa backstage-k8s-sa -n {{ .Release.Namespace }} >/dev/null 2>&1; then
-              echo "Service account found! Generating token..."
-              break
-            else
-              echo "Waiting for service account... ($COUNTER/$TIMEOUT seconds)"
-              sleep 10
-              COUNTER=$((COUNTER + 10))
-            fi
-          done
-          
-          if [ $COUNTER -ge $TIMEOUT ]; then
-            echo "ERROR: Timeout waiting for service account"
+          # Verify service account exists
+          if ! oc get sa backstage-k8s-sa -n {{ .Release.Namespace }} >/dev/null 2>&1; then
+            echo "ERROR: Service account backstage-k8s-sa not found"
             exit 1
           fi
+          
+          echo "Service account found! Generating token..."
           
           # Generate token with long duration (11 years)
           TOKEN=$(oc create token backstage-k8s-sa --duration=99999h -n {{ .Release.Namespace }})
