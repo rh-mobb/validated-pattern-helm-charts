@@ -45,15 +45,12 @@ spec:
 {{- range .Values.client.redirectUri }}
           - {{ . | quote }}
 {{- end }}
-    roles:
-      realm:
-        - name: admin
-          description: Administrator role for realm management
     users:
       - username: service-account-backstage
         enabled: true
         serviceAccountClientId: backstage
-        realmRoles:
-          - admin
+        clientRoles:
+          realm-management:
+            - realm-admin
 
 
