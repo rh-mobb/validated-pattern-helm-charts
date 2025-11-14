@@ -92,8 +92,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-    argocd.argoproj.io/sync-wave: "-2"
-    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   template:
     spec:
@@ -107,13 +106,23 @@ spec:
         - -c
         - |
           echo "Generating service account token..."
-          sleep 2
+          echo "Waiting for service account to be available..."
           
-          # Verify service account exists
-          if ! oc get sa backstage-k8s-sa -n {{ .Release.Namespace }} >/dev/null 2>&1; then
-            echo "ERROR: Service account backstage-k8s-sa not found"
-            exit 1
-          fi
+          # Wait up to 60 seconds for service account to exist
+          for i in {1..12}; do
+            if oc get sa backstage-k8s-sa -n {{ .Release.Namespace }} >/dev/null 2>&1; then
+              echo "Service account found after $((i*5)) seconds!"
+              break
+            fi
+            echo "Attempt $i: Service account not found, waiting 5 seconds..."
+            sleep 5
+            if [ $i -eq 12 ]; then
+              echo "ERROR: Service account backstage-k8s-sa not found after 60 seconds"
+              echo "Available service accounts in {{ .Release.Namespace }}:"
+              oc get sa -n {{ .Release.Namespace }}
+              exit 1
+            fi
+          done
           
           echo "Service account found! Generating token..."
           
