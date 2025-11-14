@@ -57,9 +57,9 @@ redhat-developer-hub:
           package: ./dynamic-plugins/dist/backstage-community-plugin-catalog-backend-module-keycloak-dynamic
         # - disabled: false
         #   package: ./dynamic-plugins/dist/backstage-plugin-auth-backend-module-oidc-provider-dynamic
-        - disabled: false
+        - disabled: true
           package: ./dynamic-plugins/dist/backstage-community-plugin-ocm
-        - disabled: false
+        - disabled: true
           package: ./dynamic-plugins/dist/backstage-community-plugin-ocm-backend-dynamic
         - disabled: false
           package: ./dynamic-plugins/dist/backstage-community-plugin-tech-radar
@@ -254,16 +254,16 @@ redhat-developer-hub:
             #       frequency: { seconds: 10 }
             #       # supports ISO duration, "human duration" as used in code
             #       timeout: { seconds: 60 }
-            ocm:
-              default:
-                name: multiclusterhub
-                kubernetesPluginRef: dev-cluster-infra
-                schedule: # optional; same options as in TaskScheduleDefinition
-                  # supports cron, ISO duration, "human duration" as used in code
-                  frequency: { seconds: 10 }
-                  # supports ISO duration, "human duration" as used in code
-                  timeout: { seconds: 60 }
-                owner: group:rhdh
+            # ocm:
+            #   default:
+            #     name: multiclusterhub
+            #     kubernetesPluginRef: dev-cluster-infra
+            #     schedule: # optional; same options as in TaskScheduleDefinition
+            #       # supports cron, ISO duration, "human duration" as used in code
+            #       frequency: { seconds: 10 }
+            #       # supports ISO duration, "human duration" as used in code
+            #       timeout: { seconds: 60 }
+            #     owner: group:rhdh
             keycloakOrg:
               default:
                 baseUrl: holder
