@@ -57,9 +57,9 @@ redhat-developer-hub:
           package: ./dynamic-plugins/dist/backstage-community-plugin-catalog-backend-module-keycloak-dynamic
         # - disabled: false
         #   package: ./dynamic-plugins/dist/backstage-plugin-auth-backend-module-oidc-provider-dynamic
-        - disabled: true
+        - disabled: false
           package: ./dynamic-plugins/dist/backstage-community-plugin-ocm
-        - disabled: true
+        - disabled: false
           package: ./dynamic-plugins/dist/backstage-community-plugin-ocm-backend-dynamic
         - disabled: false
           package: ./dynamic-plugins/dist/backstage-community-plugin-tech-radar
