@@ -19,13 +19,15 @@ redhat-developer-hub:
             dynamicPlugins:
               frontend:
                 backstage-community.plugin-redhat-argocd:
-                  mountPoints:
-                    - mountPoint: nav.page.argocd
+                  appIcons:
+                    - name: argocdIcon
+                      importName: ArgocdIcon
+                  dynamicRoutes:
+                    - path: /argocd
                       importName: ArgocdPage
-                      config:
-                        path: /argocd
-                        title: ArgoCD
-                        icon: extension
+                      menuItem:
+                        icon: argocdIcon
+                        text: ArgoCD
         - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
           disabled: false
         - package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
