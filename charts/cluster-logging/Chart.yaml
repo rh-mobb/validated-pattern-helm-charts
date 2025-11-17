@@ -1,5 +1,5 @@
 name: cluster-logging
-version: 0.5.10
+version: 0.5.11
 apiVersion: v2
 dependencies:
   - name: helper-operator

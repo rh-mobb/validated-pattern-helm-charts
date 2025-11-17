@@ -19,7 +19,7 @@ helper-operator:
         name: openshift-logging
         create: false
       subscription:
-        channel: stable-6.2
+        channel: stable-6.4
         approval: Manual
         operatorName: cluster-logging
         source: redhat-operators

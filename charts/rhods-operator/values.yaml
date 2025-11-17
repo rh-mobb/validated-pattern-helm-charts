@@ -20,7 +20,7 @@ helper-operator:
       subscription:
         # -- Channel of the Subscription
         # @default -- stable
-        channel: stable
+        channel: fast-3.x
         # -- Update behavior of the Operator. Manual/Automatic
         # @default -- Automatic
         approval: Manual
@@ -94,18 +94,39 @@ openshiftAI:
     name: default-dsc
     spec:
       components:
-        codeflare:
+        # AI Pipelines (replaces datasciencepipelines in v3.0)
+        aipipelines:
           managementState: Managed
+        # Dashboard
         dashboard:
           managementState: Managed
-        datasciencepipelines:
-          managementState: Managed
+        # KServe with optional NIM support
         kserve:
           managementState: Managed
-        modelmeshserving:
+          # Uncomment to enable NVIDIA Inference Microservices
+          # nim:
+          #   managementState: Managed
+        # Model Registry (new in v3.0)
+        modelregistry:
           managementState: Managed
+          registriesNamespace: rhoai-model-registries
+        # Ray
         ray:
           managementState: Managed
+        # Training Operator (new in v3.0)
+        trainingoperator:
+          managementState: Managed
+        # TrustyAI (new in v3.0)
+        trustyai:
+          managementState: Managed
+        # Workbenches
         workbenches:
           managementState: Managed
+        # Removed components (set to Removed for v3.0 compatibility)
+        feastoperator:
+          managementState: Removed
+        kueue:
+          managementState: Removed
+        llamastackoperator:
+          managementState: Removed
 

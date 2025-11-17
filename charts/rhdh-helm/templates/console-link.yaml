@@ -1,0 +1,15 @@
+{{- if .Values.consoleLink.enabled }}
+apiVersion: console.openshift.io/v1
+kind: ConsoleLink
+metadata:
+  name: {{ include "rhdh-helm.fullname" . }}-console-link
+  labels:
+    {{- include "rhdh-helm.labels" . | nindent 4 }}
+spec:
+  href: {{ .Values.consoleLink.url | quote }}
+  location: ApplicationMenu
+  text: {{ .Values.consoleLink.text | default "Red Hat Developer Hub" | quote }}
+  applicationMenu:
+    section: {{ .Values.consoleLink.section | default "Developer Tools" | quote }}
+    imageURL: {{ .Values.consoleLink.imageURL | default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIwIDQwQzMxLjA0NTcgNDAgNDAgMzEuMDQ1NyA0MCAyMEM0MCA4Ljk1NDMgMzEuMDQ1NyAwIDIwIDBDOC45NTQzIDAgMCA4Ljk1NDMgMCAyMEMwIDMxLjA0NTcgOC45NTQzIDQwIDIwIDQwWiIgZmlsbD0iIzAwNzNFNiIvPgo8cGF0aCBkPSJNMjAgMzJDMjYuNjI3NCAzMiAzMiAyNi42Mjc0IDMyIDIwQzMyIDEzLjM3MjYgMjYuNjI3NCA4IDIwIDhDMTMuMzcyNiA4IDggMTMuMzcyNiA4IDIwQzggMjYuNjI3NCAxMy4zNzI2IDMyIDIwIDMyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+" | quote }}
+{{- end }}
