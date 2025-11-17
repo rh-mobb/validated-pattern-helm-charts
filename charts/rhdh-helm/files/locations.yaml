@@ -9,3 +9,4 @@ spec:
     - ./location.resources.yaml
     - ./location.components.yaml
     - ./location.apis.yaml
+    - ./location.examples.yaml

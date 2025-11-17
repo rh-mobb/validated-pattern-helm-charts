@@ -1,0 +1,30 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: example-app
+  description: Example component showing ArgoCD integration
+  annotations:
+    # ArgoCD integration - matches ArgoCD Applications with this label
+    argocd/app-selector: 'rht-gitops.com/janus-argocd=example-app'
+    # Kubernetes integration
+    backstage.io/kubernetes-id: example-app
+    backstage.io/kubernetes-namespace: default
+  tags:
+    - example
+    - argocd
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:rhdh
+  system: example-system
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: example-system
+  description: Example system for demonstration
+  tags:
+    - example
+spec:
+  owner: group:rhdh
+

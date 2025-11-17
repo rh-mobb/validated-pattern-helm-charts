@@ -15,41 +15,27 @@ redhat-developer-hub:
       plugins:
         - disabled: false
           package: ./dynamic-plugins/dist/backstage-community-plugin-redhat-argocd
-          pluginConfig:
-            dynamicPlugins:
-              frontend:
-                # Use the exact plugin ID (backstage-community.plugin-redhat-argocd)
-                backstage-community.plugin-redhat-argocd:
-                  # Define the icons that the plugin provides and that will be used in the menu
-                  appIcons:
-                    - name: argocdIcon
-                      importName: ArgocdIcon
-                  mountPoints:
-                    - mountPoint: entity.page.overview/cards
-                      importName: EntityArgoCDOverviewCard
-                    - mountPoint: entity.page.cd/cards
-                      importName: EntityArgoCDHistoryCard      
-                  # Define the routes (pages) the plugin adds
-                  dynamicRoutes:
-                    - path: /argocd
-                      importName: ArgocdPage
-                      menuItem:
-                        icon: argocdIcon
-                        text: ArgoCD
-                  
-                  # Define the extension points (e.g., tabs to add to the Service Catalog)
-                  # This section is necessary to see the ArgoCD tab on component pages.
-                  routeExtensions:
-                    - type: entity.page.details
-                      importName: ArgocdOverview
-                      contents:
-                        - path: /argocd-tab
-                          importName: EntityArgoCDContent
-                          title: ArgoCD
-                          # Optional: Add a title that appears in the dropdown menu if using tabs
-                          menuItem:
-                            icon: argocdIcon
-                            text: ArgoCD
+          # pluginConfig:
+          #   dynamicPlugins:
+          #     frontend:
+          #       # Use the exact plugin ID (backstage-community.plugin-redhat-argocd)
+          #       backstage-community.plugin-redhat-argocd:
+          #         # Define the icons that the plugin provides and that will be used in the menu
+          #         appIcons:
+          #           - name: argocdIcon
+          #             importName: ArgocdIcon
+          #         mountPoints:
+          #           - mountPoint: entity.page.overview/cards
+          #             importName: EntityArgoCDOverviewCard
+          #           - mountPoint: entity.page.cd/cards
+          #             importName: EntityArgoCDHistoryCard      
+          #         # Define the routes (pages) the plugin adds
+          #         dynamicRoutes:
+          #           - path: /argocd
+          #             importName: ArgocdPage
+          #             menuItem:
+          #               icon: argocdIcon
+          #               text: ArgoCD
         - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
           disabled: false
         - package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic

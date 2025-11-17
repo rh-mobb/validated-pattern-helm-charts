@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: example-components
+  description: Example components demonstrating ArgoCD and Kubernetes integration
+spec:
+  type: url
+  targets:
+    - https://raw.githubusercontent.com/rosa-hcp-dedicated-vpc/helm-repository/main/charts/rhdh-helm/files/example-component.yaml
+
