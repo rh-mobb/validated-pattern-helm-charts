@@ -27,9 +27,8 @@ redhat-developer-hub:
                   mountPoints:
                     - mountPoint: entity.page.overview/cards
                       importName: EntityArgoCDOverviewCard
-                      config:
-                        layout:
-                        gridColumn: "1 / -1"      
+                    - mountPoint: entity.page.cd/cards
+                      importName: EntityArgoCDHistoryCard      
                   # Define the routes (pages) the plugin adds
                   dynamicRoutes:
                     - path: /argocd
