@@ -2,9 +2,11 @@
 apiVersion: console.openshift.io/v1
 kind: ConsoleLink
 metadata:
-  name: {{ include "rhbk-operator.fullname" . }}-console-link
+  name: rhbk-console-link
   labels:
-    {{- include "rhbk-operator.labels" . | nindent 4 }}
+    app.kubernetes.io/name: rhbk-operator
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   href: {{ .Values.consoleLink.url | quote }}
   location: ApplicationMenu

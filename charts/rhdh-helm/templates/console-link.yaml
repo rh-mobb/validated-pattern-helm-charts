@@ -2,9 +2,11 @@
 apiVersion: console.openshift.io/v1
 kind: ConsoleLink
 metadata:
-  name: {{ include "rhdh-helm.fullname" . }}-console-link
+  name: rhdh-console-link
   labels:
-    {{- include "rhdh-helm.labels" . | nindent 4 }}
+    app.kubernetes.io/name: rhdh-helm
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   href: {{ .Values.consoleLink.url | quote }}
   location: ApplicationMenu
