@@ -2,7 +2,7 @@ apiVersion: v2
 name: authorino-operator
 description: Helm chart for deploying Red Hat Authorino Operator
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "1.2.3"
 dependencies:
   - name: helper-status-checker

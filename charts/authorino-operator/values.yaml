@@ -11,7 +11,7 @@ subscription:
   startingCSV: authorino-operator.v1.2.3
 
 # ArgoCD sync wave
-syncwave: "1"
+syncwave: "0"
 
 # Helper status checker dependency
 helper-status-checker:
