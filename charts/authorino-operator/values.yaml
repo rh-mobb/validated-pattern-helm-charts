@@ -1,0 +1,26 @@
+# Authorino Operator Configuration
+
+# Operator subscription settings
+subscription:
+  name: authorino-operator
+  namespace: openshift-operators
+  channel: stable
+  installPlanApproval: Automatic
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: authorino-operator.v1.2.3
+
+# ArgoCD sync wave
+syncwave: "1"
+
+# Helper status checker dependency
+helper-status-checker:
+  enabled: true
+  approver: true
+  checks:
+    - operatorName: authorino-operator
+      subscriptionName: authorino-operator
+      namespace:
+        name: openshift-operators
+      serviceAccount:
+        name: "authorino-install-check"
