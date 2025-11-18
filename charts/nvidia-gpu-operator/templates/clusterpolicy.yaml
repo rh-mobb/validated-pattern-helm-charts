@@ -39,6 +39,12 @@ spec:
     certConfig:
       name: ""
     enabled: {{ .Values.clusterPolicy.driver.enabled }}
+    {{- if .Values.clusterPolicy.driver.repository }}
+    repository: {{ .Values.clusterPolicy.driver.repository }}
+    {{- end }}
+    {{- if .Values.clusterPolicy.driver.image }}
+    image: {{ .Values.clusterPolicy.driver.image }}
+    {{- end }}
     {{- if hasKey .Values.clusterPolicy.driver "useOpenKernelModules" }}
     useOpenKernelModules: {{ .Values.clusterPolicy.driver.useOpenKernelModules }}
     {{- end }}
