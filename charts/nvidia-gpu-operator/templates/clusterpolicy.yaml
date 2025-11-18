@@ -98,7 +98,9 @@ spec:
     defaultRuntime: {{ .Values.clusterPolicy.operator.defaultRuntime }}
     initContainer: {}
     runtimeClass: nvidia
-    use_ocp_driver_toolkit: true
+    {{- if hasKey .Values.clusterPolicy.operator "use_ocp_driver_toolkit" }}
+    use_ocp_driver_toolkit: {{ .Values.clusterPolicy.operator.use_ocp_driver_toolkit }}
+    {{- end }}
   # Sandbox Device Plugin
   sandboxDevicePlugin:
     enabled: true
