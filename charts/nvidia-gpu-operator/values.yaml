@@ -25,9 +25,9 @@ clusterPolicy:
   driver:
     enabled: true
     # Use Red Hat's certified driver images (pre-built for RHEL, no entitlements needed)
+    # Note: Not specifying version - let operator choose from Red Hat registry
     repository: registry.redhat.io/nvidia
     image: driver
-    version: "550.127.05"
     imagePullSecrets:
       - redhat-pull-secret
     useOpenKernelModules: false
