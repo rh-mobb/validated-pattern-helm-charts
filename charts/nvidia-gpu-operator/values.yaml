@@ -27,7 +27,7 @@ clusterPolicy:
     # Use Red Hat's certified driver images (pre-built for RHEL, no entitlements needed)
     repository: registry.redhat.io/nvidia
     image: driver
-    # Let GPU Operator choose the version automatically
+    version: "550.127.05"
     useOpenKernelModules: false
   # NVIDIA Container Toolkit - REQUIRED
   toolkit:
