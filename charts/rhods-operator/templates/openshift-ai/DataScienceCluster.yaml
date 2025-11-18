@@ -10,9 +10,6 @@ metadata:
   namespace: {{ .Values.openshiftAI.namespace.name | default "redhat-ods-operator" }}
 spec:
   components:
-    # AI Pipelines (replaces datasciencepipelines in v3.0)
-    aipipelines:
-      managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.aipipelines.managementState | default "Managed" }}
     # Dashboard
     dashboard:
       managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.dashboard.managementState | default "Managed" }}

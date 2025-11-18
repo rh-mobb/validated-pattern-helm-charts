@@ -94,9 +94,6 @@ openshiftAI:
     name: default-dsc
     spec:
       components:
-        # AI Pipelines (replaces datasciencepipelines in v3.0)
-        aipipelines:
-          managementState: Managed
         # Dashboard
         dashboard:
           managementState: Managed
