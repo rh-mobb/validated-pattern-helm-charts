@@ -22,8 +22,11 @@ clusterPolicy:
   # NVIDIA Driver - REQUIRED
   driver:
     enabled: true
-    # Use Driver Toolkit (DTK) for ROSA HCP - builds drivers without RHEL entitlements
-    # DTK uses OpenShift's driver-toolkit image to compile drivers
+    # Use pre-built driver container for ROSA HCP
+    # This avoids compilation and RHEL entitlement requirements
+    repository: nvcr.io/nvidia
+    image: driver
+    version: "550.127.05"
     useOpenKernelModules: false
   # NVIDIA Container Toolkit - REQUIRED
   toolkit:
