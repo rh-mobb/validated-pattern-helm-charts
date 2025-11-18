@@ -28,6 +28,8 @@ clusterPolicy:
     repository: registry.redhat.io/nvidia
     image: driver
     version: "550.127.05"
+    imagePullSecrets:
+      - redhat-pull-secret
     useOpenKernelModules: false
   # NVIDIA Container Toolkit - REQUIRED
   toolkit:
