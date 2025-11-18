@@ -22,11 +22,8 @@ clusterPolicy:
   # NVIDIA Driver - REQUIRED
   driver:
     enabled: true
-    # Use pre-built driver container for ROSA HCP
-    # This avoids compilation and RHEL entitlement requirements
-    repository: nvcr.io/nvidia
-    image: driver
-    version: "550.127.05"
+    # Let GPU Operator choose the driver version automatically
+    # Don't specify version - let it pick a compatible one
     useOpenKernelModules: false
   # NVIDIA Container Toolkit - REQUIRED
   toolkit:
