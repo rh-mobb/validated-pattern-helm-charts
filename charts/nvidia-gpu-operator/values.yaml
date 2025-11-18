@@ -19,18 +19,9 @@ clusterPolicy:
   # Operator configuration (NFD managed separately)
   operator:
     defaultRuntime: crio
-    # Disable DTK - use pre-built drivers instead (avoids RHEL entitlement requirement)
-    use_ocp_driver_toolkit: false
   # NVIDIA Driver - REQUIRED
   driver:
     enabled: true
-    # Use Red Hat's certified driver images (pre-built for RHEL, no entitlements needed)
-    # Note: Not specifying version - let operator choose from Red Hat registry
-    repository: registry.redhat.io/nvidia
-    image: driver
-    imagePullSecrets:
-      - redhat-pull-secret
-    useOpenKernelModules: false
   # NVIDIA Container Toolkit - REQUIRED
   toolkit:
     enabled: true
