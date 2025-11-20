@@ -74,3 +74,13 @@ application-gitops:
   domain: <domain>
   argocd:
     initialRepositories:
+aws-privateca-issuer:
+  enabled: false
+  certManagerRole: ""
+  awsAcmPcaArn: ""
+  region: ""
+  csv: ""
+  ecr_account: ""
+  helper-installplan-approver:
+    aws_region: ""
+    ecr_account: ""
