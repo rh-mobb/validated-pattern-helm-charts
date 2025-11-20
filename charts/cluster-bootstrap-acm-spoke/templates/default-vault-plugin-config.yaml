@@ -18,7 +18,7 @@ imagePullSecrets:
 metadata:
   annotations:
     helm.sh/hook: post-install
-    eks.amazonaws.com/role-arn: arn:aws:iam::{{ $plugin.aws_account }}:role/{{ .Values.clusterName }}-rosa-cpaas-secretsmanager-role-iam
+    eks.amazonaws.com/role-arn: arn:aws:iam::{{ $.Values.aws_account }}:role/{{ $.Values.clusterName }}-rosa-secretsmanager-role-iam
   name: vplugin
   namespace: openshift-gitops
 ---

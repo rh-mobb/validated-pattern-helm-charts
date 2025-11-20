@@ -4,9 +4,12 @@ helper-installplan-approver:
   namespace: openshift-gitops-operator
 nameOverride: ""
 fullnameOverride: ""
+# Values injected from ManagedCluster labels via ACM
+clusterName: <cluster-name>
+environment: <environment>
 aws_region: <region>
 aws_account: <account-id>
-domain: <domain>
+domainSuffix: "43o8.p3.openshiftapps.com"
 namespaces:
   - name: openshift-gitops
   - name: openshift-gitops-operator
@@ -49,9 +52,10 @@ argocd:
     helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     chart: app-of-apps-infrastructure
     project: cluster-config-project
-    targetRevision: 0.0.4
+    targetRevision: 0.1.8
     gitRepoUrl: https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
     adGroup: PFAUTHAD
+    # gitPathFile will be constructed as: {{ .Values.environment }}/{{ .Values.clusterName }}/infrastructure.yaml
     gitPathFile: /infrastructure.yaml
     repositories:
     - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
@@ -61,9 +65,10 @@ argocd:
     helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     chart: app-of-apps-application
     project: application-ns-project
-    targetRevision: 1.5.1
+    targetRevision: 1.5.4
     gitRepoUrl: https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
     adGroup: PFAUTHAD
+    # gitPathFile will be constructed as: {{ .Values.environment }}/{{ .Values.clusterName }}/applications-ns.yaml
     gitPathFile: /applications-ns.yaml
     repositories:
     - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
@@ -71,16 +76,10 @@ argocd:
 application-gitops:
   name: application-gitops
   gitopsNamespace: application-gitops
-  domain: <domain>
+  # NOTE: The domain value is set dynamically via the ACM Subscription
+  # It should be: {{ .Values.clusterName }}.{{ .Values.domainSuffix }}
+  # But Helm subcharts cannot use parent values directly in values.yaml
+  # So ACM must set: application-gitops.domain via helmValues
+  domain: ""
   argocd:
     initialRepositories:
-aws-privateca-issuer:
-  enabled: false
-  certManagerRole: ""
-  awsAcmPcaArn: ""
-  region: ""
-  csv: ""
-  ecr_account: ""
-  helper-installplan-approver:
-    aws_region: ""
-    ecr_account: ""

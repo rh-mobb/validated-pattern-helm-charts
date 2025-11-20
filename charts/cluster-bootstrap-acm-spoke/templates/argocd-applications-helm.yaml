@@ -37,7 +37,7 @@ spec:
           path: /charts
           helm:
             valueFiles:
-            - $values/{{ $.Values.gitPath }}/{{ $applications.gitPathFile }}
+            - $values/{{ $.Values.environment }}/{{ $.Values.clusterName }}/{{ $applications.gitPathFile }}
             values: |
               appTeam: {{ $applications.name }}
         - repoURL: {{ $applications.gitRepoUrl }}

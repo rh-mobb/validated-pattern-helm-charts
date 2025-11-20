@@ -6,7 +6,7 @@ metadata:
   name: gitops-cluster-console-link
   namespace: openshift-gitops
 spec:
-  href: 'https://cluster-gitops-server-openshift-gitops.apps.rosa.{{ .Values.domain }}'
+  href: 'https://cluster-gitops-server-openshift-gitops.apps.rosa.{{ .Values.clusterName }}.{{ .Values.domainSuffix }}'
   location: ApplicationMenu
   text: "Cluster Argo CD"
   applicationMenu:
