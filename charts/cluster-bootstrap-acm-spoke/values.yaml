@@ -56,7 +56,7 @@ argocd:
     gitRepoUrl: https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
     adGroup: PFAUTHAD
     # gitPathFile will be constructed as: {{ .Values.environment }}/{{ .Values.clusterName }}/infrastructure.yaml
-    gitPathFile: /infrastructure.yaml
+    gitPathFile: infrastructure.yaml
     repositories:
     - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
     - https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
@@ -69,7 +69,7 @@ argocd:
     gitRepoUrl: https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
     adGroup: PFAUTHAD
     # gitPathFile will be constructed as: {{ .Values.environment }}/{{ .Values.clusterName }}/applications-ns.yaml
-    gitPathFile: /applications-ns.yaml
+    gitPathFile: applications-ns.yaml
     repositories:
     - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
     - https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
