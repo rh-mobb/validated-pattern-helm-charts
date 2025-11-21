@@ -1,0 +1,21 @@
+{{ range $applications := .Values.applications }}
+{{ if $applications.gitopsCreate }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team
+  annotations:
+    # ACM hub annotations.
+    apps.open-cluster-management.io/ocm-managed-cluster: '{{name}}'
+    apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
+    argocd.argoproj.io/skip-reconcile: "true"
+  {{- if $applications.annotations }}
+    {{- toYaml $applications.annotations | trimPrefix "|" | indent 2 }}
+  {{ end }}
+  labels:
+    {{- if $applications.labels }}
+      {{- toYaml $applications.labels | trimPrefix "|" | indent 2 }}
+    {{ end }}
+  {{- end }}
+{{- end }}

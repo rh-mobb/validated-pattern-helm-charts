@@ -1,0 +1,40 @@
+# #################################################################
+# # teamName used for argocd applicaiton names and namespace names.
+# #################################################################
+# teamName: cpaas-d1
+# #################################################################
+# # default Values for app-of-apps-infrastructure helm chart
+# #################################################################
+# defaults:
+#   # argcod application defaults
+#   finalizers: resources-finalizer.argocd.argoproj.io
+#   gitopsNamespace: openshift-gitops
+#   # Helm defaults
+#   helmRepoUrl: https://pages.github.service.anz/ics/cpaas-helm-charts
+#   path: charts
+#   # namespaces chart defaults
+#   namespaceChart: namespaces
+#   namespaceChartRevision: 1.0.3
+#   # Vault plugin defaults.
+#   plugin: true
+#   AWS_REGION: "ap-southeast-2"
+#   AVP_TYPE: "awssecretsmanager"
+# #################################################################
+# # NAMESPACE CREATION and APPLICATION deployments within.
+# #################################################################
+# namespaces: {}
+# #################################################################
+# # INFRASTRUCTURE Charts to be deployed.
+# #################################################################
+# infrastructure:
+#   - chart: cluster-efs
+#     targetRevision: 0.0.7
+#     namespace: openshift-cluster-csi-drivers
+#     values:
+#       roleArn: arn:aws:iam::730335292448:role/cpaas-tf1002-rosa-efs-csi-role-iam
+#       fileSystemId: fs-00374a7e3e1ae66a7
+#   - chart: test-app
+#     targetRevision: 1.0.8
+#     namespace: openshift-cluster-csi-drivers
+#     values:
+#       secret: <path:user#cpaas-tf1002-secret-1>

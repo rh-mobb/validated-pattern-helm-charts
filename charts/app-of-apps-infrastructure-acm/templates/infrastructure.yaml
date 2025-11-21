@@ -1,0 +1,72 @@
+{{ $teamName := .Values.teamName -}}
+---
+{{ $defaults := .Values.defaults -}}
+---
+{{ range $infra := .Values.infrastructure -}}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ $teamName }}-{{ $infra.chart }}"
+  annotations:
+    # ACM hub annotations.
+    apps.open-cluster-management.io/ocm-managed-cluster: '{{name}}'
+    apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
+    argocd.argoproj.io/skip-reconcile: "true"
+    argocd.argoproj.io/sync-wave: {{ $infra.syncWave | default 0 | quote }}
+  namespace: {{ $defaults.gitopsNamespace }}
+  finalizers:
+    - {{ $defaults.finalizers | default "null" | quote }}
+spec:
+  project: "{{ $teamName }}-project"
+  source:
+    {{- if or (eq $infra.plugin true) (eq $defaults.plugin true) }}
+    plugin:
+      env:
+      - name: AWS_REGION
+        value: {{ $infra.AWS_REGION | default $defaults.AWS_REGION }}
+      - name: AVP_TYPE
+        value: {{ $infra.AVP_TYPE | default $defaults.AVP_TYPE }}
+        {{- if $infra.values }}
+      - name: HELM_VALUES
+        value: |
+          {{ toYaml $infra.values | nindent 10 }}
+        {{- end }}
+    {{ else }}
+    helm:
+      {{- if $infra.values }}
+      values: |
+        {{- toYaml $infra.values | nindent 8 }}
+      {{- end }}
+    {{- end }}
+    repoURL: {{ $infra.helmRepoUrl | default $defaults.helmRepoUrl }}
+    targetRevision: '{{ $infra.targetRevision }}'
+    path: {{ $infra.path | default $defaults.path }}
+    chart: {{ $infra.chart }}
+  destination:
+    server: https://kubernetes.default.svc
+    {{- if $infra.namespace}}
+    namespace: {{ $infra.namespace }}
+    {{- end }}
+  syncPolicy:
+    automated:
+      prune: false
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - Validate=false  
+    - CreateNamespace=false
+    - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  ignoreDifferences:
+    - group: serving.kserve.io
+      kind: InferenceService
+      jsonPointers:
+      - /status
+---
+{{ end }}
+---

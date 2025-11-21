@@ -1,0 +1,128 @@
+{{ $apmnum := .Values.apmnum -}}
+{{ $appserviceNumber := .Values.appserviceNumber -}}
+{{ $ecrUpdateRole := .Values.ecrUpdateRole -}}
+{{ $defaults := .Values.defaults -}}
+{{ $defaultsAnnotations := $defaults.annotations -}}
+{{ $defaultsLabels := $defaults.labels -}}
+{{ $defaultsGroupname := $defaults.groupname -}}
+{{ $defaultsResourceQuota := $defaults.resourceQuota -}}
+{{ $defaultsServiceAccount := $defaults.serviceAccount -}}
+{{ range $ns := .Values.namespaces -}}
+{{ $nsAnnotations := $ns.annotations -}}
+{{ $nsLabels := $ns.labels -}}
+{{ $nsGroupname := $ns.groupname -}}
+{{ $nsResourceQuota := $ns.resourceQuota -}}
+{{ $nsServiceAccount := $ns.serviceAccount -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ $apmnum }}-{{ $appserviceNumber }}-{{ $ns.name }}"
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $ns.syncWave | default 0 | quote }}
+  namespace: "openshift-gitops"
+  finalizers:
+    - {{ $defaults.finalizers | default "null" | quote }}
+spec:
+  project: "default"
+  source:
+    {{- if or (eq $ns.plugin true) (eq $defaults.plugin true) }}
+    plugin:
+      env:
+      - name: AWS_REGION
+        value: {{ $ns.AWS_REGION | default $defaults.AWS_REGION }}
+      - name: AVP_TYPE
+        value: {{ $ns.AVP_TYPE | default $defaults.AVP_TYPE }}
+      - name: HELM_VALUES
+        value: |
+          project:
+          name: "{{ $ns.name }}"
+          apmnum: "{{ $apmnum }}"
+          appserviceNumber: "{{ $appserviceNumber }}"
+            ecrUpdateRole: {{ $ns.ecrUpdateRole | default $defaults.ecrUpdateRole }}
+            annotations:
+              comments: {{ $nsAnnotations.comments | default $defaultsAnnotations.comments }}
+              description: {{ $nsAnnotations.description | default $defaultsAnnotations.description }}
+              display_name: {{ $nsAnnotations.display_name | default $defaultsAnnotations.display_name }}
+            labels:
+              domain: {{ $nsLabels.domain | default $defaultsLabels.domain }}
+              egressip: {{ $nsLabels.egressip | default $defaultsLabels.egressip }}
+              ingress: {{ $nsLabels.ingress | default $defaultsLabels.ingress }}
+              primary_owner: {{ $nsLabels.primary_owner | default $defaultsLabels.primary_owner }}
+              zone: {{ $nsLabels.zone | default $defaultsLabels.zone }}
+          groupname:
+            admin_group: {{ $nsGroupname.admin_group | default $defaultsGroupname.admin_group }}  
+          resourceQuota:
+            limits_cpu: {{ $nsResourceQuota.limits_cpu | default $defaultsResourceQuota.limits_cpu }}
+            limits_memory: {{ $nsResourceQuota.limits_memory | default $defaultsResourceQuota.limits_memory }}
+            requests_cpu: {{ $nsResourceQuota.requests_cpu | default $defaultsResourceQuota.requests_cpu }}
+            requests_memory: {{ $nsResourceQuota.requests_memory | default $defaultsResourceQuota.requests_memory }}
+            persistentvolumeclaims: {{ $nsResourceQuota.persistentvolumeclaims | default $defaultsResourceQuota.persistentvolumeclaims }}
+            limits_ephemeral_storage: {{ $nsResourceQuota.limits_ephemeral_storage | default $defaultsResourceQuota.limits_ephemeral_storage }}
+            pods: {{ $nsResourceQuota.pods | default $defaultsResourceQuota.pods }}
+          serviceAccount:
+            create: {{ $nsServiceAccount.create | default $defaultsServiceAccount.create }}
+            automount: {{ $nsServiceAccount.automount | default $defaultsServiceAccount.automount }}
+            annotations: {{ $nsServiceAccount.annotations | default $defaultsServiceAccount.annotations }}
+            name: {{ $nsServiceAccount.name | default $defaultsServiceAccount.name }}
+    {{ else }}
+    helm:
+      values: |
+        project:
+          name: "{{ $ns.name }}"
+          apmnum: "{{ $apmnum }}"
+          appserviceNumber: "{{ $appserviceNumber }}"
+          ecrUpdateRole: {{ $ns.ecrUpdateRole | default $defaults.ecrUpdateRole }}
+          annotations:
+            comments: {{ $nsAnnotations.comments | default $defaultsAnnotations.comments }}
+            description: {{ $nsAnnotations.description | default $defaultsAnnotations.description }}
+            display_name: {{ $nsAnnotations.display_name | default $defaultsAnnotations.display_name }}
+          labels:
+            domain: {{ $nsLabels.domain | default $defaultsLabels.domain }}
+            egressip: {{ $nsLabels.egressip | default $defaultsLabels.egressip }}
+            ingress: {{ $nsLabels.ingress | default $defaultsLabels.ingress }}
+            primary_owner: {{ $nsLabels.primary_owner | default $defaultsLabels.primary_owner }}
+            zone: {{ $nsLabels.zone | default $defaultsLabels.zone }}
+            apm-number: {{ $apmnum }}
+        groupname:
+          admin_group: {{ $nsGroupname.admin_group | default $defaultsGroupname.admin_group }}  
+          edit_group: {{ $nsGroupname.edit_group | default $defaultsGroupname.edit_group }} 
+          view_group: {{ $nsGroupname.view_group | default $defaultsGroupname.view_group }} 
+        resourceQuota:
+          limits_cpu: {{ $nsResourceQuota.limits_cpu | default $defaultsResourceQuota.limits_cpu }}
+          limits_memory: {{ $nsResourceQuota.limits_memory | default $defaultsResourceQuota.limits_memory }}
+          requests_cpu: {{ $nsResourceQuota.requests_cpu | default $defaultsResourceQuota.requests_cpu }}
+          requests_memory: {{ $nsResourceQuota.requests_memory | default $defaultsResourceQuota.requests_memory }}
+          persistentvolumeclaims: {{ $nsResourceQuota.persistentvolumeclaims | default $defaultsResourceQuota.persistentvolumeclaims }}
+          limits_ephemeral_storage: {{ $nsResourceQuota.limits_ephemeral_storage | default $defaultsResourceQuota.limits_ephemeral_storage }}
+          pods: {{ $nsResourceQuota.pods | default $defaultsResourceQuota.pods }}
+        serviceAccount:
+          create: {{ $nsServiceAccount.create | default $defaultsServiceAccount.create }}
+          automount: {{ $nsServiceAccount.automount | default $defaultsServiceAccount.automount }}
+          annotations: {{ $nsServiceAccount.annotations | default $defaultsServiceAccount.annotations }}
+          name: {{ $nsServiceAccount.name | default $defaultsServiceAccount.name }}
+     {{- end }}
+    repoURL: {{ $ns.helmRepoUrl | default $defaults.helmRepoUrl }}
+    targetRevision: {{ $ns.targetRevision | default $defaults.targetRevision }}
+    path: {{ $ns.path | default $defaults.path }}
+    chart: {{ $ns.chart | default $defaults.chart }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "{{ $ns.name }}"
+  syncPolicy:
+    automated:
+      prune: false
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - Validate=false
+    - CreateNamespace=false
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  ignoreDifferences:
+---
+{{ end }}
+---
+

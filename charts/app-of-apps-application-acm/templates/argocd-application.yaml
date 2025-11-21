@@ -1,0 +1,43 @@
+{{ $defaults := .Values.defaults -}}
+---
+{{ range $applications := .Values.applications -}}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-namespaces
+  namespace: openshift-gitops
+  annotations:
+    # ACM hub annotations.
+    apps.open-cluster-management.io/ocm-managed-cluster: '{{name}}'
+    apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
+    argocd.argoproj.io/skip-reconcile: "true"
+    argocd.argoproj.io/sync-wave: {{ $applications.syncWave | default 0 | quote }}
+spec:
+  project: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project
+  project: default
+  sources:
+    - repoURL: {{ $applications.helmRepoUrl | default $defaults.helmRepoUrl }}
+      chart: {{ $applications.chart | default $defaults.chart }}
+      targetRevision: {{ $applications.targetRevision | default $defaults.targetRevision }}
+      path: {{ $applications.path | default $defaults.path }}
+      helm:
+        valueFiles:
+        - $values/{{ $applications.gitPath }}
+        values: |
+          apmnum: {{ $applications.apmnum }}
+          appserviceNumber: {{ $applications.appserviceNumber }}
+    - repoURL: {{ $applications.gitRepoUrl }}
+      targetRevision: HEAD
+      ref: values
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+---
+{{- end }}

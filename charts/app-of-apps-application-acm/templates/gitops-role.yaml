@@ -1,0 +1,43 @@
+{{ range $applications := .Values.applications }}
+{{ if $applications.gitopsCreate }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+  annotations:
+  name: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
+  namespace: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: {{ $applications.appProject.adGroup }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/name: argocd-application-controller
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/component: application-controller
+  name: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
+  namespace: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team
+rules:
+- apiGroups:
+  - argoproj.io
+  resources:
+  - applications
+  verbs:
+  - '*'
+- apiGroups:
+  - argoproj.io
+  resources:
+  - applicationsets
+  verbs:
+  - '*'
+  {{- end }}
+{{- end }}

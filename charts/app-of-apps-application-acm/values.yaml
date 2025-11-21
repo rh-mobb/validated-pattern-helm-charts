@@ -1,0 +1,45 @@
+# #################################################################
+# # teamName used for argocd applicaiton names and namespace names.
+# #################################################################
+# teamName: platform
+# #################################################################
+# # default Values for app-of-apps-infrastructure helm chart
+# #################################################################
+# defaults:
+#   # argcod application defaults
+#   finalizers: resources-finalizer.argocd.argoproj.io
+#   gitopsNamespace: openshift-gitops
+#   # Helm defaults
+#   helmRepoUrl: ttps://rosa-hcp-dedicated-vpc.github.io/helm-repository
+#   path: charts
+#   chart: app-of-apps-namespaces
+#   targetRevision: 0.1.8
+#   # Vault plugin defaults.
+#   plugin: false
+#   AWS_REGION: "ap-southeast-2"
+#   AVP_TYPE: "awssecretsmanager"
+# #################################################################
+# # INFRASTRUCTURE Charts to be deployed.
+# ################################################################# 
+# applications:
+#   - name: payments
+#     appNumber: "1234"
+#     gitopsCreate: true
+#     gitRepoUrl: 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+#     gitPath: nonprod/paul/namespaces/payments-1234.yaml
+#     appProject:
+#       adGroup: PFAUTHAD
+#       repos:
+#       - 'https://rosa-hcp-dedicated-vpc.github.io/helm-repository'
+#       - 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+#   - name: accounting
+#     appNumber: "5678"
+#     gitopsCreate: false
+#     gitRepoUrl: 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+#     gitPath: nonprod/paul/namespaces/accounting-5678.yaml
+#     appProject:
+#       adGroup: PFAUTHAD
+#       repos:
+#       - 'https://rosa-hcp-dedicated-vpc.github.io/helm-repository'
+#       - 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+    
