@@ -312,7 +312,7 @@ redhat-developer-hub:
                   url: holder
                   authProvider: "serviceAccount"
                   skipTLSVerify: true
-                  serviceAccountToken: eyJhbGciOiJSUzI1NiIsImtpZCI6IkUzc2IzTlZ3OUhpSDVfbEExMDdLRHl2TEdaemVOSWh0T0JHLVhUbXFCTzgifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImFkYWZiMDA5LTU5YTMtNGZiMC1hMDVlLTM0MGUwMWYxN2FiMiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.dTK1gr0dO259c3Me5WhogSrJdu2pK_RN-Gb4BIFTklx7ldZuYdC87fDTA-OFQroD51l1bytNy01qs7dS6F0qYBc8q3T5qVTTTdMw_6IhsKLNrq7fr2M5ZjdD5d7EcGurOBIbz4qkKct75UvisfsfXGu6aAUCLriX5AU5F2arLXSBk__D73oXvHoNlei6Ewf3iyvTcdchLklbGsjXGCJc4MmUIeylkFeJ5EAEGS3hKw3-sen6sATavdvDTut-WPY4m2ZrDRfbd0rulPGYyneiMxSMYAhDfwKa7ef4EwHT6kNvJcECuGwbFWto8NNnAm8EmKm4CpDGnKU2FVAJHHGNAVmrtbeTd91k0sVnDv8mcPFXndbt2e2tcbro4Q_MLvAANuaQtNPGLfj8vnywbW09DpE_yUXMvUq2ZNUQft41bJ47xHSRl64_VR346ak7Tr_XIPVdo_l2ZM0zyZ8s61y6xO12xftc34QZFwDuCCcxGev22WOL6fgK6JPL3bGpQxVlWlDcqZ2nKfSpDnKvCB2efoGYjiw64U8n0rdMrMJmjht8n5BQnz-Mcw3Ba-4zqV8iEXa9SsCYWwq7NsshwR9x5bA49pvyO3PlHcWsAJyOm_yICdlTnFNPooGjfTOdgxUTbS2MrD13Uau-EN2RwtiaeWhO-e1XGmh3P2f6ldwU3L0
+                  serviceAccountToken: "${K8S_SERVICE_ACCOUNT_TOKEN}"
           customResources:
             - group: 'tekton.dev'
               apiVersion: 'v1beta1'
