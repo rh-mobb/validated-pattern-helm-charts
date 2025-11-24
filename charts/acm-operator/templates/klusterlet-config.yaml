@@ -5,10 +5,11 @@ apiVersion: config.open-cluster-management.io/v1alpha1
 kind: KlusterletConfig
 metadata:
   name: global
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Delete=false
 spec:
   hubKubeAPIServerConfig:
     serverVerificationStrategy: UseSystemTruststore

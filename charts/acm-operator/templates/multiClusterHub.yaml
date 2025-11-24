@@ -3,9 +3,10 @@ kind: MultiClusterHub
 metadata:
   finalizers:
   - finalizer.operator.open-cluster-management.io
+  - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: {{ .Values.syncwave | default 4 | quote }}
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Delete=false
     argocd.argoproj.io/health-check-timeout-seconds: "600"
   name: multiclusterhub
   namespace: open-cluster-management

@@ -3,9 +3,12 @@
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: "{{ $ns.name }}"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: "-10"
-  name: "{{ $ns.name }}"
+    argocd.argoproj.io/sync-options: Delete=false
   {{- if $ns.annotations }}
   annotations:
     {{- toYaml $ns.annotations | trimPrefix "|" | indent 2 }}

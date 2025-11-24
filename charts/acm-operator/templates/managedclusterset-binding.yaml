@@ -6,10 +6,11 @@ kind: ManagedClusterSetBinding
 metadata:
   name: global
   namespace: openshift-gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Delete=false
 spec:
   clusterSet: global
 

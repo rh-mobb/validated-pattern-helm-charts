@@ -37,7 +37,7 @@ requeueAfterSeconds: 10
 # ArgoCD ApplicationSets for spoke cluster management
 argocd:
   applications:
-  - name: cluster-config
+  - name: spoke-cluster-config
     annotations:
     helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     chart: app-of-apps-infrastructure-acm
@@ -50,7 +50,7 @@ argocd:
     repositories:
     - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
     - https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
-  - name: application-ns
+  - name: spoke-application-ns
     annotations:
     helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     chart: app-of-apps-application-acm
