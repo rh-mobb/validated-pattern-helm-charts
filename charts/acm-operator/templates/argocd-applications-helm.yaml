@@ -7,7 +7,8 @@ metadata:
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-wave: "7"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   {{- range $key, $value := $applications.annotations }}
     {{ $key }}: {{ $value | quote }}

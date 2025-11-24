@@ -29,6 +29,9 @@ helper-operator:
 namespaces:
   - name: open-cluster-management
 
+# Sync wave for MultiClusterHub deployment
+syncwave: 4
+
 requeueAfterSeconds: 10
 
 # ArgoCD ApplicationSets for spoke cluster management
