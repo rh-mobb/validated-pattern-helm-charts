@@ -19,7 +19,7 @@ spec:
       labelSelector:
         matchLabels:
           cluster.open-cluster-management.io/placement: all-spoke-clusters
-      requeueAfterSeconds: {{ .Values.argocd.requeueAfterSeconds | default 10 }}
+      requeueAfterSeconds: {{ $.Values.requeueAfterSeconds | default 10 }}
   template:
     metadata:
       name: '{{`{{name}}`}}-{{ $applications.name }}'

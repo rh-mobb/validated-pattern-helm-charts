@@ -29,9 +29,10 @@ helper-operator:
 namespaces:
   - name: open-cluster-management
 
+requeueAfterSeconds: 10
+
 # ArgoCD ApplicationSets for spoke cluster management
 argocd:
-  requeueAfterSeconds: 10
   applications:
   - name: cluster-config
     annotations:
