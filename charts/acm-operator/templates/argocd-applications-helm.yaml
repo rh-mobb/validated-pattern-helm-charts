@@ -6,27 +6,29 @@ metadata:
   name: {{ $applications.name }}-applicationset
   namespace: openshift-gitops
   annotations:
-    # ACM placement
-    apps.open-cluster-management.io/ocm-managed-cluster: '{{`{{name}}`}}'
-    apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
-    argocd.argoproj.io/skip-reconcile: "true"
     argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-wave: '3'
+    argocd.argoproj.io/sync-wave: "5"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   {{- range $key, $value := $applications.annotations }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
 spec:
   generators:
-  - list:
-      elements:
-      - cluster: in-cluster
-        url: https://kubernetes.default.svc
+  - clusterDecisionResource:
+      configMapRef: acm-placement
+      labelSelector:
+        matchLabels:
+          cluster.open-cluster-management.io/placement: all-spoke-clusters
+      requeueAfterSeconds: {{ .Values.argocd.requeueAfterSeconds | default 10 }}
   template:
     metadata:
-      name: {{ $applications.name }}
+      name: '{{`{{name}}`}}-{{ $applications.name }}'
       namespace: openshift-gitops
       annotations:
+        # ACM Pull model annotations - propagate to spoke
+        apps.open-cluster-management.io/ocm-managed-cluster: '{{`{{name}}`}}'
+        apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
+        argocd.argoproj.io/skip-reconcile: "true"
         argocd.argoproj.io/compare-options: IgnoreExtraneous
     spec:
       destination:
@@ -40,7 +42,7 @@ spec:
           path: /charts
           helm:
             valueFiles:
-            - $values/{{ $.Values.environment }}/{{ $.Values.clusterName }}/{{ $applications.gitPathFile }}
+            - $values/{{`{{metadata.labels.environment}}`}}/{{`{{name}}`}}/{{ $applications.gitPathFile }}
             values: |
               appTeam: {{ $applications.name }}
         - repoURL: {{ $applications.gitRepoUrl }}
@@ -55,3 +57,4 @@ spec:
         - CreateNamespace=true
 ---
 {{ end }}
+

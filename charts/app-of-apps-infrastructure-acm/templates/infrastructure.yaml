@@ -7,10 +7,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: "{{ $teamName }}-{{ $infra.chart }}"
+  name: "{{ $defaults.clusterName }}-{{ $teamName }}-{{ $infra.chart }}"
   annotations:
     # ACM hub annotations.
-    apps.open-cluster-management.io/ocm-managed-cluster: '{{name}}'
+    apps.open-cluster-management.io/ocm-managed-cluster: '{{ $defaults.clusterName }}'
     apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
     argocd.argoproj.io/skip-reconcile: "true"
     argocd.argoproj.io/sync-wave: {{ $infra.syncWave | default 0 | quote }}

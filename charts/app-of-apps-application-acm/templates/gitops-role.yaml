@@ -1,3 +1,5 @@
+{{ $defaults := .Values.defaults -}}
+---
 {{ range $applications := .Values.applications }}
 {{ if $applications.gitopsCreate }}
 ---
@@ -6,12 +8,16 @@ kind: RoleBinding
 metadata:
   labels:
   annotations:
-  name: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
-  namespace: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team
+    # ACM hub annotations.
+    apps.open-cluster-management.io/ocm-managed-cluster: '{{ $defaults.clusterName }}'
+    apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
+    argocd.argoproj.io/skip-reconcile: "true"
+  name: {{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
+  namespace: {{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
+  name: {{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
@@ -24,8 +30,8 @@ metadata:
     app.kubernetes.io/name: argocd-application-controller
     app.kubernetes.io/part-of: argocd
     app.kubernetes.io/component: application-controller
-  name: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
-  namespace: {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team
+  name: {{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-admin
+  namespace: {{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team
 rules:
 - apiGroups:
   - argoproj.io

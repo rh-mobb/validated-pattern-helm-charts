@@ -1,0 +1,14 @@
+---
+# ManagedClusterSetBinding - Allows openshift-gitops namespace to access clusters
+# Note: The 'global' ManagedClusterSet already exists in ACM by default
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSetBinding
+metadata:
+  name: global
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  clusterSet: global
+

@@ -1,0 +1,14 @@
+---
+# KlusterletConfig - Required for ROSA HCP certificate trust
+# This allows spoke clusters to trust the hub's API server certificate
+apiVersion: config.open-cluster-management.io/v1alpha1
+kind: KlusterletConfig
+metadata:
+  name: global
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  hubKubeAPIServerConfig:
+    serverVerificationStrategy: UseSystemTruststore
+

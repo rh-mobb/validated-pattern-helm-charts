@@ -16,8 +16,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: "{{ $apmnum }}-{{ $appserviceNumber }}-{{ $ns.name }}"
+  name: "{{ $defaults.clusterName }}-{{ $apmnum }}-{{ $appserviceNumber }}-{{ $ns.name }}"
   annotations:
+    # ACM hub annotations.
+    apps.open-cluster-management.io/ocm-managed-cluster: '{{ $defaults.clusterName }}'
+    apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
+    argocd.argoproj.io/skip-reconcile: "true"
     argocd.argoproj.io/sync-wave: {{ $ns.syncWave | default 0 | quote }}
   namespace: "openshift-gitops"
   finalizers:

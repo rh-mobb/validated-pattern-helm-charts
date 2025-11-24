@@ -1,4 +1,4 @@
 name: app-of-apps-application-acm
 description: Chart to generate argocd apps for each team and gitops set up
-version: 1.5.5
+version: 1.6.2
 apiVersion: v2

@@ -29,6 +29,37 @@ helper-operator:
 namespaces:
   - name: open-cluster-management
 
+# ArgoCD ApplicationSets for spoke cluster management
+argocd:
+  requeueAfterSeconds: 10
+  applications:
+  - name: cluster-config
+    annotations:
+    helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    chart: app-of-apps-infrastructure-acm
+    project: cluster-config-project
+    targetRevision: 0.2.5
+    gitRepoUrl: https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
+    adGroup: PFAUTHAD
+    # gitPathFile will be constructed dynamically as: {{metadata.labels.environment}}/{{name}}/infrastructure.yaml
+    gitPathFile: infrastructure.yaml
+    repositories:
+    - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
+    - https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+  - name: application-ns
+    annotations:
+    helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    chart: app-of-apps-application-acm
+    project: application-ns-project
+    targetRevision: 1.6.2
+    gitRepoUrl: https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
+    adGroup: PFAUTHAD
+    # gitPathFile will be constructed dynamically as: {{metadata.labels.environment}}/{{name}}/applications-ns.yaml
+    gitPathFile: applications-ns.yaml
+    repositories:
+    - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
+    - https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+
 # apiVersion: operators.coreos.com/v1alpha1
 # kind: Subscription
 # metadata:

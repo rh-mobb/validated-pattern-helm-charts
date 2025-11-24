@@ -5,18 +5,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: "{{ $applications.apmnum }}-project"
+  name: "{{ $defaults.clusterName }}-{{ $applications.apmnum }}-project"
   namespace: application-gitops
   annotations:
     # ACM hub annotations.
-    apps.open-cluster-management.io/ocm-managed-cluster: '{{name}}'
+    apps.open-cluster-management.io/ocm-managed-cluster: '{{ $defaults.clusterName }}'
     apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
     argocd.argoproj.io/skip-reconcile: "true"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   sourceNamespaces:
-  - "{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team"
+  - "{{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-team"
   description: "{{ $applications.apmnum }} users project"
   sourceRepos:
   {{ toYaml $applications.appProject.repos | nindent 2 }}
@@ -27,7 +27,7 @@ spec:
   {{ toYaml $applications.appProject.clusterResourceWhitelist | nindent 2 }}
   {{- end }}
   destinations:
-  - namespace: "{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}}*"
+  - namespace: "{{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-*"
     server: 'https://kubernetes.default.svc'
   {{- if $applications.appProject.destinations }}
   {{ toYaml $applications.appProject.destinations | nindent 2 }}
@@ -39,8 +39,8 @@ spec:
   - name: 'all-app-actions'
     description: Application privliges to my-project
     policies:
-    - p, proj:{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project:all-app-actions, applications, *, {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project/*, allow
-    - p, proj:{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project:all-app-actions, applicationssets, *, {{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project/*, allow
+    - p, proj:{{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project:all-app-actions, applications, *, {{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project/*, allow
+    - p, proj:{{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project:all-app-actions, applicationssets, *, {{ $defaults.clusterName }}-{{ $applications.apmnum }}-{{ $applications.appserviceNumber }}-project/*, allow
     groups:
     - {{ $applications.appProject.adGroup }}
     {{- end }}
