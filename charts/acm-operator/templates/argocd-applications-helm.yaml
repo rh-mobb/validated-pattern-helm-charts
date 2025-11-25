@@ -39,6 +39,8 @@ spec:
         apps.open-cluster-management.io/pull-to-ocm-managed-cluster: 'true'
         argocd.argoproj.io/skip-reconcile: "true"
         argocd.argoproj.io/compare-options: IgnoreExtraneous
+      labels:
+        apps.open-cluster-management.io/pull-to-ocm-managed-cluster: "true"
     spec:
       destination:
         namespace: openshift-gitops
