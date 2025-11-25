@@ -10,6 +10,8 @@ environment: <environment>
 aws_region: <region>
 aws_account: <account-id>
 domainSuffix: "43o8.p3.openshiftapps.com"
+# GitOps operator CSV version (set via bootstrap script)
+gitops_csv: ""
 namespaces:
   - name: openshift-gitops
   - name: openshift-gitops-operator
@@ -24,8 +26,6 @@ subscriptions:
       - name: ARGOCD_CLUSTER_CONFIG_NAMESPACES
         value: application-gitops,openshift-gitops
     installPlanApproval: Manual
-    # csv is injected via the helm install in bootstrap.tftpl
-    csv:
     source: redhat-operators
     sourceNamespace: openshift-marketplace
 operatorGroups:

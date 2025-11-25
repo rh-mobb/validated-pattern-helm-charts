@@ -22,7 +22,9 @@ spec:
   installPlanApproval: {{ .installPlanApproval }}
   source: {{ .source }}
   sourceNamespace: {{ .sourceNamespace | default $c.Release.Namespace }}
-  startingCSV: {{ .csv }}
+  {{- if $c.Values.gitops_csv }}
+  startingCSV: {{ $c.Values.gitops_csv }}
+  {{- end }}
 {{ end }}
 ---
 {{ $c := . }}
