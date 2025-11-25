@@ -45,6 +45,7 @@ spec:
   - {{ .targetNamespace }}
   {{- end }}
 {{ end }}
+{{- if .Values.catalogSources }}
 ---
 {{ $c := . }}
 {{ range .Values.catalogSources }}
@@ -65,3 +66,4 @@ spec:
   publisher: {{ .publisher }}
 {{ end }}
 ---
+{{- end }}

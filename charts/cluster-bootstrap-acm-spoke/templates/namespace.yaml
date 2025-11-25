@@ -10,10 +10,10 @@ metadata:
   {{- if $ns.annotations }}
   annotations:
     {{- toYaml $ns.annotations | trimPrefix "|" | indent 2 }}
-  {{ end }}
-  labels:
+  {{- end }}
   {{- if $ns.labels }}
-    {{- toYaml $ns.labels | trimPrefix "|" | indent 2 }}
-  {{ end }}
+  labels:
+    {{- toYaml $ns.labels | trimPrefix "|" | indent 4 }}
+  {{- end }}
 ---
 {{ end -}}
