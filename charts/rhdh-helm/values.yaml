@@ -142,7 +142,10 @@ redhat-developer-hub:
         - name: NODE_OPTIONS
           value: --no-node-snapshot
         - name: BACKEND_SECRET
-          value: "{{ randAlphaNum 24 | b64enc }}"
+          valueFrom:
+            secretKeyRef:
+              name: backstage-backend-secret
+              key: backend-secret
         - name: POSTGRES_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
