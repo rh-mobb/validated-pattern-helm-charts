@@ -11,6 +11,8 @@ metadata:
     argocd.argoproj.io/sync-wave: "10"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
+  clusterSets:
+    - global
   predicates:
     - requiredClusterSelector:
         labelSelector:
@@ -19,4 +21,12 @@ spec:
               operator: In
               values:
                 - spoke
+  decisionStrategy:
+    groupStrategy:
+      clustersPerDecisionGroup: 100
+      decisionGroups:
+        - groupName: "spoke-clusters"
+          groupClusterSelector:
+            labelSelector:
+              matchLabels: {}
 

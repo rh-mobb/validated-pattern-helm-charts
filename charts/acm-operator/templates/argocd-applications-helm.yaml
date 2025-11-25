@@ -5,8 +5,6 @@ kind: ApplicationSet
 metadata:
   name: {{ $applications.name }}-applicationset
   namespace: openshift-gitops
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-wave: "15"
@@ -16,12 +14,20 @@ metadata:
   {{- end }}
 spec:
   generators:
-  - clusterDecisionResource:
-      configMapRef: acm-placement
-      labelSelector:
-        matchLabels:
-          cluster.open-cluster-management.io/placement: all-spoke-clusters
-      requeueAfterSeconds: {{ $.Values.requeueAfterSeconds | default 10 }}
+  - matrix:
+      generators:
+      - clusterDecisionResource:
+          configMapRef: acm-placement
+          labelSelector:
+            matchLabels:
+              cluster.open-cluster-management.io/placement: all-spoke-clusters
+          requeueAfterSeconds: {{ $.Values.requeueAfterSeconds | default 10 }}
+      - clusters:
+          selector:
+            matchLabels:
+              argocd.argoproj.io/secret-type: cluster
+          values:
+            environment: '{{`{{metadata.labels.environment}}`}}'
   template:
     metadata:
       name: '{{`{{name}}`}}-{{ $applications.name }}'
@@ -44,7 +50,7 @@ spec:
           path: /charts
           helm:
             valueFiles:
-            - $values/{{`{{metadata.labels.environment}}`}}/{{`{{name}}`}}/{{ $applications.gitPathFile }}
+            - $values/{{`{{values.environment}}`}}/{{`{{name}}`}}/{{ $applications.gitPathFile }}
             values: |
               appTeam: {{ $applications.name }}
         - repoURL: {{ $applications.gitRepoUrl }}
