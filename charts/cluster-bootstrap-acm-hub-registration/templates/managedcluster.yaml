@@ -1,0 +1,12 @@
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  name: {{ .Values.clusterName }}
+  labels:
+    acm: spoke
+    environment: {{ .Values.environment }}
+    name: {{ .Values.clusterName }}
+spec:
+  hubAcceptsClient: {{ .Values.managedCluster.hubAcceptsClient }}
+  leaseDurationSeconds: {{ .Values.managedCluster.leaseDurationSeconds }}
+

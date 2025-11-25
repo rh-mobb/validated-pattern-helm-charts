@@ -1,0 +1,23 @@
+# Default values for cluster-bootstrap-acm-hub-registration
+# This chart registers a spoke cluster with ACM hub
+
+# Cluster identification
+clusterName: ""
+environment: ""
+
+# ManagedCluster configuration
+managedCluster:
+  hubAcceptsClient: true
+  leaseDurationSeconds: 60
+
+# ManagedClusterAddOn configuration
+applicationManager:
+  enabled: true
+  installNamespace: open-cluster-management-agent-addon
+
+# GitOpsCluster configuration
+gitopsCluster:
+  enabled: true
+  argoNamespace: openshift-gitops
+  placementName: all-spoke-clusters
+

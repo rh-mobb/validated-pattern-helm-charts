@@ -1,0 +1,16 @@
+{{- if .Values.gitopsCluster.enabled }}
+apiVersion: apps.open-cluster-management.io/v1beta1
+kind: GitOpsCluster
+metadata:
+  name: {{ .Values.clusterName }}-gitops
+  namespace: {{ .Values.gitopsCluster.argoNamespace }}
+spec:
+  argoServer:
+    cluster: local-cluster
+    argoNamespace: {{ .Values.gitopsCluster.argoNamespace }}
+  placementRef:
+    kind: Placement
+    apiVersion: cluster.open-cluster-management.io/v1beta1
+    name: {{ .Values.gitopsCluster.placementName }}
+{{- end }}
+
