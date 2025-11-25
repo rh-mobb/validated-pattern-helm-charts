@@ -5,6 +5,8 @@ kind: ApplicationSet
 metadata:
   name: {{ $applications.name }}-applicationset
   namespace: openshift-gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-wave: "15"
@@ -40,7 +42,7 @@ spec:
         argocd.argoproj.io/skip-reconcile: "true"
         argocd.argoproj.io/compare-options: IgnoreExtraneous
       labels:
-        apps.open-cluster-management.io/pull-to-ocm-managed-cluster: "true"
+        apps.open-cluster-management.io/pull-to-ocm-managed-cluster: "true" 
     spec:
       destination:
         namespace: openshift-gitops
