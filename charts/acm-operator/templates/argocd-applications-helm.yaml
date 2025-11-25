@@ -36,6 +36,7 @@ spec:
         # ACM Pull model annotations - propagate to spoke
         apps.open-cluster-management.io/ocm-managed-cluster: '{{`{{name}}`}}'
         apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
+        apps.open-cluster-management.io/pull-to-ocm-managed-cluster: 'true'
         argocd.argoproj.io/skip-reconcile: "true"
         argocd.argoproj.io/compare-options: IgnoreExtraneous
     spec:
