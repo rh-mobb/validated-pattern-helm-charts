@@ -46,6 +46,9 @@ argocd:
       type: helm
       project: default
       url: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+  applications:
+  - name: cluster-config
+  - name: application-ns
 application-gitops:
   name: application-gitops
   gitopsNamespace: application-gitops
