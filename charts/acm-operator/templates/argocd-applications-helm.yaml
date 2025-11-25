@@ -9,8 +9,8 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Delete=false
+    argocd.argoproj.io/sync-wave: "15"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   {{- range $key, $value := $applications.annotations }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}

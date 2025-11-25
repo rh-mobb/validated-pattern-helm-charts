@@ -6,7 +6,6 @@ metadata:
   name: "{{ $ns.name }}"
   annotations:
     argocd.argoproj.io/sync-wave: "-10"
-    argocd.argoproj.io/sync-options: Delete=false
   {{- if $ns.annotations }}
   annotations:
     {{- toYaml $ns.annotations | trimPrefix "|" | indent 2 }}
