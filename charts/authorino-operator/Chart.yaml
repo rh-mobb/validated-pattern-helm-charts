@@ -2,10 +2,10 @@ apiVersion: v2
 name: authorino-operator
 description: Helm chart for deploying Red Hat Authorino Operator
 type: application
-version: 0.1.2
+version: 0.1.3
 appVersion: "1.2.3"
 dependencies:
   - name: helper-status-checker
-    version: 4.4.0
+    version: 4.4.3
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     condition: helper-status-checker.enabled

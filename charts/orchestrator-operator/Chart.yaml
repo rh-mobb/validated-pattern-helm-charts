@@ -12,10 +12,10 @@ sources:
   - https://github.com/redhat-developer/rhdh-chart
 dependencies:
   - name: helper-status-checker
-    version: 4.4.0
+    version: 4.4.3
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     condition: helper-status-checker.enabled
   - name: postgresql
     version: "12.12.10"
     repository: https://charts.bitnami.com/bitnami
-version: 1.0.3
+version: 1.0.4

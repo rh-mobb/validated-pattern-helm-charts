@@ -1,11 +1,11 @@
 dependencies:
   - name: helper-status-checker
-    version: 4.4.0
+    version: 4.4.3
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
   - name: helper-operator
     version: 1.1.0
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
 name: cluster-efs
-version: 0.4.13
+version: 0.4.14
 apiVersion: v2
 description: Chart to deploy the efs operator and supporting componenets
