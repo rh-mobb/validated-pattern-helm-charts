@@ -2,10 +2,10 @@ apiVersion: v2
 name: lightspeed-operator
 description: Helm chart for deploying Red Hat OpenShift Lightspeed Operator
 type: application
-version: 0.3.5
+version: 0.3.6
 appVersion: "1.0"
 dependencies:
   - name: helper-status-checker
-    version: 4.4.0
+    version: 4.4.1
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     condition: helper-status-checker.enabled

@@ -9,7 +9,7 @@ maintainers:
 type: application
 dependencies:
   - name: helper-status-checker
-    version: 4.4.0
+    version: 4.4.1
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     condition: helper-status-checker.enabled
-version: 1.0.0
+version: 1.0.1

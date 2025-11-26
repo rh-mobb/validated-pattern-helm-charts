@@ -1,11 +1,11 @@
 dependencies:
   - name: helper-status-checker
-    version: 4.4.0
+    version: 4.4.1
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
   - name: helper-operator
     version: 1.1.0
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
 name: acm-operator
-version: 0.5.9
+version: 0.5.10
 apiVersion: v2
 description: Chart to deploy Red Hat Advanced Cluster Management (RHACM) with ArgoCD ApplicationSets for spoke cluster management

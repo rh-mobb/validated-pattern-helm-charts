@@ -1,5 +1,5 @@
 name: cluster-observability-operator
-version: 0.1.11
+version: 0.1.12
 apiVersion: v2
 description: Deploys the Cluster Observability Operator for OpenShift cluster monitoring and observability
 dependencies:
@@ -7,7 +7,7 @@ dependencies:
     version: ~1.1.0
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
   - name: helper-status-checker
-    version: ~4.4.0
+    version: ~4.4.1
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     condition: helper-status-checker.enabled
 
