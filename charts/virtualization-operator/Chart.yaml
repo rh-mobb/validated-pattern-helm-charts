@@ -6,6 +6,6 @@ version: 0.2.2
 appVersion: "4.16"
 dependencies:
   - name: helper-status-checker
-    version: 4.4.1
+    version: 4.4.0
     repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     condition: helper-status-checker.enabled
