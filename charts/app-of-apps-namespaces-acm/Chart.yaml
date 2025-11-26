@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Chart to generate namespaces apps.
 name: app-of-apps-namespaces-acm
-version: 0.3.8
+version: 0.3.9

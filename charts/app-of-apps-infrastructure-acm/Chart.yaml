@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Chart to generate argocd apps
 name: app-of-apps-infrastructure-acm
-version: 0.2.5
+version: 0.2.6

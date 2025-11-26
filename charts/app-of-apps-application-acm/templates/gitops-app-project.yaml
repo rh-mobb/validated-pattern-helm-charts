@@ -8,10 +8,6 @@ metadata:
   name: "{{ $defaults.clusterName }}-{{ $applications.apmnum }}-project"
   namespace: application-gitops
   annotations:
-    # ACM hub annotations.
-    apps.open-cluster-management.io/ocm-managed-cluster: '{{ $defaults.clusterName }}'
-    apps.open-cluster-management.io/ocm-managed-cluster-app-namespace: openshift-gitops
-    argocd.argoproj.io/skip-reconcile: "true"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
