@@ -26,7 +26,7 @@ spec:
 
               # Wrapper function to log oc commands before execution
               oc() {
-                echo "→ Running: oc $*"
+                echo "→ Running: oc $*" >&2
                 command oc "$@"
               }
 
