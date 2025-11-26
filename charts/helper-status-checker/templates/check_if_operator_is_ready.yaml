@@ -26,6 +26,12 @@ spec:
              counter=0
              status=0
 
+             # Wrapper function to log oc commands before execution
+             oc() {
+               echo "→ Running: oc $*"
+               command oc "$@"
+             }
+
              echo "Starting operator status checker"
              operator={{ .operatorName }}
              printf "\nWaiting for operator %s to appear\n" "$i";

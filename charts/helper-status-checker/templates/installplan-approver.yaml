@@ -24,6 +24,12 @@ spec:
             - |
               export HOME=/tmp/approver
 
+              # Wrapper function to log oc commands before execution
+              oc() {
+                echo "→ Running: oc $*"
+                command oc "$@"
+              }
+
               echo "Approving operator install.  Waiting a few seconds to make sure the InstallPlan gets created first."
               sleep_timer={{ .sleeptimer | default 45 }}
 
