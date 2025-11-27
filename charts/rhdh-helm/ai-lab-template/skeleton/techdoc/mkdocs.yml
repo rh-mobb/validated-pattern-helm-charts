@@ -1,0 +1,8 @@
+site_name: 'Documentation'
+
+nav:
+  - Application: index.md
+  - OpenShift AI: rhoai.md
+
+plugins:
+  - techdocs-core

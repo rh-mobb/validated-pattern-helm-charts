@@ -1,0 +1,832 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: sed.edit.APP_NAME
+  title: sed.edit.APP_DISPLAY_NAME
+  description: sed.edit.DESCRIPTION
+  tags: sed.edit.APPTAGS
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: service
+  owner: sed.edit.OWNER
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters:
+    - title: Application Information
+      required:
+        - name
+        - owner
+        - argoNS
+        - argoInstance
+        - argoProject
+        - modelServer
+      ui:order:
+        - name
+        - owner
+        - argoNS
+        - argoInstance
+        - argoProject
+        - includeArgoLabel
+        - argoAppLabel
+        - modelServer
+        - '*'
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+          ui:field: EntityNamePicker
+          maxLength: 63
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          default: user:guest
+          ui:field: OwnerPicker
+          ui:options: {}
+        argoNS:
+          title: ArgoCD Namespace
+          type: string
+          description: The target namespace of the ArgoCD deployment
+          default: ${ARGOCD__DEFAULT__NAMESPACE}
+          maxLength: 63
+        argoInstance:
+          title: ArgoCD Instance
+          type: string
+          description: The target ArgoCD instance name
+          default: ${ARGOCD__DEFAULT__INSTANCE}
+          maxLength: 63
+        argoProject:
+          title: ArgoCD Project
+          type: string
+          description: The target ArgoCD project name
+          default: ${ARGOCD__DEFAULT__PROJECT}
+          maxLength: 63
+        includeArgoLabel:
+          title: Include ArgoCD App Label?
+          type: boolean
+          description: Indicates whether to include a user provided ArgoCD Application Label to set
+        modelServer:
+          # SED_LLM_SERVER_START
+          title: Model Server
+          # SED_LLM_LLAMA_SERVER_START
+          default: llama.cpp
+          # SED_LLM_LLAMA_SERVER_END
+          type: string
+          ui:enumDisabled:
+            - Create a new model server
+            # SED_EXISTING_START
+            - Select an existing model server
+            # SED_EXISTING_END
+          enum:
+            - Create a new model server
+            - vLLM
+            # SED_LLM_LLAMA_SERVER_START
+            - llama.cpp
+            # SED_LLM_LLAMA_SERVER_END
+          # SED_LLM_SERVER_END
+          # SED_ASR_MODEL_SERVER_START
+          title: Model Server
+          type: string
+          default: whisper.cpp
+          ui:enumDisabled:
+            - Create a new model server
+            # SED_EXISTING_START
+            - Select an existing model server
+            # SED_EXISTING_END
+          enum:
+            - Create a new model server
+            - whisper.cpp
+          # SED_ASR_MODEL_SERVER_END
+          # SED_DETR_MODEL_SERVER_START
+          title: Model Server
+          type: string
+          default: detr-resnet-101
+          ui:enumDisabled:
+            - Create a new model server
+            # SED_EXISTING_START
+            - Select an existing model server
+            # SED_EXISTING_END
+          enum:
+            - Create a new model server
+            - detr-resnet-101
+            # SED_DETR_MODEL_SERVER_END
+            # SED_EXISTING_START
+            - Select an existing model server
+            # SED_EXISTING_SERVER_START
+            - Bring you own model server
+            # SED_EXISTING_SERVER_END
+            # SED_EXISTING_FROM_CATALOG_START
+            - choose-from-the-catalog
+            # SED_EXISTING_FROM_CATALOG_END
+            # SED_EXISTING_END
+          enumNames:
+            - Create a new model server
+            # SED_LLM_SERVER_START
+            - vLLM
+            # SED_LLM_LLAMA_SERVER_START
+            - llama.cpp
+            # SED_LLM_LLAMA_SERVER_END
+            # SED_LLM_SERVER_END
+            # SED_ASR_MODEL_SERVER_START
+            - whisper.cpp
+            # SED_ASR_MODEL_SERVER_END
+            # SED_DETR_MODEL_SERVER_START
+            - detr-resnet-101
+            # SED_DETR_MODEL_SERVER_END
+            # SED_EXISTING_START
+            - Select an existing model server
+            # SED_EXISTING_SERVER_START
+            - Bring you own model server
+            # SED_EXISTING_SERVER_END
+            # SED_EXISTING_FROM_CATALOG_START
+            # SED_LLM_SERVER_START
+            - Choose from the Catalog model(s)
+            # SED_LLM_SERVER_END
+            # SED_ASR_MODEL_SERVER_START
+            - Choose from the Catalog model server(s)
+            # SED_ASR_MODEL_SERVER_END
+            # SED_DETR_MODEL_SERVER_START
+            - Choose from the Catalog model server(s)
+            # SED_DETR_MODEL_SERVER_END
+            # SED_EXISTING_FROM_CATALOG_END
+            # SED_EXISTING_END
+      dependencies:
+        includeArgoLabel:
+          oneOf:
+            - required:
+                - argoAppLabel
+              properties:
+                includeArgoLabel:
+                  const: true
+                argoAppLabel:
+                  title: ArgoCD Application Label
+                  type: string
+                  description: Define the label RHDH will use to identify the ArgoCD Applications
+        modelServer:
+          oneOf:
+            # SED_EXISTING_START
+            # SED_EXISTING_SERVER_START
+            - required:
+                - modelEndpoint
+                # SED_LLM_SERVER_START
+                - modelName
+                # SED_LLM_SERVER_END
+              properties:
+                modelServer:
+                  const: Bring you own model server
+                modelServerDescription:
+                  type: 'null'
+                  # SED_LLM_SERVER_START
+                  description: Fill in the model server endpoint and model name you wish to use with your application.
+                  # SED_LLM_SERVER_END
+                  # SED_DETR_MODEL_SERVER_START
+                  description: Fill in the model server endpoint you wish to use with your application.
+                  # SED_DETR_MODEL_SERVER_END
+                  # SED_ASR_MODEL_SERVER_START
+                  description: Fill in the model server endpoint you wish to use with your application.
+                  # SED_ASR_MODEL_SERVER_END
+                modelEndpoint:
+                  title: Model Server Endpoint
+                  type: string
+                  description: "The endpoint for an existing model server."
+                # SED_LLM_SERVER_START
+                modelName:
+                  title: Model Name
+                  type: string
+                  ui:help: "The name of the model deployed on the model server you would like to use."
+                # SED_LLM_SERVER_END
+                includeModelEndpointSecret:
+                  title: Is bearer authentication required?
+                  type: boolean
+                  default: false
+                  ui:help: Create a Secret containing the authentication bearer in the preferred targeted Namespace first.
+              dependencies:
+                includeModelEndpointSecret:
+                  allOf:
+                    - if:
+                        properties:
+                          includeModelEndpointSecret:
+                            const: true
+                      then:
+                        properties:
+                          modelEndpointSecretName:
+                            title: Model Server Endpoint Secret Name
+                            ui:help: Paste in the name of the Secret containing your bearer.
+                            type: string
+                          modelEndpointSecretKey:
+                            title: Model Server Endpoint Secret Key
+                            ui:help: Paste in the key of the Secret containing the bearer value.
+                            type: string
+                        required:
+                          - modelEndpointSecretName
+                          - modelEndpointSecretKey
+            # SED_EXISTING_SERVER_END
+            # SED_EXISTING_FROM_CATALOG_START
+            - required:
+                # SED_LLM_SERVER_START
+                - catalogModel
+                # SED_LLM_SERVER_END
+                # SED_ASR_MODEL_SERVER_START
+                - catalogModelServer
+                # SED_ASR_MODEL_SERVER_END
+                # SED_DETR_MODEL_SERVER_START
+                - catalogModelServer
+                # SED_DETR_MODEL_SERVER_END
+              properties:
+                modelServer:
+                  const: choose-from-the-catalog
+                modelServerDescription:
+                  type: 'null'
+                  # SED_LLM_SERVER_START
+                  description: Select a model from the RHDH catalog you wish to use with your application.
+                catalogModel:
+                  title: Model name
+                  type: string
+                  ui:help: "The model chosen from the model catalog."
+                  ui:field: EntityPicker
+                  ui:options:
+                    allowedKinds: []
+                    catalogFilter:
+                      kind: resource
+                      spec.type: ai-model
+                      spec.dependencyOf:
+                        exists: true
+                  # SED_LLM_SERVER_END
+                  # SED_DETR_MODEL_SERVER_START
+                  description: Select a model server from the RHDH catalog you wish to use with your application.
+                catalogModelServer:
+                  title: Model Server Entity
+                  type: string
+                  ui:help: "The model server chosen from the model catalog."
+                  ui:field: EntityPicker
+                  ui:options:
+                    allowedKinds: []
+                    catalogFilter:
+                      kind: component
+                      spec.type: model-server
+                  # SED_DETR_MODEL_SERVER_END
+                  # SED_ASR_MODEL_SERVER_START
+                  description: Select a model server from the RHDH catalog you wish to use with your application.
+                catalogModelServer:
+                  title: Model Server Entity
+                  type: string
+                  ui:help: "The model server chosen from the model catalog."
+                  ui:field: EntityPicker
+                  ui:options:
+                    allowedKinds: []
+                    catalogFilter:
+                      kind: component
+                      spec.type: model-server
+                # SED_ASR_MODEL_SERVER_END
+                includeModelEndpointSecret:
+                  title: Is bearer authentication required?
+                  type: boolean
+                  default: false
+                  ui:help: Create a Secret containing the authentication bearer in the preferred targeted Namespace first.
+              dependencies:
+                includeModelEndpointSecret:
+                  allOf:
+                    - if:
+                        properties:
+                          includeModelEndpointSecret:
+                            const: true
+                      then:
+                        properties:
+                          modelEndpointSecretName:
+                            title: Model Server Endpoint Secret Name
+                            ui:help: Paste in the name of the Secret containing your bearer.
+                            type: string
+                          modelEndpointSecretKey:
+                            title: Model Server Endpoint Secret Key
+                            ui:help: Paste in the key of the Secret containing the bearer value.
+                            type: string
+                        required:
+                          - modelEndpointSecretName
+                          - modelEndpointSecretKey
+            # SED_EXISTING_FROM_CATALOG_END
+            # SED_EXISTING_END
+            # SED_LLM_SERVER_START
+            - properties:
+                modelServer:
+                  const: vLLM
+                modelServerDescription:
+                  type: 'null'
+                  description: ${VLLM_DESC}. If you choose vLLM, ensure that your cluster has Nvidia GPU supported (with compute capability 7.0 or higher). Also, it should have enough CPU & memory resources for the model you would like to work with. | [Learn more](${VLLM_SRC})
+                modelNameDeployed:
+                  title: Model Name
+                  description: ${LLM_MODEL_CLASSIFICATION} | ${LLM_MODEL_LICENSE} | [Learn more](${LLM_MODEL_SRC})
+                  default: ${LLM_MODEL_NAME}
+                  type: string
+                  enum:
+                    - ${LLM_MODEL_NAME}
+            # SED_LLM_LLAMA_SERVER_START
+            - properties:
+                modelServer:
+                  const: llama.cpp
+                modelServerDescription:
+                  type: 'null'
+                  description: ${MODEL_SERVICE_DESC}. | [Learn more](${MODEL_SERVICE_SRC})
+                modelNameDeployed:
+                  title: Model Name
+                  description: ${LLM_MODEL_CLASSIFICATION} | ${LLM_MODEL_LICENSE} | [Learn more](${LLM_MODEL_SRC})
+                  default: ${LLM_MODEL_NAME}
+                  type: string
+                  enum:
+                    - ${LLM_MODEL_NAME}
+            # SED_LLM_LLAMA_SERVER_END
+            # SED_LLM_SERVER_END
+            # SED_ASR_MODEL_SERVER_START
+            - properties:
+                modelServer:
+                  const: whisper.cpp
+                modelServerDescription:
+                  type: 'null'
+                  description: ${MODEL_SERVICE_DESC}. The deployed model on the server must support automatic speech recognition (ASR). | [Learn more](${MODEL_SERVICE_SRC})
+                modelNameDeployed:
+                  title: Model Name
+                  description: ${ASR_MODEL_CLASSIFICATION} | ${ASR_MODEL_LICENSE} | [Learn more](${ASR_MODEL_SRC})
+                  default: ${ASR_MODEL_NAME}
+                  type: string
+                  enum:
+                    - ${ASR_MODEL_NAME}
+            # SED_ASR_MODEL_SERVER_END
+            # SED_DETR_MODEL_SERVER_START
+            - properties:
+                modelServer:
+                  const: detr-resnet-101
+                modelServerDescription:
+                  type: 'null'
+                  description: ${MODEL_SERVICE_DESC}. The deployed model on the server must support object detection. | [Learn more](${MODEL_SERVICE_SRC})
+                modelNameDeployed:
+                  title: Model Name
+                  description: ${DETR_MODEL_CLASSIFICATION} | ${DETR_MODEL_LICENSE} | [Learn more](${DETR_MODEL_SRC})
+                  default: ${DETR_MODEL_NAME}
+                  type: string
+                  enum:
+                    - ${DETR_MODEL_NAME}
+                    # SED_DETR_MODEL_SERVER_END
+    - title: Application Repository Information
+      required:
+        - hostType
+        - repoOwner
+        - repoName
+        - branch
+      properties:
+        hostType:
+          title: Host Type
+          type: string
+          enum:
+            - GitHub
+            - GitLab
+          default: GitHub
+        repoOwner:
+          title: Repository Owner
+          type: string
+          ui:help: The organization, user or project that this repo will belong to
+        repoName:
+          title: Repository Name
+          type: string
+        branch:
+          title: Repository Default Branch
+          type: string
+          default: main
+      dependencies:
+        hostType:
+          oneOf:
+            - required:
+                - githubServer
+              properties:
+                hostType:
+                  const: GitHub
+                githubServer:
+                  title: Repository Server
+                  type: string
+                  default: ${GITHUB__DEFAULT__HOST}
+                  ui:help: "You can also provide the on-prem github server, example: github-github.apps.cluster-ljg9z.sandbox219.opentlc.com"
+            - required:
+                - gitlabServer
+              properties:
+                hostType:
+                  const: GitLab
+                gitlabServer:
+                  title: Repository Server
+                  type: string
+                  default: ${GITLAB__DEFAULT__HOST}
+                  ui:help: "You can also provide the on-prem gitlab server, example: gitlab-gitlab.apps.cluster-ljg9z.sandbox219.opentlc.com"
+    - title: Deployment Information
+      required:
+        # SED_APP_SUPPORT_START
+        - imageRegistry
+        - imageOrg
+        - imageName
+        # SED_APP_SUPPORT_END
+        - namespace
+      ui:order:
+        - imageRegistry
+        - imageOrg
+        - imageName
+        - namespace
+        - deployArgoCDApplicationOnRemoteCluster
+        - remoteClusterAPIUrl
+        - remoteClusterDeploymentNamespace
+        - rhoaiSelected
+      properties:
+        # SED_APP_SUPPORT_START
+        imageRegistry:
+          title: Image Registry
+          type: string
+          description: The image registry host
+          default: ${QUAY__DEFAULT__HOST}
+          ui:help: "You can also provide the on-prem registry host, example: quay-tv2pb.apps.cluster-tv2pb.sandbox1194.opentlc.com"
+        imageOrg:
+          title: Image Organization
+          type: string
+          description: The organization, user or project that this repo will belong to
+        imageName:
+          title: Image Name
+          type: string
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        # SED_APP_SUPPORT_END
+        namespace:
+          title: Deployment Namespace
+          type: string
+          default: ${DEFAULT__DEPLOYMENT__NAMESPACE__PREFIX}
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        deployArgoCDApplicationOnRemoteCluster:
+          title: Deploy ArgoCD Application on Remote Cluster?
+          type: boolean
+          default: false
+          ui:help: "If you select this field, you must ensure that the Remote Cluster is already configured on your RHDH instance."
+        # SED_APP_SUPPORT_START
+        rhoaiSelected:
+          title: Create Workbench for OpenShift AI
+          description: Deploy to OpenShift AI in your app's namespace
+          type: boolean
+          default: false
+          ui:help: If you select this field, you must ensure that Red Hat OpenShift AI has been installed on your cluster.
+          # SED_APP_SUPPORT_END
+      dependencies:
+        deployArgoCDApplicationOnRemoteCluster:
+          oneOf:
+            - required:
+                - remoteClusterAPIUrl
+                - remoteClusterDeploymentNamespace
+              properties:
+                deployArgoCDApplicationOnRemoteCluster:
+                  const: true
+                remoteClusterAPIUrl:
+                  title: Remote Cluster API URL
+                  type: string
+                  ui:help: "Kube API URL of remote cluster"
+                remoteClusterDeploymentNamespace:
+                  title: Remote Cluster Deployment Namespace
+                  type: string
+                  ui:help: "The namespace of the remote cluster that the argoCD application will be deployed"
+            - properties:
+                deployArgoCDApplicationOnRemoteCluster:
+                  const: false
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    # SED_EXISTING_START
+    # SED_EXISTING_FROM_CATALOG_START
+    # SED_LLM_SERVER_START
+    # Fetches the ai-model entity if selected
+    - id: fetch-model-from-catalog
+      name: Fetch Model From Catalog
+      action: catalog:fetch
+      if: ${{ parameters.modelServer === 'choose-from-the-catalog' }}
+      input:
+        entityRef: ${{ parameters.catalogModel }}
+    # SED_LLM_SERVER_END
+    # Fetches the model-server entity of the selected ai-model
+    - id: fetch-model-server-from-catalog
+      name: Fetch Model Server From Catalog
+      action: catalog:fetch
+      if: ${{ parameters.modelServer === 'choose-from-the-catalog' }}
+      input:
+        # SED_LLM_SERVER_START
+        entityRef: ${{ steps['fetch-model-from-catalog'].output.entity.spec.dependencyOf[0] }}
+        # SED_LLM_SERVER_END
+        # SED_ASR_MODEL_SERVER_START
+        entityRef: ${{ parameters.catalogModelServer }}
+        # SED_ASR_MODEL_SERVER_END
+        # SED_DETR_MODEL_SERVER_START
+        entityRef: ${{ parameters.catalogModelServer }}
+        # SED_DETR_MODEL_SERVER_END
+    # SED_EXISTING_FROM_CATALOG_END
+    # SED_EXISTING_END
+    # SED_APP_SUPPORT_START
+    # Each step executes an action, in this case one templates files into the workspace.
+    # Get the sample source code
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./content
+        targetPath: source
+    # Renders all of the template variables into the techdocs and adds them to the source repo
+    - id: fetch-skeleton-docs
+      name: Fetch Skeleton Techdocs
+      action: fetch:template
+      input:
+        url: ../../skeleton/techdoc
+        targetPath: source
+        values:
+          name: ${{ parameters.name }}
+          appSummary: ${APP_SUMMARY}
+          namespace: ${{ parameters.namespace }}
+          repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
+          srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
+          appContainer: ${{ 'quay.io/redhat-ai-dev/ai-template-bootstrap-app:latest' if parameters.hostType === 'GitHub' else '${APP_INTERFACE_CONTAINER}' }}
+          appPort: ${APP_PORT}
+          appRunCommand: "${APP_RUN_COMMAND}"
+          modelServiceContainer: ${MODEL_SERVICE_CONTAINER}
+          modelServicePort: ${MODEL_SERVICE_PORT}
+          customModelName: ${{ steps['fetch-model-from-catalog'].output.entity.metadata.annotations | pick('rhdh.modelcatalog.io/model-name') if parameters.modelServer === 'choose-from-the-catalog' else parameters.modelName }}
+          modelName: ${MODEL_NAME}
+          modelSrc: ${MODEL_SRC}
+          modelServerName: ${{ parameters.modelServer }}
+          customModelAndModelServerSelected: ${{ true if parameters.modelServer === 'Bring you own model server' else (true if parameters.modelServer === 'choose-from-the-catalog' else false) }}
+          modelServiceSrcVLLM: ${MODEL_SERVICE_SRC_VLLM}
+          modelServiceSrcOther: ${MODEL_SERVICE_SRC_OTHER}
+    # Renders all the template variables into the files and directory names and content, and places the result in the workspace.
+    - id: fetch-skeleton
+      name: Fetch Skeleton
+      action: fetch:template
+      input:
+        url: ../../skeleton/source-repo
+        targetPath: source
+        values:
+          name: ${{ parameters.name }}
+          namespace: ${{ parameters.namespace }}
+          description: sed.edit.CATALOG_DESCRIPTION
+          dockerfile: sed.edit.DOCKERFILE
+          buildContext: sed.edit.BUILDCONTEXT
+          gitopsSecretName: ${{ 'gitops-auth-secret' if parameters.hostType === 'GitHub' else 'gitlab-auth-secret' }}
+          image: '${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          tags: 'sed.edit.APPTAGS'
+          owner: ${{ parameters.owner }}
+          repoSlug: '${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          defaultBranch: ${{ parameters.branch }}
+    - id: fetch-github-action
+      name: Fetch GitHub Action
+      action: fetch:plain
+      if: ${{ parameters.hostType === 'GitHub' }}
+      input:
+        targetPath: source
+        url: ../../skeleton/github-action
+    # This action creates a new GitHub repository and publishes the files in the workspace directory to the repository.
+    - id: publish-github
+      name: Publish Repository to GitHub
+      action: publish:github
+      if: ${{ parameters.hostType === 'GitHub' }}
+      input:
+        sourcePath: source
+        description: This is ${{ parameters.name }}
+        repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
+        defaultBranch: ${{ parameters.branch }}
+        protectDefaultBranch: true
+        allowAutoMerge: true
+        deleteBranchOnMerge: true
+        requiredStatusCheckContexts: []
+        repoVisibility: "public"
+        requiredApprovingReviewCount: 0
+    # This action creates a new GitLab repository and publishes the files in the workspace directory to the repository.
+    - id: publish-gitlab
+      name: Publish Repository to GitLab
+      action: publish:gitlab
+      if: ${{ parameters.hostType === 'GitLab' }}
+      input:
+        sourcePath: source
+        description: This is ${{ parameters.name }}
+        repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
+        defaultBranch: ${{ parameters.branch }}
+        protectDefaultBranch: false
+        repoVisibility: "public"
+    # SED_APP_SUPPORT_END
+    # The final step is to register our new component in the catalog.
+    - id: fetch-gitops-skeleton
+      name: Fetch Gitops Skeleton
+      action: fetch:template
+      input:
+        url: ../../skeleton/gitops-template
+        targetPath: gitops
+        values:
+          name: ${{ parameters.name }}
+          appName: ${{ parameters.name }}-gitops # for now just use the component name, since it's single component app
+          description: This is GitOps manifest for ${{ parameters.name }}
+          namespace: ${{ parameters.remoteClusterDeploymentNamespace if parameters.deployArgoCDApplicationOnRemoteCluster else parameters.namespace }}
+          rhdhNamespace: ${RHDH__DEFAULT__NAMESPACE}
+          # example: github.com?owner=<owner>&repo=<srcRepo>, the gitops repo name will be <srcRepo>-gitops
+          repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
+          srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
+          argoComponentOverlays: './components/${{ parameters.name }}/overlays'
+          owner: ${{ parameters.owner }}
+          argoNS: ${{ parameters.argoNS }}
+          argoProject: ${{ parameters.argoProject }}
+          secretRef: ${{ parameters.hostType === 'GitLab' }}
+          gitSecret: ${GIT__SECRET__DEFAULT__NAME}
+          gitSecretKey: ${GIT__SECRET__DEFAULT__KEY}
+          webhookSecret: ${WEBHOOK__SECRET__DEFAULT__NAME}
+          webhookSecretKey: ${WEBHOOK__SECRET__DEFAULT__KEY}
+          defaultBranch: main
+          initContainer: ${INIT_CONTAINER}
+          modelInitCommand: "${INIT_CONTAINER_COMMAND}"
+          modelPath: "${MODEL_PATH}"
+          appContainer: ${{ 'quay.io/redhat-ai-dev/ai-template-bootstrap-app:latest' if parameters.hostType === 'GitHub' else '${APP_INTERFACE_CONTAINER}' }}
+          appPort: ${APP_PORT}
+          modelServiceContainer: ${MODEL_SERVICE_CONTAINER}
+          modelServicePort: ${MODEL_SERVICE_PORT}
+          # SED_LLM_SERVER_START
+          # for vllm
+          vllmSelected: ${{ parameters.modelServer === 'vLLM' }}
+          vllmModelServiceContainer: ${VLLM_CONTAINER}
+          modelName: ${{ parameters.modelName if parameters.modelServer === 'Bring you own model server' else (steps['fetch-model-from-catalog'].output.entity.metadata.annotations | pick('rhdh.modelcatalog.io/model-name') if parameters.modelServer === 'choose-from-the-catalog' else '${LLM_MODEL_NAME}') }}
+          modelSrc: ${MODEL_SRC}
+          maxModelLength: ${LLM_MAX_MODEL_LEN}
+          # SED_LLM_SERVER_END
+          existingModelServer: ${{ true if parameters.modelServer === 'Bring you own model server' else (true if parameters.modelServer === 'choose-from-the-catalog' else false) }}
+          # SED_EXISTING_START
+          modelEndpoint: ${{ (steps['fetch-model-server-from-catalog'].output.entity.metadata.annotations | pick('rhdh.modelcatalog.io/internal-service-url')) if parameters.modelServer === 'choose-from-the-catalog' else parameters.modelEndpoint }}
+          modelEndpointSecretName: ${{ parameters.modelEndpointSecretName }}
+          modelEndpointSecretKey: ${{ parameters.modelEndpointSecretKey }}
+          includeModelEndpointSecret: ${{ parameters.includeModelEndpointSecret }}
+          # SED_EXISTING_END
+          # SED_APP_SUPPORT_START
+          # for RHOAI
+          rhoaiSelected: ${{ parameters.rhoaiSelected }}
+          # SED_APP_SUPPORT_END
+          # Database is required for the RAG templates
+          dbRequired: ${SUPPORT_DB}
+          # SED_DB_START
+          dbContainer: ${DB_CONTAINER}
+          dbPort: ${DB_PORT}
+          # SED_DB_END
+          supportApp: ${SUPPORT_APP}
+          modelServerName: ${{ parameters.modelServer }}
+          modelServiceSrcVLLM: ${MODEL_SERVICE_SRC_VLLM}
+          modelServiceSrcOther: ${MODEL_SERVICE_SRC_OTHER}
+          imageRegistry: ${{ parameters.imageRegistry }}
+          imageOrg: ${{ parameters.imageOrg }}
+          imageName: ${{ parameters.imageName }}
+          # Remote cluster configuration
+          deployOnRemoteCluster: ${{ parameters.deployArgoCDApplicationOnRemoteCluster }}
+          remoteClusterAPIUri: ${{ parameters.remoteClusterAPIUrl }}
+          remoteClusterDeploymentNamespace: ${{ parameters.remoteClusterDeploymentNamespace }}
+          customModelServer: ${{ parameters.modelServer }}
+          customModelName: ${{ parameters.modelName }}
+    - id: cleanupDatabaseResources
+      action: fs:delete
+      name: Cleanup Unused Database Resources
+      if: ${CLEANUP_DB}
+      input:
+        files:
+          - 'gitops/components/http/base/deployment-database.yaml'
+          - 'gitops/components/http/base/service-database.yaml'
+          - 'gitops/components/http/base/database-config.yaml'
+    - id: cleanupRhoaiResources
+      action: fs:delete
+      name: Cleanup Unused RHOAI Resources
+      if: ${{ not parameters.rhoaiSelected }}
+      input:
+        files:
+          - 'gitops/components/http/base/rhoai'
+    - id: cleanupvLLMResources
+      action: fs:delete
+      name: Cleanup Unused vLLM Resources
+      if: ${{ parameters.modelServer !== 'vLLM' }}
+      input:
+        files:
+          - 'gitops/components/http/base/pvc.yaml'
+    - id: cleanupModelServerResources
+      action: fs:delete
+      name: Cleanup Unused Model Server Resources
+      if: ${{ true if parameters.modelServer === 'Bring you own model server' else (true if parameters.modelServer === 'choose-from-the-catalog' else false) }}
+      input:
+        files:
+          - 'gitops/components/http/base/deployment-model-server.yaml'
+          - 'gitops/components/http/base/service-model-server.yaml'
+    - id: cleanupApplicationResources
+      action: fs:delete
+      name: Cleanup Unused Application Resources
+      if: ${CLEANUP_APP}
+      input:
+        files:
+          - 'gitops/components/http/base/deployment.yaml'
+          - 'gitops/components/http/base/service.yaml'
+          - 'gitops/components/http/base/route.yaml'
+    - action: fs:rename
+      id: renameComponentDir
+      name: Rename Component Directory
+      input:
+        files:
+          - from: gitops/components/http
+            to: gitops/components/${{ parameters.name }}
+            overwrite: true
+    - id: publish-github-gitops
+      name: Publish GitOps Repository to Github
+      action: publish:github
+      if: ${{ parameters.hostType === 'GitHub' }}
+      input:
+        sourcePath: gitops
+        description: This is GitOps repository for ${{ parameters.name }}
+        repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
+        defaultBranch: "main"
+        protectDefaultBranch: false
+        repoVisibility: "public"
+    # This action creates a new GitLab repository and publishes the files in the workspace directory to the repository.
+    - id: publish-gitlab-gitops
+      name: Publish GitOps Repository to GitLab
+      action: publish:gitlab
+      if: ${{ parameters.hostType === 'GitLab' }}
+      input:
+        sourcePath: gitops
+        description: This is GitOps repository for ${{ parameters.name }}
+        repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
+        defaultBranch: "main"
+        protectDefaultBranch: false
+        repoVisibility: "public"
+    - id: wait-for-github-repository
+      name: Waiting for Repository Availability
+      action: 'debug:wait'
+      input:
+        seconds: 3
+    # SED_APP_SUPPORT_START
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish-github'].output.repoContentsUrl if steps['publish-github'].output else steps['publish-gitlab'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+    # SED_APP_SUPPORT_END
+    - id: register-gitops
+      name: Register Gitops
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish-github-gitops'].output.repoContentsUrl if steps['publish-github-gitops'].output else steps['publish-gitlab-gitops'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+    - id: create-argocd-resources
+      name: Create ArgoCD Resources
+      action: argocd:create-resources
+      input:
+        appName: ${{ parameters.name }}-app-of-apps
+        # name set in rhdh config
+        argoInstance: ${{ parameters.argoInstance }}
+        namespace: ${{ parameters.argoNS }}
+        labelValue: ${{ parameters.argoAppLabel if parameters.includeArgoLabel else '' }}
+        repoUrl: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops.git
+        path: './app-of-apps'
+    # SED_APP_SUPPORT_START
+    # PR with empty commit
+    - id: trigger-build-pr
+      name: PR to Trigger Pipeline Build
+      action: publish:github:pull-request
+      if: ${{ parameters.hostType === 'GitHub' }}
+      input:
+        repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
+        branchName: trigger-pipeline
+        commitMessage: trigger pipeline build
+        description: "pr to trigger pipeline build"
+        title: trigger pipeline build
+        sourcePath: source
+        targetBranchName: ${{ parameters.branch }}
+    # dispatch the workflow to automerge the pr and trigger the pipeline build
+    - id: trigger_gh_workflow
+      name: Trigger GitHub workflow
+      action: github:actions:dispatch
+      if: ${{ parameters.hostType === 'GitHub' }}
+      input:
+        repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
+        branchOrTagName: ${{ parameters.branch }}
+        workflowId: automerge.yml
+        workflowInputs: {pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}"}
+  # SED_APP_SUPPORT_END
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      # SED_APP_SUPPORT_START
+      - title: Source Repository
+        url: ${{ steps['publish-github'].output.remoteUrl if steps['publish-github'].output else steps['publish-gitlab'].output.remoteUrl }}
+      # SED_APP_SUPPORT_END
+      - title: GitOps Repository
+        url: ${{ steps['publish-github-gitops'].output.remoteUrl if steps['publish-github-gitops'].output else steps['publish-gitlab-gitops'].output.remoteUrl }}
+      # SED_APP_SUPPORT_START
+      - title: Open Component in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
+      # SED_APP_SUPPORT_END
+      - title: Open GitOps Resource in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register-gitops'].output.entityRef }}

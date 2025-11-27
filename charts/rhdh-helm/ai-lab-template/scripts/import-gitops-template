@@ -1,0 +1,30 @@
+#!/bin/bash
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" 
+ROOTDIR=$(realpath $SCRIPTDIR/..)
+source $ROOTDIR/properties
+
+#get gitops templates
+REPO="${GITOPS_REPO:-https://github.com/redhat-ai-dev/ai-lab-app}"
+BRANCH="${GITOPS_BRANCH:-main}"
+REPONAME=$(basename $REPO)
+
+TEMPDIR=$ROOTDIR/temp
+rm -rf $TEMPDIR # clean up
+mkdir -p $TEMPDIR
+cd $TEMPDIR
+git clone $REPO 2>&1 > /dev/null
+(cd $REPONAME; git checkout $BRANCH; git pull)
+
+
+DEST=$ROOTDIR/skeleton/gitops-template
+rm -rf $DEST/components
+rm -rf $DEST/app-of-apps
+rm -rf $DEST/application.yaml
+mkdir -p $DEST/components
+mkdir -p $DEST/app-of-apps
+cp -r $TEMPDIR/$REPONAME/templates/app-of-apps $DEST/
+cp -r $TEMPDIR/$REPONAME/templates/http $DEST/components/http     # only support http now
+cp -r $TEMPDIR/$REPONAME/templates/application.yaml $DEST/
+
+rm -rf $TEMPDIR

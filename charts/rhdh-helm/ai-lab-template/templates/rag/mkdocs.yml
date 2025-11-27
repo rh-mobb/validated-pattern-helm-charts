@@ -1,0 +1,9 @@
+site_name: 'Template Documentation'
+nav:
+  - Overview: index.md
+  - Prerequisites: template-prerequisites.md
+  - Template Usage: usage.md
+  - Remote Cluster configuration: template-remote-cluster.md
+  - Deployed Application: application.md
+plugins:
+  - techdocs-core
