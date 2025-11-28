@@ -1,17 +1,4 @@
 namespace: backstage
-
-# GitHub App Configuration
-# Replace these values with your actual GitHub App credentials
-github:
-  appId: "REPLACE_WITH_YOUR_APP_ID"
-  clientId: "REPLACE_WITH_YOUR_CLIENT_ID"
-  clientSecret: "REPLACE_WITH_YOUR_CLIENT_SECRET"
-  webhookSecret: "REPLACE_WITH_YOUR_WEBHOOK_SECRET"
-  privateKey: |
-    -----BEGIN RSA PRIVATE KEY-----
-    REPLACE_WITH_YOUR_PRIVATE_KEY_CONTENT
-    -----END RSA PRIVATE KEY-----
-
 redhat-developer-hub:
   #helm repo add backstage https://janus-idp.github.io/helm-backstage
   #helm repo update
@@ -142,6 +129,10 @@ redhat-developer-hub:
           package: ./dynamic-plugins/dist/backstage-plugin-notifications-backend-dynamic
         - disabled: false
           package: ./dynamic-plugins/dist/backstage-plugin-signals-backend-dynamic
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic
         # - disabled: false
         #   package: '@red-hat-developer-hub/backstage-plugin-catalog-backend-module-rhdh-ai'
 
