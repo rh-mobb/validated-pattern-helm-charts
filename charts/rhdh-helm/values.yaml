@@ -1,4 +1,17 @@
 namespace: backstage
+
+# GitHub App Configuration
+# Replace these values with your actual GitHub App credentials
+github:
+  appId: "REPLACE_WITH_YOUR_APP_ID"
+  clientId: "REPLACE_WITH_YOUR_CLIENT_ID"
+  clientSecret: "REPLACE_WITH_YOUR_CLIENT_SECRET"
+  webhookSecret: "REPLACE_WITH_YOUR_WEBHOOK_SECRET"
+  privateKey: |
+    -----BEGIN RSA PRIVATE KEY-----
+    REPLACE_WITH_YOUR_PRIVATE_KEY_CONTENT
+    -----END RSA PRIVATE KEY-----
+
 redhat-developer-hub:
   #helm repo add backstage https://janus-idp.github.io/helm-backstage
   #helm repo update
@@ -129,7 +142,9 @@ redhat-developer-hub:
           package: ./dynamic-plugins/dist/backstage-plugin-notifications-backend-dynamic
         - disabled: false
           package: ./dynamic-plugins/dist/backstage-plugin-signals-backend-dynamic
-  
+        # - disabled: false
+        #   package: '@red-hat-developer-hub/backstage-plugin-catalog-backend-module-rhdh-ai'
+
   upstream:
     backstage:
       image:
@@ -163,6 +178,31 @@ redhat-developer-hub:
             secretKeyRef:
               key: CLIENT_SECRET
               name: keycloak-client-secret-backstage
+        - name: GITHUB_APP_ID
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_APP_ID
+              name: github-app-credentials
+        - name: GITHUB_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_CLIENT_ID
+              name: github-app-credentials
+        - name: GITHUB_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_CLIENT_SECRET
+              name: github-app-credentials
+        - name: GITHUB_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_WEBHOOK_SECRET
+              name: github-app-credentials
+        - name: GITHUB_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_PRIVATE_KEY
+              name: github-app-credentials
         - name: LOG_LEVEL
           value: debug
       appConfig:
@@ -193,6 +233,7 @@ redhat-developer-hub:
           reading:
             allow:
               - host: holder
+              - host: raw.githubusercontent.com
   
         integrations:
         ######### COMMENTED OUT ##########
