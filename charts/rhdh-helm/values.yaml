@@ -130,7 +130,8 @@ redhat-developer-hub:
         - disabled: false
           package: ./dynamic-plugins/dist/backstage-plugin-signals-backend-dynamic
         - disabled: false
-          package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+          package: './dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github'
+          
         # - disabled: false
         #   package: '@red-hat-developer-hub/backstage-plugin-catalog-backend-module-rhdh-ai'
 
