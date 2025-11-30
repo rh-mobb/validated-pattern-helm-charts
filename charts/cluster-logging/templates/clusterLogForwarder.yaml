@@ -21,9 +21,9 @@ spec:
           token:
             from: serviceAccount
         type: iamRole
-      groupName: the-cluster-infrastructure
-      region: ap-southeast-2
-    name: cloudwatch-infrastructure
+      groupName: /{{ .Values.clustername }}/infrastructure
+      region: {{ .Values.region }}
+    name: output-cloudwatch-infrastructure
     type: cloudwatch
   - cloudwatch:
       authentication:
@@ -34,39 +34,20 @@ spec:
           token:
             from: serviceAccount
         type: iamRole
-      groupName: the-cluster.{.kubernetes.namespace_name||"unknown"}
-      region: ap-southeast-2
-    name: cloudwatch-namespace-all
+      groupName: /{{ .Values.clustername }}/{.kubernetes.namespace_name||"unknown"}
+      region: {{ .Values.region }}
+    name: output-cloudwatch-namespace-all
     type: cloudwatch
-  - name: openshift-logging-lokistack
-    type: lokiStack
-    lokiStack:
-      authentication:
-        token:
-          from: serviceAccount
-      target:
-        name: openshift-logging-lokistack
-        namespace: openshift-logging
-    tls:
-      ca:
-        key: service-ca.crt
-        configMapName: openshift-service-ca.crt
   pipelines:
   - name: input-cloudwatch-infrastructure
     inputRefs:
     - infrastructure
     outputRefs:
-    - cloudwatch-infrastructure
+    - output-cloudwatch-infrastructure
   - name: input-cloudwatch-namespace-all
     inputRefs:
     - application
     outputRefs:
-    - cloudwatch-namespace-all
-  - name: input-openshift-logging-lokistack
-    inputRefs:
-    - application
-    - infrastructure
-    outputRefs:
-    - openshift-logging-lokistack
+    - output-cloudwatch-namespace-all
   serviceAccount:
-    name: logging
+    name: {{ .Values.serviceAccount }}
