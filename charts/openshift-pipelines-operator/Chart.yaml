@@ -1,5 +1,8 @@
 apiVersion: v2
 name: openshift-pipelines-operator
 description: Chart to deploy OpenShift Pipelines (Tekton) operator
-version: 0.1.13
-
+version: 0.1.14
+dependencies:
+  - name: helper-status-checker
+    repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    version: 4.4.3

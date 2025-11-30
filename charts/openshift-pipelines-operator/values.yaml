@@ -1,2 +1,13 @@
 startingCSV: openshift-pipelines-operator-rh.v1.17.0
+namespace: openshift-operators
 
+helper-status-checker:
+  approver: true
+  enabled: true
+  checks:
+    - operatorName: openshift-pipelines-operator-rh
+      subscriptionName: openshift-pipelines-operator-rh
+      namespace:
+        name: openshift-operators
+      serviceAccount:
+        name: "status-checker"
