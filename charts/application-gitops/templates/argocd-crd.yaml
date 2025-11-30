@@ -62,7 +62,12 @@ spec:
      defaultPolicy: ""
      policy: |
        g, cluster-admins, role:admin
+       p, role:backstage, applications, *, */*, allow
+       p, role:backstage, projects, *, *, allow
+       g, backstage, role:backstage
      scopes: '[groups]'
+  extraConfig:
+    accounts.backstage: apiKey, login
   redis:
     resources:
       limits:

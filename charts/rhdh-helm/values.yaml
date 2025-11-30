@@ -191,6 +191,11 @@ redhat-developer-hub:
             secretKeyRef:
               key: GITHUB_WEBHOOK_SECRET
               name: github-app-credentials
+        - name: GITHUB_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_WEBHOOK_URL
+              name: github-app-credentials
         - name: GITHUB_PRIVATE_KEY
           valueFrom:
             secretKeyRef:
