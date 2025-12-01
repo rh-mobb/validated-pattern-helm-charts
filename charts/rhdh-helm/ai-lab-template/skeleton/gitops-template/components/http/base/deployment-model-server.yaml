@@ -17,6 +17,10 @@ spec:
       labels:
         app.kubernetes.io/instance: ${{ values.name }}-model-server
     spec:
+      {%- if values.vllmSelected %}
+      securityContext:
+        fsGroup: 1001
+      {%- endif %}
       {%- if values.vllmSelected == nil or not(values.vllmSelected) %}
       initContainers:
         - name: model-file
