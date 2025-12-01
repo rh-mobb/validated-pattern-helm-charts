@@ -239,7 +239,7 @@ redhat-developer-hub:
         - package: oci://quay.io/karthik_jk/ai-experience:1.6.1!red-hat-developer-hub-backstage-plugin-ai-experience-backend-dynamic
           disabled: false
         # Red Hat Developer Hub Lightspeed Plugin (Frontend)
-        - disabled: true
+        - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed
           pluginConfig:
             dynamicPlugins:
@@ -261,7 +261,7 @@ redhat-developer-hub:
                         icon: LightspeedIcon
                         text: Lightspeed
         # Red Hat Developer Hub Lightspeed Plugin (Backend)
-        - disabled: true
+        - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed-backend:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed-backend
         # MCP Actions Backend Plugin
         - disabled: true
