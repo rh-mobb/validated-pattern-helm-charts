@@ -13,29 +13,111 @@ redhat-developer-hub:
       includes:
         - dynamic-plugins.default.yaml
       plugins:
+        # Dynamic Home Page Plugin
+        - package: ./dynamic-plugins/dist/red-hat-developer-hub-backstage-plugin-dynamic-home-page
+          disabled: true
+        # Customized Sign-In Page Plugin
+        - package: oci://quay.io/tpetkos/customized-sign-in-page:v0.1.0!red-hat-developer-hub-backstage-plugin-customized-sign-in-page
+          disabled: false
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                red-hat-developer-hub.backstage-plugin-customized-sign-in-page:
+                  signInPage:
+                    importName: CustomizedSignInPage
+        # Global Header Plugin
+        - package: ./dynamic-plugins/dist/red-hat-developer-hub-backstage-plugin-global-header
+          disabled: false
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                default.main-menu-items:
+                  menuItems:
+                    default.create:
+                      title: ''
+                    default.admin:
+                      title: Administration
+                      textKey: menuItem.administration
+                      icon: admin
+                red-hat-developer-hub.backstage-plugin-global-header:
+                  mountPoints:
+                    - mountPoint: application/header
+                      importName: GlobalHeader
+                      config:
+                        position: above-main-content
+                    - mountPoint: global.header/component
+                      importName: SearchComponent
+                      config:
+                        priority: 100
+                    - mountPoint: global.header/component
+                      importName: Spacer
+                      config:
+                        priority: 99
+                        props:
+                          growFactor: 0
+                    - mountPoint: global.header/component
+                      importName: HeaderIconButton
+                      config:
+                        priority: 90
+                        props:
+                          title: Create...
+                          icon: add
+                          to: create
+                    - mountPoint: global.header/component
+                      importName: StarredDropdown
+                      config:
+                        priority: 85
+                    - mountPoint: global.header/component
+                      importName: ApplicationLauncherDropdown
+                      config:
+                        priority: 82
+                    - mountPoint: global.header/component
+                      importName: SupportButton
+                      config:
+                        priority: 80
+                    - mountPoint: global.header/component
+                      importName: NotificationButton
+                      config:
+                        priority: 70
+                    - mountPoint: global.header/component
+                      importName: Divider
+                      config:
+                        priority: 50
+                    - mountPoint: global.header/component
+                      importName: ProfileDropdown
+                      config:
+                        priority: 10
+                    - mountPoint: global.header/profile
+                      importName: MenuItemLink
+                      config:
+                        priority: 100
+                        props:
+                          title: Settings
+                          link: /settings
+                          icon: manageAccounts
+                    - mountPoint: global.header/profile
+                      importName: LogoutButton
+                      config:
+                        priority: 10
+        # ArgoCD Plugins (Your existing plugins)
         - disabled: false
           package: ./dynamic-plugins/dist/backstage-community-plugin-redhat-argocd
-          # pluginConfig:
-          #   dynamicPlugins:
-          #     frontend:
-          #       # Use the exact plugin ID (backstage-community.plugin-redhat-argocd)
-          #       backstage-community.plugin-redhat-argocd:
-          #         # Define the icons that the plugin provides and that will be used in the menu
-          #         appIcons:
-          #           - name: argocdIcon
-          #             importName: ArgocdIcon
-          #         mountPoints:
-          #           - mountPoint: entity.page.overview/cards
-          #             importName: EntityArgoCDOverviewCard
-          #           - mountPoint: entity.page.cd/cards
-          #             importName: EntityArgoCDHistoryCard      
-          #         # Define the routes (pages) the plugin adds
-          #         dynamicRoutes:
-          #           - path: /argocd
-          #             importName: ArgocdPage
-          #             menuItem:
-          #               icon: argocdIcon
-          #               text: ArgoCD
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                backstage-community.plugin-redhat-argocd:
+                  mountPoints:
+                    - mountPoint: entity.page.overview/cards
+                      importName: ArgocdDeploymentSummary
+                      config:
+                        layout:
+                          gridColumnEnd:
+                            lg: "span 8"
+                            md: "span 6"
+                            xs: "span 4"
+                        if:
+                          allOf:
+                            - isArgocdAvailable
         - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
           disabled: false
         - package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
@@ -135,6 +217,70 @@ redhat-developer-hub:
           package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic    
         - disabled: false
           package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
+        # AI Experience Plugin (Frontend)
+        - package: oci://quay.io/karthik_jk/ai-experience:1.6.1!red-hat-developer-hub-backstage-plugin-ai-experience
+          disabled: false
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                red-hat-developer-hub.backstage-plugin-ai-experience:
+                  appIcons:
+                    - name: aiNewsIcon
+                      importName: AiNewsIcon
+                  dynamicRoutes:
+                    - path: /
+                      importName: AiExperiencePage
+                    - path: /ai-news
+                      importName: AiNewsPage
+                      menuItem:
+                        icon: aiNewsIcon
+                        text: AI News
+        # AI Experience Plugin (Backend)
+        - package: oci://quay.io/karthik_jk/ai-experience:1.6.1!red-hat-developer-hub-backstage-plugin-ai-experience-backend-dynamic
+          disabled: false
+        # Red Hat Developer Hub Lightspeed Plugin (Frontend)
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                red-hat-developer-hub.backstage-plugin-lightspeed:
+                  translationResources:
+                    - importName: lightspeedTranslations
+                      module: Alpha
+                      ref: lightspeedTranslationRef
+                  appIcons:
+                    - name: LightspeedIcon
+                      module: LightspeedPlugin
+                      importName: LightspeedIcon
+                  dynamicRoutes:
+                    - path: /lightspeed
+                      importName: LightspeedPage
+                      module: LightspeedPlugin
+                      menuItem:
+                        icon: LightspeedIcon
+                        text: Lightspeed
+        # Red Hat Developer Hub Lightspeed Plugin (Backend)
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed-backend:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed-backend
+        # MCP Actions Backend Plugin
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-mcp-actions-backend:next__0.1.2!backstage-plugin-mcp-actions-backend
+        # Software Catalog MCP Tool Plugin
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-software-catalog-mcp-tool:bs_1.42.5__0.2.3!red-hat-developer-hub-backstage-plugin-software-catalog-mcp-tool
+        # TechDocs MCP Tool Plugin
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-techdocs-mcp-tool:bs_1.42.5__0.3.0!red-hat-developer-hub-backstage-plugin-techdocs-mcp-tool
+        # Analytics Provider Segment Plugin (disabled)
+        - disabled: true
+          package: ./dynamic-plugins/dist/backstage-community-plugin-analytics-provider-segment
+        # Model Catalog Backend Module
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-catalog-backend-module-model-catalog:bs_1.42.5__0.7.0!red-hat-developer-hub-backstage-plugin-catalog-backend-module-model-catalog
+        # Catalog TechDoc URL Reader Backend
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-catalog-techdoc-url-reader-backend:bs_1.42.5__0.3.0!red-hat-developer-hub-backstage-plugin-catalog-techdoc-url-reader-backend
         # - disabled: false
         #   package: '@red-hat-developer-hub/backstage-plugin-catalog-backend-module-rhdh-ai'
 
@@ -214,7 +360,16 @@ redhat-developer-hub:
           csp:
             script-src: ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
             script-src-elem: ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
-            img-src: ["'self'", 'data:']
+            img-src: 
+              - "'self'"
+              - 'data:'
+              - https://cdn.jsdelivr.net
+              - https://upload.wikimedia.org
+              - https://podman-desktop.io
+              - https://argo-cd.readthedocs.io
+              - https://instructlab.ai
+              - https://quay.io
+              - https://news.mit.edu
             connect-src: ["'self'", 'http:', 'https:', 'data:']
           cors:
             origin: holder
@@ -241,8 +396,18 @@ redhat-developer-hub:
           #   apiBaseUrl: https://gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io/api/v4
           #   token: null
   
-        # proxy:
-        #   endpoints:
+        proxy:
+          endpoints:
+            '/developer-hub':
+              target: https://raw.githubusercontent.com
+              pathRewrite:
+                "^/api/proxy/developer-hub/learning-paths": "/redhat-developer/rhdh-plugins/refs/heads/main/workspaces/ai-integrations/plugins/ai-experience/src/learning-paths/data.json"
+              changeOrigin: true
+              secure: false
+            '/ai-rssfeed':
+              target: "https://news.mit.edu/topic/mitartificial-intelligence2-rss.xml"
+              changeOrigin: true
+              followRedirects: true
         #     '/quay/api':
         #       target: {{ .Values.quay.apiUrl }}
         #       headers:
@@ -251,12 +416,6 @@ redhat-developer-hub:
         #         Authorization: 'Bearer 1LOQ7ZNVEUDIALE4WNL3ZBNPKBCR5D4F9UNISVAW'
         #       changeOrigin: true
         #       # Change to "false" in case of using self hosted quay instance with a self-signed certificate
-        #       secure: false
-        #     '/developer-hub':
-        #       target: {{ .Values.github.baseUrl }}/
-        #       pathRewrite:
-        #         '^/api/proxy/developer-hub/tech-radar': /gitops/janus-idp-gitops/-/raw/main/config/tech-radar.json
-        #       changeOrigin: true
         #       secure: false
   
         # quay:
