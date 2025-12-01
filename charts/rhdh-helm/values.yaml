@@ -264,13 +264,13 @@ redhat-developer-hub:
         - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed-backend:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed-backend
         # MCP Actions Backend Plugin
-        - disabled: true
+        - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-mcp-actions-backend:next__0.1.2!backstage-plugin-mcp-actions-backend
         # Software Catalog MCP Tool Plugin
-        - disabled: true
+        - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-software-catalog-mcp-tool:bs_1.42.5__0.2.3!red-hat-developer-hub-backstage-plugin-software-catalog-mcp-tool
         # TechDocs MCP Tool Plugin
-        - disabled: true
+        - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-techdocs-mcp-tool:bs_1.42.5__0.3.0!red-hat-developer-hub-backstage-plugin-techdocs-mcp-tool
         # Analytics Provider Segment Plugin (disabled)
         - disabled: true
