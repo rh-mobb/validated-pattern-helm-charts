@@ -1,4 +1,41 @@
 {{- if .Values.sidecars.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sidecars-injector
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sidecars-injector
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sidecars-injector
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+subjects:
+- kind: ServiceAccount
+  name: sidecars-injector
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: sidecars-injector
+  apiGroup: rbac.authorization.k8s.io
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
