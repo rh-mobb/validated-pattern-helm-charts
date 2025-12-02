@@ -1,4 +1,4 @@
-{{- if .Values.sidecars.enabled }}
+{{- if and .Values.sidecars.enabled (or .Values.modelCatalog.enabled .Values.lightspeed.enabled) }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -68,6 +68,7 @@ spec:
               PATCH_FILE="${TEMP_DIR}/patch.json"
 
               # Create the container definition files
+              {{- if .Values.modelCatalog.enabled }}
               cat > "${TEMP_DIR}/location.json" <<EOF
               {
                 "name": "location",
@@ -138,7 +139,9 @@ spec:
                 "workingDir": "/opt/app-root/src"
               }
               EOF
+              {{- end }}
 
+              {{- if .Values.lightspeed.enabled }}
               cat > "${TEMP_DIR}/llama-stack-sidecar.json" <<EOF
               {
                 "name": "llama-stack",
@@ -215,27 +218,44 @@ spec:
               }
 
               # check action for each one of the containers
+              {{- if .Values.modelCatalog.enabled }}
               # Location: Add/Replace
               if echo "$CONTAINERS" | grep -q '"location"'; then
                 echo "Container 'location' already exists, will replace..."
                 LOCATION_INDEX=$(kubectl get deployment $DEPLOYMENT -n $NAMESPACE -o json | jq '.spec.template.spec.containers | map(.name == "location") | index(true)')
+                {{- if .Values.lightspeed.enabled }}
                 add_patch_operation "replace" "/spec/template/spec/containers/$LOCATION_INDEX" "${TEMP_DIR}/location.json" "false"
+                {{- else }}
+                add_patch_operation "replace" "/spec/template/spec/containers/$LOCATION_INDEX" "${TEMP_DIR}/location.json" "true"
+                {{- end }}
               else
                 echo "Container 'location' does not exist, will add..."
+                {{- if .Values.lightspeed.enabled }}
                 add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/location.json" "false"
+                {{- else }}
+                add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/location.json" "true"
+                {{- end }}
               fi
 
               # Storage REST: Add/Replace
               if echo "$CONTAINERS" | grep -q '"storage-rest"'; then
                 echo "Container 'storage-rest' already exists, will replace..."
                 STORAGE_REST_INDEX=$(kubectl get deployment $DEPLOYMENT -n $NAMESPACE -o json | jq '.spec.template.spec.containers | map(.name == "storage-rest") | index(true)')
+                {{- if .Values.lightspeed.enabled }}
                 add_patch_operation "replace" "/spec/template/spec/containers/$STORAGE_REST_INDEX" "${TEMP_DIR}/storage-rest.json" "false"
+                {{- else }}
+                add_patch_operation "replace" "/spec/template/spec/containers/$STORAGE_REST_INDEX" "${TEMP_DIR}/storage-rest.json" "true"
+                {{- end }}
               else
                 echo "Container 'storage-rest' does not exist, will add..."
+                {{- if .Values.lightspeed.enabled }}
                 add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/storage-rest.json" "false"
+                {{- else }}
+                add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/storage-rest.json" "true"
+                {{- end }}
               fi
 
-              # RHOAI Normalizer: Add/Replace (last container if lightspeed is disabled)
+              # RHOAI Normalizer: Add/Replace
               if echo "$CONTAINERS" | grep -q '"rhoai-normalizer"'; then
                 echo "Container 'rhoai-normalizer' already exists, will replace..."
                 RHOAI_NORMALIZER_INDEX=$(kubectl get deployment $DEPLOYMENT -n $NAMESPACE -o json | jq '.spec.template.spec.containers | map(.name == "rhoai-normalizer") | index(true)')
@@ -252,6 +272,7 @@ spec:
                 add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/rhoai-normalizer.json" "true"
                 {{- end }}
               fi
+              {{- end }}
 
               {{- if .Values.lightspeed.enabled }}
               # Lightspeed Core: Add/Replace
