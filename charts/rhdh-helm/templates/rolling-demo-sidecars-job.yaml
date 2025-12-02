@@ -189,6 +189,7 @@ spec:
                 ]
               }
               EOF
+              {{- end }}
 
               # build the file used for patching
               echo "[" > "$PATCH_FILE"
