@@ -54,7 +54,7 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-              DEPLOYMENT="{{ .Release.Name }}-backstage"
+              DEPLOYMENT="{{ .Release.Name }}-developer-hub"
               NAMESPACE="{{ .Values.namespace }}"
 
               echo "Waiting deployment ${DEPLOYMENT} to be available.."
