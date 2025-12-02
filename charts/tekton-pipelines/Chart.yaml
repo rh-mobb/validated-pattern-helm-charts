@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tekton-pipelines
+description: Chart to deploy OpenShift Pipelines (Tekton) operator
+version: 0.1.0
+
+

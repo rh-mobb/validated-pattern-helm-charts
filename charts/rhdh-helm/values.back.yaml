@@ -1,8 +1,4 @@
 namespace: backstage
-
-# Quay/Red Hat Pull Secret (for AI Rolling Demo images)
-quayPullSecret: ""  # Populated via infrastructure file from AWS Secrets Manager
-
 redhat-developer-hub:
   #helm repo add backstage https://janus-idp.github.io/helm-backstage
   #helm repo update
@@ -242,8 +238,8 @@ redhat-developer-hub:
         # AI Experience Plugin (Backend)
         - package: oci://quay.io/karthik_jk/ai-experience:1.6.1!red-hat-developer-hub-backstage-plugin-ai-experience-backend-dynamic
           disabled: false
-        # Red Hat Developer Hub Lightspeed Plugin (Frontend) - DISABLED BY DEFAULT
-        - disabled: true
+        # Red Hat Developer Hub Lightspeed Plugin (Frontend)
+        - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed
           pluginConfig:
             dynamicPlugins:
@@ -264,11 +260,11 @@ redhat-developer-hub:
                       menuItem:
                         icon: LightspeedIcon
                         text: Lightspeed
-        # Red Hat Developer Hub Lightspeed Plugin (Backend) - DISABLED BY DEFAULT
-        - disabled: true
+        # Red Hat Developer Hub Lightspeed Plugin (Backend)
+        - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed-backend:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed-backend
-        # MCP Actions Backend Plugin - DISABLED BY DEFAULT
-        - disabled: true
+        # MCP Actions Backend Plugin
+        - disabled: false
           package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-mcp-actions-backend:next__0.1.2!backstage-plugin-mcp-actions-backend
         # Software Catalog MCP Tool Plugin
         - disabled: true
@@ -293,7 +289,7 @@ redhat-developer-hub:
       image:
         registry: quay.io
         repository: rhdh/rhdh-hub-rhel9
-        tag: '1.4-290'
+        tag: '1.7-154'
         pullSecrets:
         - redhat-gpte-devhub-pull-secret
       extraEnvVars:
@@ -353,74 +349,6 @@ redhat-developer-hub:
               name: github-app-credentials
         - name: LOG_LEVEL
           value: debug
-      # Arguments for Backstage to load dynamic plugins configuration
-      args:
-        - "--config"
-        - dynamic-plugins-root/app-config.dynamic-plugins.yaml
-      # Volume mounts for dynamic plugins
-      extraVolumeMounts:
-        - name: dynamic-plugins-root
-          mountPath: /opt/app-root/src/dynamic-plugins-root
-      # Volumes for dynamic plugins and Lightspeed
-      extraVolumes:
-        - name: dynamic-plugins-root
-          ephemeral:
-            volumeClaimTemplate:
-              spec:
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 2Gi
-        - name: dynamic-plugins
-          configMap:
-            defaultMode: 420
-            name: "{{ .Release.Name }}-dynamic-plugins"
-            optional: true
-        - name: dynamic-plugins-npmrc
-          secret:
-            defaultMode: 420
-            optional: true
-            secretName: dynamic-plugins-npmrc
-        - name: lightspeed-stack
-          configMap:
-            name: lightspeed-stack
-            optional: true
-        - name: shared-storage
-          emptyDir: {}
-        - name: rag-data-volume
-          emptyDir: {}
-      # Init containers for dynamic plugins and RAG data
-      initContainers:
-        - name: install-dynamic-plugins
-          image: '{{ include "backstage.image" . }}'
-          command:
-            - ./install-dynamic-plugins.sh
-            - /dynamic-plugins-root
-          env:
-            - name: NPM_CONFIG_USERCONFIG
-              value: /opt/app-root/src/.npmrc.dynamic-plugins
-          imagePullPolicy: Always
-          volumeMounts:
-            - mountPath: /dynamic-plugins-root
-              name: dynamic-plugins-root
-            - mountPath: /opt/app-root/src/dynamic-plugins.yaml
-              name: dynamic-plugins
-              readOnly: true
-              subPath: dynamic-plugins.yaml
-            - mountPath: /opt/app-root/src/.npmrc.dynamic-plugins
-              name: dynamic-plugins-npmrc
-              readOnly: true
-              subPath: .npmrc
-        - name: init-rag-data
-          image: 'quay.io/redhat-ai-dev/rag-content:release-1.7-lcs'
-          command:
-            - "sh"
-            - "-c"
-            - "echo 'Copying RAG data...'; cp -r /rag/vector_db/rhdh_product_docs /data/ && cp -r /rag/embeddings_model /data/ && echo 'Copy complete.' || echo 'RAG data copy failed or not available'"
-          volumeMounts:
-            - mountPath: /data
-              name: rag-data-volume
       appConfig:
         app:
           baseUrl: holder
@@ -459,16 +387,7 @@ redhat-developer-hub:
             allow:
               - host: holder
               - host: raw.githubusercontent.com
-          actions:
-            pluginSources:
-              - 'software-catalog-mcp-tool'
-              - 'techdocs-mcp-tool'
   
-        lightspeed:
-          mcpServers:
-            - name: mcp-integration-tools
-              token: ${MCP_TOKEN}
-
         integrations:
         ######### COMMENTED OUT ##########
           # gitlab:
@@ -678,54 +597,3 @@ redhat-developer-hub:
       createDBJobImage: "{{ .Values.upstream.postgresql.image.registry }}/{{ .Values.upstream.postgresql.image.repository }}:{{ .Values.upstream.postgresql.image.tag }}"
     # -- Orchestrator plugins and their configuration
     plugins: []
-
-# Lightspeed Configuration
-lightspeed:
-  enabled: false  # Disabled by default - requires external secrets
-  mcpToken: "your-mcp-token-here"
-  # vLLM/Mistral Model Configuration
-  vllmUrl: "https://mistral-small-24b-instruct-quantized-mistral-ai.apps.rosa.np-ai-1.p867.p3.openshiftapps.com/v1"
-  vllmApiKey: ""  # Leave empty if no auth required
-  validationProvider: "vllm"
-  validationModelName: "mistralai/Mistral-Small-Instruct-2409"
-  postgres:
-    enabled: false
-    namespace: lightspeed-postgres
-    image: postgres:15
-    storageSize: 5Gi
-    user: postgres
-    password: postgres
-    dbName: lightspeed
-
-# Model Catalog Configuration
-modelCatalog:
-  enabled: false  # Disabled by default - requires RHOAI
-
-# Kubernetes Configuration
-kubernetes:
-  clusterReaderEnabled: false
-  clusterToken: ""
-
-# Sidecars Configuration (for Model Catalog and Lightspeed integration)
-sidecars:
-  enabled: false  # Disabled by default - requires external secrets: llama-stack-secrets
-  serviceAccount: default
-  image: quay.io/redhat-ai-dev/utils:latest
-  locationImage: quay.io/redhat-ai-dev/model-catalog-location-service:latest
-  storageRestImage: quay.io/redhat-ai-dev/model-catalog-storage-rest:latest
-  rhoaiNormalizerImage: quay.io/redhat-ai-dev/model-catalog-rhoai-normalizer:latest
-  llamaStackImage: quay.io/redhat-ai-dev/llama-stack:0.1.0
-  lightspeedCoreImage: quay.io/lightspeed-core/lightspeed-stack:dev-20251021-ee9f08f
-  feedbackHarvesterImage: quay.io/redhat-ai-dev/feedback-harvester:v0.1.0
-
-# ArgoCD Configuration
-argocd:
-  enabled: false
-  username: admin
-  password: ""
-  apiToken: ""
-  hostname: ""
-
-# Dynamic Plugins Configuration
-dynamicPlugins:
-  enabled: false

@@ -21,3 +21,4 @@ gitopsCluster:
   argoNamespace: openshift-gitops
   placementName: all-spoke-clusters
 
+
