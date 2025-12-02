@@ -220,43 +220,27 @@ spec:
 
               # check action for each one of the containers
               {{- if .Values.modelCatalog.enabled }}
-              # Location: Add/Replace
+              # Location: Add/Replace (never last - storage-rest or rhoai-normalizer follows)
               if echo "$CONTAINERS" | grep -q '"location"'; then
                 echo "Container 'location' already exists, will replace..."
                 LOCATION_INDEX=$(kubectl get deployment $DEPLOYMENT -n $NAMESPACE -o json | jq '.spec.template.spec.containers | map(.name == "location") | index(true)')
-                {{- if .Values.lightspeed.enabled }}
                 add_patch_operation "replace" "/spec/template/spec/containers/$LOCATION_INDEX" "${TEMP_DIR}/location.json" "false"
-                {{- else }}
-                add_patch_operation "replace" "/spec/template/spec/containers/$LOCATION_INDEX" "${TEMP_DIR}/location.json" "true"
-                {{- end }}
               else
                 echo "Container 'location' does not exist, will add..."
-                {{- if .Values.lightspeed.enabled }}
                 add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/location.json" "false"
-                {{- else }}
-                add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/location.json" "true"
-                {{- end }}
               fi
 
-              # Storage REST: Add/Replace
+              # Storage REST: Add/Replace (never last - rhoai-normalizer follows)
               if echo "$CONTAINERS" | grep -q '"storage-rest"'; then
                 echo "Container 'storage-rest' already exists, will replace..."
                 STORAGE_REST_INDEX=$(kubectl get deployment $DEPLOYMENT -n $NAMESPACE -o json | jq '.spec.template.spec.containers | map(.name == "storage-rest") | index(true)')
-                {{- if .Values.lightspeed.enabled }}
                 add_patch_operation "replace" "/spec/template/spec/containers/$STORAGE_REST_INDEX" "${TEMP_DIR}/storage-rest.json" "false"
-                {{- else }}
-                add_patch_operation "replace" "/spec/template/spec/containers/$STORAGE_REST_INDEX" "${TEMP_DIR}/storage-rest.json" "true"
-                {{- end }}
               else
                 echo "Container 'storage-rest' does not exist, will add..."
-                {{- if .Values.lightspeed.enabled }}
                 add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/storage-rest.json" "false"
-                {{- else }}
-                add_patch_operation "add" "/spec/template/spec/containers/-" "${TEMP_DIR}/storage-rest.json" "true"
-                {{- end }}
               fi
 
-              # RHOAI Normalizer: Add/Replace
+              # RHOAI Normalizer: Add/Replace (last if lightspeed disabled)
               if echo "$CONTAINERS" | grep -q '"rhoai-normalizer"'; then
                 echo "Container 'rhoai-normalizer' already exists, will replace..."
                 RHOAI_NORMALIZER_INDEX=$(kubectl get deployment $DEPLOYMENT -n $NAMESPACE -o json | jq '.spec.template.spec.containers | map(.name == "rhoai-normalizer") | index(true)')
