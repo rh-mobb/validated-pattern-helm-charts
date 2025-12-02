@@ -49,7 +49,7 @@ argocd:
     helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
     chart: app-of-apps-infrastructure
     project: cluster-config-project
-    targetRevision: 0.1.8
+    targetRevision: 0.2.2
     gitRepoUrl: https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
     adGroup: PFAUTHAD
     gitPathFile: /infrastructure.yaml
