@@ -2,7 +2,7 @@ apiVersion: v2
 name: cluster-bootstrap-acm-hub-registration
 description: Helm chart to register spoke clusters with ACM hub
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "1.0"
 
 
