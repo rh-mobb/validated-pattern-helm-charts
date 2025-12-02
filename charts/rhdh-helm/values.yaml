@@ -203,7 +203,7 @@ redhat-developer-hub:
         #     orchestrator:
         #       dataIndexService:
         #         url: http://sonataflow-platform-data-index-service
-        - disabled: false
+        - disabled: true
           integrity: sha512-0KIXrZoJ+O4xNNzN/zB4+VMuaRPuiUviAmM+fIhTo/P9aLA36F9aIlyMbUbki49uaJ0zd8KXMBvmJSHZNrYkGQ==
           package: '@redhat/backstage-plugin-orchestrator-form-widgets@1.7.1'
           pluginConfig:
