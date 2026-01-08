@@ -125,5 +125,5 @@ openshiftAI:
         kueue:
           managementState: Removed
         llamastackoperator:
-          managementState: Removed
+          managementState: Managed
 
