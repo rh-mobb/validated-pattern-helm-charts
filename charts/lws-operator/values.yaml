@@ -1,0 +1,19 @@
+startingCSV: leader-worker-set.v1.0.0
+namespace: openshift-lws-operator
+
+# LeaderWorkerSetOperator CR configuration
+lwsOperator:
+  enabled: true
+  name: cluster
+  managementState: Managed
+
+helper-status-checker:
+  approver: true
+  enabled: true
+  checks:
+    - operatorName: leader-worker-set
+      subscriptionName: leader-worker-set
+      namespace:
+        name: openshift-lws-operator
+      serviceAccount:
+        name: "status-checker"

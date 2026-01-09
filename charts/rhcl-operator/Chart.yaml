@@ -1,0 +1,8 @@
+apiVersion: v2
+name: rhcl-operator
+description: Chart to deploy Red Hat Connectivity Link (RHCL) operator for API gateway and rate limiting
+version: 0.1.0
+dependencies:
+  - name: helper-status-checker
+    repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    version: 4.4.3
