@@ -137,3 +137,15 @@ openshiftAI:
           managementState: Managed
           workbenchNamespace: rhods-notebooks
 
+  # -- Gateway configuration for KServe inference
+  gateway:
+    # -- Enable Gateway creation for OpenShift AI inference
+    enabled: true
+    # -- Name of the Gateway
+    name: openshift-ai-inference
+    # -- Namespace for the Gateway
+    namespace: openshift-ingress
+    # -- GatewayClass to use
+    gatewayClassName: openshift-default
+    # -- Syncwave for Gateway (should be after DSC)
+    syncwave: '5'

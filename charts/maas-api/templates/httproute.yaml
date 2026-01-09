@@ -1,0 +1,43 @@
+{{- if .Values.httproute.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: maas-api-route
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: api
+    app.kubernetes.io/name: maas-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  parentRefs:
+    - name: {{ .Values.gateway.name }}
+      namespace: {{ .Values.gateway.namespace }}
+  rules:
+    # OpenAI-compatible /v1/models endpoint at top level
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /v1/models
+      backendRefs:
+        - name: maas-api
+          port: {{ .Values.service.port }}
+          weight: 100
+    # All other maas-api endpoints remain under /maas-api prefix
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /maas-api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: maas-api
+          port: {{ .Values.service.port }}
+          weight: 100
+{{- end }}
+

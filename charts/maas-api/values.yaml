@@ -1,0 +1,121 @@
+# Model-as-a-Service (MaaS) API Configuration
+namespace: maas-api
+
+# MaaS API Image Configuration
+image:
+  repository: registry.redhat.io/rhoai/odh-maas-api-rhel9
+  tag: v3.0.0
+  pullPolicy: Always
+
+# Deployment configuration
+deployment:
+  replicas: 1
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+
+# Service configuration
+service:
+  port: 8080
+  type: ClusterIP
+
+# Gateway configuration
+gateway:
+  enabled: true
+  name: maas-default-gateway
+  namespace: openshift-ingress
+  # CLUSTER_DOMAIN - will be set from infrastructure.yaml
+  # e.g., apps.rosa.np-ai-1.p867.p3.openshiftapps.com
+  clusterDomain: ""
+  # TLS certificate secret name (optional - for HTTPS listener)
+  tlsCertSecretName: ""
+  gatewayClassName: openshift-default
+
+# HTTPRoute configuration
+httproute:
+  enabled: true
+
+# Auth Policy configuration
+authPolicy:
+  enabled: true
+  # Kubernetes token review audiences
+  audiences:
+    - https://kubernetes.default.svc
+    - maas-default-gateway-sa
+  # Custom audience (set from cluster if different)
+  customAudience: ""
+  # Auto-detect audience from cluster and patch AuthPolicies (runs as PostSync Job)
+  autoDetectAudience: true
+
+# Gateway Auth Policy (for tier-based access control)
+gatewayAuthPolicy:
+  enabled: true
+
+# Rate Limiting configuration
+rateLimitPolicy:
+  enabled: true
+  limits:
+    free:
+      rate: 5
+      window: 2m
+    premium:
+      rate: 20
+      window: 2m
+    enterprise:
+      rate: 50
+      window: 2m
+
+# Token Rate Limiting configuration
+tokenLimitPolicy:
+  enabled: true
+  limits:
+    free:
+      rate: 100
+      window: 1m
+    premium:
+      rate: 50000
+      window: 1m
+    enterprise:
+      rate: 100000
+      window: 1m
+
+# Tier Mapping configuration
+tierMapping:
+  enabled: true
+  tiers:
+    - name: free
+      displayName: Free Tier
+      level: 0
+      groups:
+        - tier-free-users
+        - system:authenticated
+    - name: premium
+      displayName: Premium Tier
+      level: 1
+      groups:
+        - tier-premium-users
+        - premium-group
+    - name: enterprise
+      displayName: Enterprise Tier
+      level: 2
+      groups:
+        - tier-enterprise-users
+        - enterprise-group
+        - admin-group
+
+# Observability configuration
+observability:
+  serviceMonitor:
+    enabled: true
+    namespace: kuadrant-system
+  telemetryPolicy:
+    enabled: true
+
+# RBAC configuration
+rbac:
+  create: true
+

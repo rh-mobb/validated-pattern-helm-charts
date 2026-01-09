@@ -1,0 +1,46 @@
+{{- if .Values.rateLimitPolicy.enabled }}
+apiVersion: kuadrant.io/v1
+kind: RateLimitPolicy
+metadata:
+  name: gateway-rate-limits
+  namespace: {{ .Values.gateway.namespace }}
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: gateway
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: {{ .Values.gateway.name }}
+  limits:
+    free:
+      rates:
+        - limit: {{ .Values.rateLimitPolicy.limits.free.rate }}
+          window: {{ .Values.rateLimitPolicy.limits.free.window }}
+      when:
+        - predicate: |
+            auth.identity.tier == "free"
+      counters:
+        - expression: auth.identity.userid
+    premium:
+      rates:
+        - limit: {{ .Values.rateLimitPolicy.limits.premium.rate }}
+          window: {{ .Values.rateLimitPolicy.limits.premium.window }}
+      when:
+        - predicate: |
+            auth.identity.tier == "premium"
+      counters:
+        - expression: auth.identity.userid
+    enterprise:
+      rates:
+        - limit: {{ .Values.rateLimitPolicy.limits.enterprise.rate }}
+          window: {{ .Values.rateLimitPolicy.limits.enterprise.window }}
+      when:
+        - predicate: |
+            auth.identity.tier == "enterprise"
+      counters:
+        - expression: auth.identity.userid
+{{- end }}
+

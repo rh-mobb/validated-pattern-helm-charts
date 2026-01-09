@@ -1,0 +1,40 @@
+{{- if .Values.authPolicy.enabled }}
+apiVersion: kuadrant.io/v1
+kind: AuthPolicy
+metadata:
+  name: maas-api-auth-policy
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: api
+    app.kubernetes.io/name: maas-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: maas-api-route
+  rules:
+    # Allow any authenticated user to access the API
+    authentication:
+      openshift-identities:
+        kubernetesTokenReview:
+          audiences:
+            {{- range .Values.authPolicy.audiences }}
+            - {{ . }}
+            {{- end }}
+            {{- if .Values.authPolicy.customAudience }}
+            - {{ .Values.authPolicy.customAudience }}
+            {{- end }}
+    response:
+      success:
+        headers:
+          X-MaaS-Username:
+            plain:
+              selector: auth.identity.user.username
+          X-MaaS-Group:
+            plain:
+              selector: auth.identity.user.groups.@tostr
+{{- end }}
+

@@ -1,0 +1,50 @@
+{{- if .Values.tokenLimitPolicy.enabled }}
+# Gateway-level Token Rate Limiting Policy
+# Automatically tracks tokens from response bodies (usage.total_tokens)
+---
+apiVersion: kuadrant.io/v1alpha1
+kind: TokenRateLimitPolicy
+metadata:
+  name: gateway-token-rate-limits
+  namespace: {{ .Values.gateway.namespace }}
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: gateway
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: {{ .Values.gateway.name }}
+  limits:
+    free-user-tokens:
+      rates:
+        - limit: {{ .Values.tokenLimitPolicy.limits.free.rate }}
+          window: {{ .Values.tokenLimitPolicy.limits.free.window }}
+      when:
+        - predicate: |
+            auth.identity.tier == "free"
+      counters:
+        - expression: auth.identity.userid
+    
+    premium-user-tokens:
+      rates:
+        - limit: {{ .Values.tokenLimitPolicy.limits.premium.rate }}
+          window: {{ .Values.tokenLimitPolicy.limits.premium.window }}
+      when:
+        - predicate: |
+            auth.identity.tier == "premium"
+      counters:
+        - expression: auth.identity.userid
+    enterprise-user-tokens:
+      rates:
+        - limit: {{ .Values.tokenLimitPolicy.limits.enterprise.rate }}
+          window: {{ .Values.tokenLimitPolicy.limits.enterprise.window }}
+      when:
+        - predicate: |
+            auth.identity.tier == "enterprise"
+      counters:
+        - expression: auth.identity.userid
+{{- end }}
+

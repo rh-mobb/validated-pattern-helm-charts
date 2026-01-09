@@ -1,0 +1,33 @@
+{{- if .Values.tierMapping.enabled }}
+# Tier to Group Mapping for MaaS API
+# This ConfigMap defines which user groups belong to each tier
+# Users in higher tier groups get higher rate limits
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tier-to-group-mapping
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: maas-api
+    component: tier-mapping
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: api
+    app.kubernetes.io/name: maas-api
+  annotations:
+    opendatahub.io/managed: "false"
+    argocd.argoproj.io/sync-wave: "-2"
+data:
+  tiers: |
+    {{- range .Values.tierMapping.tiers }}
+    # {{ .displayName }}
+    - name: {{ .name }}
+      displayName: {{ .displayName }}
+      level: {{ .level }}
+      groups:
+        {{- range .groups }}
+        - {{ . }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+

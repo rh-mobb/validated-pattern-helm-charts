@@ -1,0 +1,16 @@
+apiVersion: v2
+name: maas-api
+description: Model-as-a-Service (MaaS) API for managing LLM inference services
+type: application
+version: 0.1.0
+appVersion: "v3.0.0"
+keywords:
+  - maas
+  - models-as-a-service
+  - llm
+  - inference
+  - openshift-ai
+  - kuadrant
+maintainers:
+  - name: Platform Team
+

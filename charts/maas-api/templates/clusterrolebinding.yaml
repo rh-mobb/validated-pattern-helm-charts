@@ -1,0 +1,21 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: maas-api
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: api
+    app.kubernetes.io/name: maas-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: maas-api
+subjects:
+- kind: ServiceAccount
+  name: maas-api
+  namespace: {{ .Values.namespace }}
+{{- end }}
+

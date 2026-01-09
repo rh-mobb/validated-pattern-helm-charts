@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maas-api
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: api
+    app.kubernetes.io/name: maas-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: maas-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: models-as-a-service
+        app.kubernetes.io/component: api
+        app.kubernetes.io/name: maas-api
+    spec:
+      serviceAccountName: maas-api
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: maas-api
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        {{- if .Values.gateway.enabled }}
+        - name: GATEWAY_NAMESPACE
+          value: {{ .Values.gateway.namespace }}
+        - name: GATEWAY_NAME
+          value: {{ .Values.gateway.name }}
+        {{- end }}
+        resources:
+          requests:
+            memory: {{ .Values.deployment.resources.requests.memory | quote }}
+            cpu: {{ .Values.deployment.resources.requests.cpu | quote }}
+          limits:
+            memory: {{ .Values.deployment.resources.limits.memory | quote }}
+            cpu: {{ .Values.deployment.resources.limits.cpu | quote }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+      terminationGracePeriodSeconds: 30
+

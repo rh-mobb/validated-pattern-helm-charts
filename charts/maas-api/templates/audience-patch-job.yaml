@@ -1,0 +1,65 @@
+{{- if .Values.authPolicy.autoDetectAudience }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: maas-api-audience-patch
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: api
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      serviceAccountName: maas-api
+      restartPolicy: OnFailure
+      containers:
+      - name: audience-patch
+        image: registry.redhat.io/openshift4/ose-cli:latest
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          
+          echo "Detecting cluster audience..."
+          
+          # Create a temporary token and extract the audience
+          AUD=$(kubectl create token default -n default --duration=10m 2>/dev/null | cut -d. -f2 | base64 -d 2>/dev/null | jq -r '.aud[0]' 2>/dev/null || echo "")
+          
+          echo "Detected audience: ${AUD}"
+          
+          # Only patch if audience is non-empty and different from default
+          if [[ -n "$AUD" && "$AUD" != "https://kubernetes.default.svc" ]]; then
+            echo "Patching maas-api-auth-policy with custom audience..."
+            kubectl patch authpolicy maas-api-auth-policy -n {{ .Values.namespace }} --type=merge -p "
+          spec:
+            rules:
+              authentication:
+                openshift-identities:
+                  kubernetesTokenReview:
+                    audiences:
+                      - $AUD
+                      - maas-default-gateway-sa
+          "
+            
+            echo "Patching gateway-auth-policy with custom audience..."
+            kubectl patch authpolicy gateway-auth-policy -n {{ .Values.gateway.namespace }} --type=merge -p "
+          spec:
+            rules:
+              authentication:
+                service-accounts:
+                  kubernetesTokenReview:
+                    audiences:
+                      - $AUD
+                      - maas-default-gateway-sa
+          "
+            echo "Audience patching complete."
+          else
+            echo "Using default audience, no patch needed."
+          fi
+  backoffLimit: 3
+{{- end }}
+

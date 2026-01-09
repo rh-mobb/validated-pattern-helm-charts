@@ -1,0 +1,24 @@
+{{- if .Values.observability.telemetryPolicy.enabled }}
+apiVersion: extensions.kuadrant.io/v1alpha1
+kind: TelemetryPolicy
+metadata:
+  name: user-group
+  namespace: {{ .Values.gateway.namespace }}
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: gateway
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  metrics:
+    default:
+      labels:
+        model: responseBodyJSON("/model")
+        tier: auth.identity.tier
+        user: auth.identity.userid
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: {{ .Values.gateway.name }}
+{{- end }}
+

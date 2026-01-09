@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: maas-api
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: models-as-a-service
+    app.kubernetes.io/component: api
+    app.kubernetes.io/name: maas-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  selector:
+    app.kubernetes.io/name: maas-api
+  ports:
+  - name: http
+    port: {{ .Values.service.port }}
+    targetPort: http
+    protocol: TCP
+  type: {{ .Values.service.type }}
+
