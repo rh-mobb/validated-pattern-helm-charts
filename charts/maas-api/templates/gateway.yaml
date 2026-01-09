@@ -5,7 +5,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: {{ .Values.gateway.name }}
-  namespace: {{ .Values.gateway.namespace }}
+  namespace: {{ .Values.deployNamespace }}
   annotations:
     opendatahub.io/managed: "false"
     argocd.argoproj.io/sync-wave: "-1"

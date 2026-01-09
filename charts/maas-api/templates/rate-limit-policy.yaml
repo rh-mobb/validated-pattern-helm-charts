@@ -3,7 +3,7 @@ apiVersion: kuadrant.io/v1
 kind: RateLimitPolicy
 metadata:
   name: gateway-rate-limits
-  namespace: {{ .Values.gateway.namespace }}
+  namespace: {{ .Values.deployNamespace }}
   labels:
     app.kubernetes.io/part-of: models-as-a-service
     app.kubernetes.io/component: gateway

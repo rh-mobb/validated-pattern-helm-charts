@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: maas-api
-  namespace: opendatahub
+  namespace: {{ .Values.deployNamespace }}
   labels:
     app.kubernetes.io/part-of: models-as-a-service
     app.kubernetes.io/component: api

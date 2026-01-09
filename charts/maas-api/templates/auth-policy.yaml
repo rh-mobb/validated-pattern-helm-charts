@@ -3,7 +3,7 @@ apiVersion: kuadrant.io/v1
 kind: AuthPolicy
 metadata:
   name: maas-api-auth-policy
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.deployNamespace }}
   labels:
     app.kubernetes.io/part-of: models-as-a-service
     app.kubernetes.io/component: api

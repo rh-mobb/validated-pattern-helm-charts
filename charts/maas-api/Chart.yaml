@@ -2,7 +2,7 @@ apiVersion: v2
 name: maas-api
 description: Model-as-a-Service (MaaS) API for managing LLM inference services
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "v3.0.0"
 keywords:
   - maas

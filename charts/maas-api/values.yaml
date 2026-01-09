@@ -1,5 +1,8 @@
 # Model-as-a-Service (MaaS) API Configuration
+# Namespace to create (for future use / isolation)
 namespace: maas-api
+# Namespace where MaaS API resources are deployed (should be opendatahub for RHOAI integration)
+deployNamespace: opendatahub
 
 # MaaS API Image Configuration
 image:

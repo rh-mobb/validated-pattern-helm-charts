@@ -3,7 +3,7 @@ apiVersion: extensions.kuadrant.io/v1alpha1
 kind: TelemetryPolicy
 metadata:
   name: user-group
-  namespace: {{ .Values.gateway.namespace }}
+  namespace: {{ .Values.deployNamespace }}
   labels:
     app.kubernetes.io/part-of: models-as-a-service
     app.kubernetes.io/component: gateway

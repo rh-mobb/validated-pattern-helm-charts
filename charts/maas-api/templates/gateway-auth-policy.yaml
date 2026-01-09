@@ -4,7 +4,7 @@ apiVersion: kuadrant.io/v1
 kind: AuthPolicy
 metadata:
   name: gateway-auth-policy
-  namespace: {{ .Values.gateway.namespace }}
+  namespace: {{ .Values.deployNamespace }}
   labels:
     app.kubernetes.io/part-of: models-as-a-service
     app.kubernetes.io/component: gateway
@@ -20,7 +20,7 @@ spec:
       # Enriching identity metadata with a proper subscription tier based on user groups
       matchedTier:
         http:
-          url: http://maas-api.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.service.port }}/v1/tiers/lookup
+          url: http://maas-api.{{ .Values.deployNamespace }}.svc.cluster.local:{{ .Values.service.port }}/v1/tiers/lookup
           contentType: application/json
           method: POST
           body:

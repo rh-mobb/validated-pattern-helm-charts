@@ -3,7 +3,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: maas-api-audience-patch
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.deployNamespace }}
   labels:
     app.kubernetes.io/part-of: models-as-a-service
     app.kubernetes.io/component: api
@@ -34,7 +34,7 @@ spec:
           # Only patch if audience is non-empty and different from default
           if [[ -n "$AUD" && "$AUD" != "https://kubernetes.default.svc" ]]; then
             echo "Patching maas-api-auth-policy with custom audience..."
-            kubectl patch authpolicy maas-api-auth-policy -n {{ .Values.namespace }} --type=merge -p "
+            kubectl patch authpolicy maas-api-auth-policy -n {{ .Values.deployNamespace }} --type=merge -p "
           spec:
             rules:
               authentication:
