@@ -115,7 +115,7 @@ openshiftAI:
         kueue:
           defaultClusterQueueName: default
           defaultLocalQueueName: default
-          managementState: Managed
+          managementState: Removed
         # Llama Stack Operator
         llamastackoperator:
           managementState: Managed
