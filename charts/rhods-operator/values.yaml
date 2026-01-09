@@ -94,8 +94,16 @@ openshiftAI:
     name: default-dsc
     spec:
       components:
+        # AI Pipelines
+        aipipelines:
+          argoWorkflowsControllers:
+            managementState: Managed
+          managementState: Managed
         # Dashboard
         dashboard:
+          managementState: Managed
+        # Feast Operator
+        feastoperator:
           managementState: Managed
         # KServe with optional NIM support
         kserve:
@@ -103,27 +111,29 @@ openshiftAI:
           # Uncomment to enable NVIDIA Inference Microservices
           # nim:
           #   managementState: Managed
-        # Model Registry (new in v3.0)
+        # Kueue
+        kueue:
+          defaultClusterQueueName: default
+          defaultLocalQueueName: default
+          managementState: Managed
+        # Llama Stack Operator
+        llamastackoperator:
+          managementState: Managed
+        # Model Registry
         modelregistry:
           managementState: Managed
           registriesNamespace: rhoai-model-registries
         # Ray
         ray:
           managementState: Managed
-        # Training Operator (new in v3.0)
+        # Training Operator
         trainingoperator:
           managementState: Managed
-        # TrustyAI (new in v3.0)
+        # TrustyAI
         trustyai:
           managementState: Managed
         # Workbenches
         workbenches:
           managementState: Managed
-        # Removed components (set to Removed for v3.0 compatibility)
-        feastoperator:
-          managementState: Removed
-        kueue:
-          managementState: Removed
-        llamastackoperator:
-          managementState: Managed
+          workbenchNamespace: rhods-notebooks
 

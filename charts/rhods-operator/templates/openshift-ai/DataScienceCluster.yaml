@@ -1,6 +1,6 @@
 {{- if .Values.openshiftAI.datasciencecluster.enabled -}}
 ---
-apiVersion: datasciencecluster.opendatahub.io/v1
+apiVersion: datasciencecluster.opendatahub.io/v2
 kind: DataScienceCluster
 metadata:
   annotations:
@@ -10,39 +10,53 @@ metadata:
   namespace: {{ .Values.openshiftAI.namespace.name | default "redhat-ods-operator" }}
 spec:
   components:
+    # AI Pipelines
+    aipipelines:
+      {{- if .Values.openshiftAI.datasciencecluster.spec.components.aipipelines.argoWorkflowsControllers }}
+      argoWorkflowsControllers:
+        managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.aipipelines.argoWorkflowsControllers.managementState | default "Managed" }}
+      {{- end }}
+      managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.aipipelines.managementState | default "Managed" }}
     # Dashboard
     dashboard:
       managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.dashboard.managementState | default "Managed" }}
-    # KServe with NIM support
+    # Feast Operator
+    feastoperator:
+      managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.feastoperator.managementState | default "Managed" }}
+    # KServe
     kserve:
       managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.kserve.managementState | default "Managed" }}
       {{- if .Values.openshiftAI.datasciencecluster.spec.components.kserve.nim }}
       nim:
         managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.kserve.nim.managementState | default "Managed" }}
       {{- end }}
-    # Model Registry (new in v3.0)
+    # Kueue
+    kueue:
+      {{- if .Values.openshiftAI.datasciencecluster.spec.components.kueue.defaultClusterQueueName }}
+      defaultClusterQueueName: {{ .Values.openshiftAI.datasciencecluster.spec.components.kueue.defaultClusterQueueName }}
+      {{- end }}
+      {{- if .Values.openshiftAI.datasciencecluster.spec.components.kueue.defaultLocalQueueName }}
+      defaultLocalQueueName: {{ .Values.openshiftAI.datasciencecluster.spec.components.kueue.defaultLocalQueueName }}
+      {{- end }}
+      managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.kueue.managementState | default "Managed" }}
+    # Llama Stack Operator
+    llamastackoperator:
+      managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.llamastackoperator.managementState | default "Managed" }}
+    # Model Registry
     modelregistry:
       managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.modelregistry.managementState | default "Managed" }}
-      {{- if .Values.openshiftAI.datasciencecluster.spec.components.modelregistry.registriesNamespace }}
       registriesNamespace: {{ .Values.openshiftAI.datasciencecluster.spec.components.modelregistry.registriesNamespace | default "rhoai-model-registries" }}
-      {{- end }}
     # Ray
     ray:
       managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.ray.managementState | default "Managed" }}
-    # Training Operator (new in v3.0)
+    # Training Operator
     trainingoperator:
       managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.trainingoperator.managementState | default "Managed" }}
-    # TrustyAI (new in v3.0)
+    # TrustyAI
     trustyai:
       managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.trustyai.managementState | default "Managed" }}
     # Workbenches
     workbenches:
       managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.workbenches.managementState | default "Managed" }}
-    # Removed components (explicitly set to Removed for v3.0 compatibility)
-    feastoperator:
-      managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.feastoperator.managementState | default "Removed" }}
-    kueue:
-      managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.kueue.managementState | default "Removed" }}
-    llamastackoperator:
-      managementState: {{ .Values.openshiftAI.datasciencecluster.spec.components.llamastackoperator.managementState | default "Removed" }}
+      workbenchNamespace: {{ .Values.openshiftAI.datasciencecluster.spec.components.workbenches.workbenchNamespace | default "rhods-notebooks" }}
 {{- end }}
