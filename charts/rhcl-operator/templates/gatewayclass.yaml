@@ -1,0 +1,12 @@
+{{- if .Values.gatewayClass.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: {{ .Values.gatewayClass.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  controllerName: {{ .Values.gatewayClass.controllerName | quote }}
+{{- end }}
+

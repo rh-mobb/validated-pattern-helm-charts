@@ -1,0 +1,599 @@
+namespace: backstage
+redhat-developer-hub:
+  #helm repo add backstage https://janus-idp.github.io/helm-backstage
+  #helm repo update
+  #oc project backstage
+  #helm install backstage backstage/backstage --values values.yaml
+  global:
+    auth:
+      backend:
+        enabled: true
+    clusterRouterBase: holder
+    dynamic:
+      includes:
+        - dynamic-plugins.default.yaml
+      plugins:
+        # Dynamic Home Page Plugin
+        - package: ./dynamic-plugins/dist/red-hat-developer-hub-backstage-plugin-dynamic-home-page
+          disabled: true
+        # Customized Sign-In Page Plugin
+        - package: oci://quay.io/tpetkos/customized-sign-in-page:v0.1.0!red-hat-developer-hub-backstage-plugin-customized-sign-in-page
+          disabled: false
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                red-hat-developer-hub.backstage-plugin-customized-sign-in-page:
+                  signInPage:
+                    importName: CustomizedSignInPage
+        # Global Header Plugin
+        - package: ./dynamic-plugins/dist/red-hat-developer-hub-backstage-plugin-global-header
+          disabled: false
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                default.main-menu-items:
+                  menuItems:
+                    default.create:
+                      title: ''
+                    default.admin:
+                      title: Administration
+                      textKey: menuItem.administration
+                      icon: admin
+                red-hat-developer-hub.backstage-plugin-global-header:
+                  mountPoints:
+                    - mountPoint: application/header
+                      importName: GlobalHeader
+                      config:
+                        position: above-main-content
+                    - mountPoint: global.header/component
+                      importName: SearchComponent
+                      config:
+                        priority: 100
+                    - mountPoint: global.header/component
+                      importName: Spacer
+                      config:
+                        priority: 99
+                        props:
+                          growFactor: 0
+                    - mountPoint: global.header/component
+                      importName: HeaderIconButton
+                      config:
+                        priority: 90
+                        props:
+                          title: Create...
+                          icon: add
+                          to: create
+                    - mountPoint: global.header/component
+                      importName: StarredDropdown
+                      config:
+                        priority: 85
+                    - mountPoint: global.header/component
+                      importName: ApplicationLauncherDropdown
+                      config:
+                        priority: 82
+                    - mountPoint: global.header/component
+                      importName: SupportButton
+                      config:
+                        priority: 80
+                    - mountPoint: global.header/component
+                      importName: NotificationButton
+                      config:
+                        priority: 70
+                    - mountPoint: global.header/component
+                      importName: Divider
+                      config:
+                        priority: 50
+                    - mountPoint: global.header/component
+                      importName: ProfileDropdown
+                      config:
+                        priority: 10
+                    - mountPoint: global.header/profile
+                      importName: MenuItemLink
+                      config:
+                        priority: 100
+                        props:
+                          title: Settings
+                          link: /settings
+                          icon: manageAccounts
+                    - mountPoint: global.header/profile
+                      importName: LogoutButton
+                      config:
+                        priority: 10
+        # ArgoCD Plugins (Your existing plugins)
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-community-plugin-redhat-argocd
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                backstage-community.plugin-redhat-argocd:
+                  mountPoints:
+                    - mountPoint: entity.page.overview/cards
+                      importName: ArgocdDeploymentSummary
+                      config:
+                        layout:
+                          gridColumnEnd:
+                            lg: "span 8"
+                            md: "span 6"
+                            xs: "span 4"
+                        if:
+                          allOf:
+                            - isArgocdAvailable
+        - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
+          disabled: false
+        - package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
+          disabled: false
+        - package: ./dynamic-plugins/dist/backstage-community-plugin-tekton
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                backstage-community.plugin-tekton:
+                  mountPoints:
+                    - mountPoint: entity.page.ci/cards
+                      importName: TektonCI
+                      config:
+                        layout:
+                          gridColumn: "1 / -1"
+                          gridRowStart: 1
+                        if:
+                          allOf:
+                            - isTektonCIAvailable
+          disabled: false
+        # - package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab-backend-dynamic
+        #   disabled: false
+        # - package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab
+        #   disabled: false
+        # - disabled: false
+        #   package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
+        - package: ./dynamic-plugins/dist/backstage-community-plugin-quay
+          disabled: false
+        - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
+          disabled: false
+        - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+          disabled: false
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-community-plugin-topology
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-techdocs
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-community-plugin-catalog-backend-module-keycloak-dynamic
+        # - disabled: false
+        #   package: ./dynamic-plugins/dist/backstage-plugin-auth-backend-module-oidc-provider-dynamic
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-community-plugin-ocm
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-community-plugin-ocm-backend-dynamic
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-community-plugin-tech-radar
+        - disabled: false
+          integrity: sha512-9cXbedr0lC7ns7SNqARrWSQI4JGcZFw5xpfpUzA1tJaMMUjzAdPHTXqljf62/fs4hYBK8TJsWJ2KJkGVMzbrHQ==
+          package: '@redhat/backstage-plugin-orchestrator-backend-dynamic@1.7.1'
+          pluginConfig:
+            orchestrator:
+              dataIndexService:
+                url: http://sonataflow-platform-data-index-service
+        - disabled: false
+          integrity: sha512-Cqu9EQwVQ4mpdgWTUA0MW89Gul0IklhvkkqVoO3CloQ1dnAj1XyXikCphzH5TmNDDd9K66dOpaKKCaW9KeJ4WA==
+          package: '@redhat/backstage-plugin-orchestrator@1.7.1'
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                red-hat-developer-hub.backstage-plugin-orchestrator:
+                  appIcons:
+                  - importName: OrchestratorIcon
+                    name: orchestratorIcon
+                  dynamicRoutes:
+                  - importName: OrchestratorPage
+                    menuItem:
+                      icon: orchestratorIcon
+                      text: Orchestrator
+                    path: /orchestrator
+        - disabled: false
+          integrity: sha512-J1sTjA5kj6DphG8D65go9KlpIfKyLN/wq+XlY5Cb5djEo8mvF3wn3Haf60OGFo5cP4OfRSWqFwT7LM5/dNVwAg==
+          package: '@redhat/backstage-plugin-scaffolder-backend-module-orchestrator-dynamic@1.7.1'
+          pluginConfig:
+            orchestrator:
+              dataIndexService:
+                url: http://sonataflow-platform-data-index-service
+        - disabled: false
+          integrity: sha512-0KIXrZoJ+O4xNNzN/zB4+VMuaRPuiUviAmM+fIhTo/P9aLA36F9aIlyMbUbki49uaJ0zd8KXMBvmJSHZNrYkGQ==
+          package: '@redhat/backstage-plugin-orchestrator-form-widgets@1.7.1'
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                red-hat-developer-hub.backstage-plugin-orchestrator-form-widgets: {}
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-notifications
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-signals
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-notifications-backend-dynamic
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-signals-backend-dynamic
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic    
+        - disabled: false
+          package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
+        # AI Experience Plugin (Frontend)
+        - package: oci://quay.io/karthik_jk/ai-experience:1.6.1!red-hat-developer-hub-backstage-plugin-ai-experience
+          disabled: false
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                red-hat-developer-hub.backstage-plugin-ai-experience:
+                  appIcons:
+                    - name: aiNewsIcon
+                      importName: AiNewsIcon
+                  dynamicRoutes:
+                    - path: /
+                      importName: AiExperiencePage
+                    - path: /ai-news
+                      importName: AiNewsPage
+                      menuItem:
+                        icon: aiNewsIcon
+                        text: AI News
+        # AI Experience Plugin (Backend)
+        - package: oci://quay.io/karthik_jk/ai-experience:1.6.1!red-hat-developer-hub-backstage-plugin-ai-experience-backend-dynamic
+          disabled: false
+        # Red Hat Developer Hub Lightspeed Plugin (Frontend)
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed
+          pluginConfig:
+            dynamicPlugins:
+              frontend:
+                red-hat-developer-hub.backstage-plugin-lightspeed:
+                  translationResources:
+                    - importName: lightspeedTranslations
+                      module: Alpha
+                      ref: lightspeedTranslationRef
+                  appIcons:
+                    - name: LightspeedIcon
+                      module: LightspeedPlugin
+                      importName: LightspeedIcon
+                  dynamicRoutes:
+                    - path: /lightspeed
+                      importName: LightspeedPage
+                      module: LightspeedPlugin
+                      menuItem:
+                        icon: LightspeedIcon
+                        text: Lightspeed
+        # Red Hat Developer Hub Lightspeed Plugin (Backend)
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-lightspeed-backend:bs_1.42.5__1.0.3!red-hat-developer-hub-backstage-plugin-lightspeed-backend
+        # MCP Actions Backend Plugin
+        - disabled: false
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-mcp-actions-backend:next__0.1.2!backstage-plugin-mcp-actions-backend
+        # Software Catalog MCP Tool Plugin
+        - disabled: true
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-software-catalog-mcp-tool:bs_1.42.5__0.2.3!red-hat-developer-hub-backstage-plugin-software-catalog-mcp-tool
+        # TechDocs MCP Tool Plugin
+        - disabled: true
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-techdocs-mcp-tool:bs_1.42.5__0.3.0!red-hat-developer-hub-backstage-plugin-techdocs-mcp-tool
+        # Analytics Provider Segment Plugin (disabled)
+        - disabled: true
+          package: ./dynamic-plugins/dist/backstage-community-plugin-analytics-provider-segment
+        # Model Catalog Backend Module
+        - disabled: true
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-catalog-backend-module-model-catalog:bs_1.42.5__0.7.0!red-hat-developer-hub-backstage-plugin-catalog-backend-module-model-catalog
+        # Catalog TechDoc URL Reader Backend
+        - disabled: true
+          package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/red-hat-developer-hub-backstage-plugin-catalog-techdoc-url-reader-backend:bs_1.42.5__0.3.0!red-hat-developer-hub-backstage-plugin-catalog-techdoc-url-reader-backend
+        # - disabled: false
+        #   package: '@red-hat-developer-hub/backstage-plugin-catalog-backend-module-rhdh-ai'
+
+  upstream:
+    backstage:
+      image:
+        registry: quay.io
+        repository: rhdh/rhdh-hub-rhel9
+        tag: '1.7-154'
+        pullSecrets:
+        - redhat-gpte-devhub-pull-secret
+      extraEnvVars:
+        - name: NODE_OPTIONS
+          value: --no-node-snapshot
+        - name: BACKEND_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: backstage-backend-secret
+              key: backend-secret
+        - name: POSTGRES_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgres-password
+              name: backstage-postgresql
+        - name: NODE_TLS_REJECT_UNAUTHORIZED
+          value: "0"
+        - name: KEYCLOAK_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: CLIENT_ID
+              name: keycloak-client-secret-backstage
+        - name: KEYCLOAK_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: CLIENT_SECRET
+              name: keycloak-client-secret-backstage
+        - name: GITHUB_APP_ID
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_APP_ID
+              name: github-app-credentials
+        - name: GITHUB_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_CLIENT_ID
+              name: github-app-credentials
+        - name: GITHUB_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_CLIENT_SECRET
+              name: github-app-credentials
+        - name: GITHUB_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_WEBHOOK_SECRET
+              name: github-app-credentials
+        - name: GITHUB_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_WEBHOOK_URL
+              name: github-app-credentials
+        - name: GITHUB_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              key: GITHUB_PRIVATE_KEY
+              name: github-app-credentials
+        - name: LOG_LEVEL
+          value: debug
+      appConfig:
+        app:
+          baseUrl: holder
+        backend:
+          baseUrl: holder
+          listen:
+            port: 7007
+            host: 0.0.0.0
+          csp:
+            script-src: ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
+            script-src-elem: ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
+            img-src: 
+              - "'self'"
+              - 'data:'
+              - https://cdn.jsdelivr.net
+              - https://upload.wikimedia.org
+              - https://podman-desktop.io
+              - https://argo-cd.readthedocs.io
+              - https://instructlab.ai
+              - https://quay.io
+              - https://news.mit.edu
+            connect-src: ["'self'", 'http:', 'https:', 'data:']
+          cors:
+            origin: holder
+            methods: [GET, POST, PUT, DELETE]
+            credentials: true
+          database:
+            client: pg
+            connection:
+              database: postgres
+              host: "${POSTGRES_HOST}"
+              port: "${POSTGRES_PORT}"
+              user: postgres
+              password: "${POSTGRES_ADMIN_PASSWORD}"
+          reading:
+            allow:
+              - host: holder
+              - host: raw.githubusercontent.com
+  
+        integrations:
+        ######### COMMENTED OUT ##########
+          # gitlab:
+          # - host: gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io
+          #   baseUrl: https://gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io
+          #   apiBaseUrl: https://gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io/api/v4
+          #   token: null
+  
+        proxy:
+          endpoints:
+            '/developer-hub':
+              target: https://raw.githubusercontent.com
+              pathRewrite:
+                "^/api/proxy/developer-hub/learning-paths": "/redhat-developer/rhdh-plugins/refs/heads/main/workspaces/ai-integrations/plugins/ai-experience/src/learning-paths/data.json"
+              changeOrigin: true
+              secure: false
+            '/ai-rssfeed':
+              target: "https://news.mit.edu/topic/mitartificial-intelligence2-rss.xml"
+              changeOrigin: true
+              followRedirects: true
+        #     '/quay/api':
+        #       target: {{ .Values.quay.apiUrl }}
+        #       headers:
+        #         X-Requested-With: 'XMLHttpRequest'
+        #         # Uncomment the following line to access a private Quay Repository using a token
+        #         Authorization: 'Bearer 1LOQ7ZNVEUDIALE4WNL3ZBNPKBCR5D4F9UNISVAW'
+        #       changeOrigin: true
+        #       # Change to "false" in case of using self hosted quay instance with a self-signed certificate
+        #       secure: false
+  
+        # quay:
+        #   # The UI url for Quay, used to generate the link to Quay
+        #   uiUrl: {{ .Values.quay.uiUrl }}
+  
+        techdocs:
+          builder: local
+          generator:
+            runIn: local
+          publisher:
+            type: local
+  
+        auth:
+          environment: production
+          providers:
+            oidc:
+              production:
+                metadataUrl: holder
+                clientId: backstage
+                clientSecret: ${KEYCLOAK_CLIENT_SECRET}
+                prompt: auto
+          session:
+            secret:
+              $env: 'BACKEND_SECRET'
+
+        signInPage: oidc
+  
+        scaffolder:
+          # see https://backstage.io/docs/features/software-templates/configuration for software template options
+  
+        catalog:
+          rules:
+            - allow: [Domain, Component, System, API, Resource, Location, Template]
+          locations:
+            - target: holder
+              type: url
+              rules:
+                - allow: [Template]
+            - target: holder
+              type: url
+              rules:
+                - allow: [Group, User]
+            - target: holder
+              type: url
+              rules:
+                - allow: [Template]
+            - target: holder
+              type: url
+              rules:
+                - allow: [Domain, Component, System, API, Resource, Location]
+          providers:
+            # gitlab:
+            #   selfHosted:
+            #     host: gitlab-gitlab.apps.cluster-lnk9m.dynamic.redhatworkshops.io
+            #     schedule: # optional; same options as in TaskScheduleDefinition
+            #       # supports cron, ISO duration, "human duration" as used in code
+            #       frequency: { seconds: 10 }
+            #       # supports ISO duration, "human duration" as used in code
+            #       timeout: { seconds: 60 }
+            # ocm:
+            #   default:
+            #     name: multiclusterhub
+            #     kubernetesPluginRef: dev-cluster-infra
+            #     schedule: # optional; same options as in TaskScheduleDefinition
+            #       # supports cron, ISO duration, "human duration" as used in code
+            #       frequency: { seconds: 10 }
+            #       # supports ISO duration, "human duration" as used in code
+            #       timeout: { seconds: 60 }
+            #     owner: group:rhdh
+            keycloakOrg:
+              default:
+                baseUrl: holder
+                loginRealm: backstage
+                realm: backstage
+                clientId: ${KEYCLOAK_CLIENT_ID}
+                clientSecret: ${KEYCLOAK_CLIENT_SECRET}
+  
+        argocd:
+          appLocatorMethods:
+            - type: 'config'
+              instances:
+                - name: main
+                  url: holder
+                  username: admin
+                  password: Mjc2NDk2
+  
+        kubernetes:
+          serviceLocatorMethod:
+            type: "multiTenant"
+          clusterLocatorMethods:
+            - type: "config"
+              clusters:
+                - name: dev-cluster-infra
+                  url: holder
+                  authProvider: "serviceAccount"
+                  skipTLSVerify: true
+                  serviceAccountToken: "${K8S_SERVICE_ACCOUNT_TOKEN}"
+          customResources:
+            - group: 'tekton.dev'
+              apiVersion: 'v1beta1'
+              plural: 'pipelineruns'
+            - group: 'tekton.dev'
+              apiVersion: 'v1beta1'
+              plural: 'taskruns'
+            - group: 'route.openshift.io'
+              apiVersion: 'v1'
+              plural: 'routes'
+  
+        permission:
+          enabled: false
+  
+        enabled:
+          kubernetes: true
+          techdocs: true
+          argocd: true
+          sonarqube: false
+          keycloak: true
+          ocm: true
+          github: true
+          githubOrg: false
+          jenkins: false
+          permission: false
+  
+    postgresql:
+      auth:
+        username: bn_backstage
+        password: Mjc2NDk2
+        database: postgres
+  
+        # Admin user (superuser)
+        postgresUser: postgres
+        postgresPassword: Mjc2NDk2
+  
+    service:
+      ports:
+        backend: 7007
+        targetPort: backend
+  
+  route:
+    enabled: true
+    host: holder
+    tls:
+      enabled: true
+      termination: "edge"
+  
+  orchestrator:
+    enabled: true
+    serverlessLogicOperator:
+      enabled: true
+    serverlessOperator:
+      enabled: true
+    sonataflowPlatform:
+      monitoring:
+        enabled: true
+      eventing:
+        broker:
+          name: ""
+          namespace: ""
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+      # -- Secret name for the user-created secret to connect an external DB
+      externalDBsecretRef: ""
+      # -- Name for the user-configured external Database
+      externalDBName: ""
+      # -- Host for the user-configured external Database
+      externalDBHost: ""
+      # -- Port for the user-configured external Database
+      externalDBPort: ""
+      # -- Image for the init container used by the create-db job
+  
+      initContainerImage: "{{ .Values.upstream.postgresql.image.registry }}/{{ .Values.upstream.postgresql.image.repository }}:{{ .Values.upstream.postgresql.image.tag }}"
+      # -- Image for the container used by the create-db job
+      createDBJobImage: "{{ .Values.upstream.postgresql.image.registry }}/{{ .Values.upstream.postgresql.image.repository }}:{{ .Values.upstream.postgresql.image.tag }}"
+    # -- Orchestrator plugins and their configuration
+    plugins: []

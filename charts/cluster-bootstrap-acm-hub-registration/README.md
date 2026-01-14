@@ -61,3 +61,4 @@ helm uninstall <cluster-name>-hub-registration -n <cluster-name>
 
 This will remove the ManagedCluster, ManagedClusterAddOn, and GitOpsCluster resources.
 
+

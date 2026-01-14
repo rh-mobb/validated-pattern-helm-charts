@@ -1,0 +1,13 @@
+{{- if .Values.lwsOperator.enabled }}
+apiVersion: operator.openshift.io/v1
+kind: LeaderWorkerSetOperator
+metadata:
+  name: {{ .Values.lwsOperator.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  managementState: {{ .Values.lwsOperator.managementState | default "Managed" }}
+{{- end }}
+

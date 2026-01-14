@@ -1,0 +1,24 @@
+startingCSV: rhcl-operator.v1.2.1
+namespace: kuadrant-system
+
+# GatewayClass configuration (prerequisite for RHCL)
+gatewayClass:
+  enabled: true
+  name: openshift-default
+  controllerName: "openshift.io/gateway-controller/v1"
+
+# Kuadrant CR configuration
+kuadrant:
+  enabled: true
+  name: kuadrant
+
+helper-status-checker:
+  approver: true
+  enabled: true
+  checks:
+    - operatorName: rhcl-operator
+      subscriptionName: rhcl-operator
+      namespace:
+        name: kuadrant-system
+      serviceAccount:
+        name: "status-checker"

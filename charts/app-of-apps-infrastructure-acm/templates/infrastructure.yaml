@@ -63,6 +63,12 @@ spec:
       kind: InferenceService
       jsonPointers:
       - /status
+    {{- if $infra.ignoreContainerDrift }}
+    - group: apps
+      kind: Deployment
+      jqPathExpressions:
+      - .spec.template.spec.containers
+    {{- end }}
 ---
 {{ end }}
 ---
