@@ -7,6 +7,13 @@ cloudwatch:
   groupPrefix: "logging"  # Will be combined with cluster name: logging-{cluster_name}
   compression: "zstd"  # Options: none, gzip, zstd
   delivery: "atMostOnce"  # Options: atMostOnce, atLeastOnce
+
+# Configure the ClusterLogForwarder
+serviceAccount: logging
+clustername: ""
+roleArn: ""
+region: ""
+
 # Sync wave configuration
 syncwave: 3
 # dependency chart helper-operator
