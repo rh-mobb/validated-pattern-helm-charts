@@ -285,7 +285,7 @@ oc get route cluster-gitops-server -n openshift-gitops
 ```yaml
 # Add to argocd.initialRepositories in values
 argocd:
-  initialRepositories: |
+  initialRepositories:
     - name: my-app-configs
       type: git
       project: default
