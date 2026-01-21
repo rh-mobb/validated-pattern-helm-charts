@@ -8,4 +8,4 @@ dependencies:
   version: 1.4.0
 description: Chart to kick off gitops installation and bootstrapping of blue print
 name: cluster-bootstrap-acm-spoke
-version: 0.6.3
+version: 0.6.4

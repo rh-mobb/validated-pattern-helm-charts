@@ -1,0 +1,39 @@
+# Helm Chart Lock Files
+Chart.lock
+*.lock
+
+# Helm Chart Dependencies
+charts/*.tgz
+charts/*/
+
+# Helm Package Output
+*.tgz
+
+# Helm Test Output
+test/
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# IDE Files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Terraform (if used)
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Environment Files
+.env
+.env.local
+
+# Logs
+*.log
