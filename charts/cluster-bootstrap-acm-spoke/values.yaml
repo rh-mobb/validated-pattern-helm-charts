@@ -45,7 +45,7 @@ argocd:
     - name: helm-repo
       type: helm
       project: default
-      url: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      url: https://rh-mobb.github.io/validated-pattern-helm-charts/
   applications:
   - name: cluster-config
   - name: application-ns

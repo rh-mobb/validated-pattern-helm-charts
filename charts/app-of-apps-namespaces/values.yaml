@@ -7,7 +7,7 @@ defaults:
   finalizers: resources-finalizer.argocd.argoproj.io
   gitopsNamespace: openshift-gitops
   # Helm defaults
-  helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository
+  helmRepoUrl: https://rh-mobb.github.io/validated-pattern-helm-charts
   path: charts
   # Vault plugin defaults.
   plugin: false

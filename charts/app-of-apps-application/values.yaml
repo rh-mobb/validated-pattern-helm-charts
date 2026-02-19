@@ -10,7 +10,7 @@
 #   finalizers: resources-finalizer.argocd.argoproj.io
 #   gitopsNamespace: openshift-gitops
 #   # Helm defaults
-#   helmRepoUrl: ttps://rosa-hcp-dedicated-vpc.github.io/helm-repository
+#   helmRepoUrl: https://rh-mobb.github.io/validated-pattern-helm-charts
 #   path: charts
 #   chart: app-of-apps-namespaces
 #   targetRevision: 0.1.8
@@ -25,21 +25,21 @@
 #   - name: payments
 #     appNumber: "1234"
 #     gitopsCreate: true
-#     gitRepoUrl: 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+#     gitRepoUrl: 'https://github.com/rh-mobb/cluster-config.git'
 #     gitPath: nonprod/paul/namespaces/payments-1234.yaml
 #     appProject:
 #       adGroup: PFAUTHAD
 #       repos:
-#       - 'https://rosa-hcp-dedicated-vpc.github.io/helm-repository'
-#       - 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+#       - 'https://rh-mobb.github.io/validated-pattern-helm-charts'
+#       - 'https://github.com/rh-mobb/cluster-config.git'
 #   - name: accounting
 #     appNumber: "5678"
 #     gitopsCreate: false
-#     gitRepoUrl: 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+#     gitRepoUrl: 'https://github.com/rh-mobb/cluster-config.git'
 #     gitPath: nonprod/paul/namespaces/accounting-5678.yaml
 #     appProject:
 #       adGroup: PFAUTHAD
 #       repos:
-#       - 'https://rosa-hcp-dedicated-vpc.github.io/helm-repository'
-#       - 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+#       - 'https://rh-mobb.github.io/validated-pattern-helm-charts'
+#       - 'https://github.com/rh-mobb/cluster-config.git'
     

@@ -4,12 +4,12 @@ apiVersion: v2
 dependencies:
   - name: helper-operator
     version: ~1.1.0
-    repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
   - name: helper-status-checker
     version: 4.4.3
-    repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
     condition: helper-status-checker.enabled
   - name: loki-operator
     version: ~0.1.5
-    repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
     condition: loki-operator.enabled

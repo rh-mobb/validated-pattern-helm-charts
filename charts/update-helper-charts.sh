@@ -13,23 +13,11 @@ cd "$SCRIPT_DIR"
 NEW_HELPER_VERSION="${1:-}"
 BUMP_TYPE="${2:-patch}"
 
-# Charts that use helper-status-checker
+# Charts that use helper-status-checker (archived charts excluded)
 CHARTS=(
-    "rhacs-operator"
-    "compliance-operator" 
-    "cluster-observability-operator"
-    "devspaces-operator"
-    "netobserv-operator"
+    "compliance-operator"
     "cluster-efs"
-    "rhods-operator"
-    "serverless-operator"
-    "servicemesh-operator"
-    "kiali-operator"
-    "nvidia-gpu-operator"
-    "acm-operator"
     "loki-operator"
-    "lightspeed-operator"
-    "nfd-operator"
     "cluster-logging"
 )
 

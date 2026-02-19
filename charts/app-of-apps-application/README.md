@@ -64,18 +64,18 @@ applications:
     apmnum: "1234"
     appserviceNumber: "5678"
     gitopsCreate: true
-    gitRepoUrl: 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+    gitRepoUrl: 'https://github.com/rh-mobb/cluster-config.git'
     gitPath: nonprod/np-hub/namespaces/payments-1234.yaml  # Single file for all payments namespaces
     appProject:
       adGroup: PFAUTHAD
       repos:
-      - 'https://rosa-hcp-dedicated-vpc.github.io/helm-repository'
+      - 'https://rh-mobb.github.io/validated-pattern-helm-charts'
       - 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
   - name: accounting
     apmnum: "abcd"
     appserviceNumber: "efgh"
     gitopsCreate: false
-    gitRepoUrl: 'https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git'
+    gitRepoUrl: 'https://github.com/rh-mobb/cluster-config.git'
     gitPath: nonprod/np-hub/namespaces/accounting-abcd.yaml  # Single file for all accounting namespaces
 ```
 

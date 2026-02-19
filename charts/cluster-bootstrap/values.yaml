@@ -42,11 +42,11 @@ argocd:
     - name: helm-repo
       type: helm
       project: default
-      url: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      url: https://rh-mobb.github.io/validated-pattern-helm-charts/
   applications:
   - name: cluster-config
     annotations:
-    helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    helmRepoUrl: https://rh-mobb.github.io/validated-pattern-helm-charts/
     chart: app-of-apps-infrastructure
     project: cluster-config-project
     targetRevision: 0.2.2
@@ -55,10 +55,10 @@ argocd:
     gitPathFile: /infrastructure.yaml
     repositories:
     - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
-    - https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    - https://rh-mobb.github.io/validated-pattern-helm-charts/
   - name: application-ns
     annotations:
-    helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    helmRepoUrl: https://rh-mobb.github.io/validated-pattern-helm-charts/
     chart: app-of-apps-application
     project: application-ns-project
     targetRevision: 1.5.4
@@ -67,7 +67,7 @@ argocd:
     gitPathFile: /applications-ns.yaml
     repositories:
     - https://github.com/rosa-hcp-dedicated-vpc/cluster-config.git
-    - https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+    - https://rh-mobb.github.io/validated-pattern-helm-charts/
 application-gitops:
   name: application-gitops
   gitopsNamespace: application-gitops

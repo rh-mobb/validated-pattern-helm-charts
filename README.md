@@ -1,6 +1,10 @@
-# ROSA HCP Dedicated VPC Helm Charts
+# Validated Pattern Helm Charts
 
-This repository contains a comprehensive collection of Helm charts designed for deploying and managing OpenShift clusters in AWS using the ROSA (Red Hat OpenShift Service on AWS) HCP (Hosted Control Plane) architecture with dedicated VPC configurations.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+This repository contains Helm charts for deploying and managing OpenShift clusters on AWS using ROSA HCP (Red Hat OpenShift Service on AWS - Hosted Control Plane) with validated-pattern workflows.
+
+**This repo is the GitOps arm of [validated-pattern-terraform-rosa](https://github.com/rh-mobb/validated-pattern-terraform-rosa)**, which uses Terraform to provision ROSA HCP clusters. After Terraform creates a cluster, the Terraform bootstrap step installs the `cluster-bootstrap` chart, which brings up OpenShift GitOps (ArgoCD) and deploys these Helm charts to configure the cluster—logging, storage, operators, team namespaces, and more.
 
 ## Architecture Overview
 
@@ -112,10 +116,10 @@ helm repo add validated-pattern https://rh-mobb.github.io/validated-pattern-helm
 helm repo update
 
 # Search for your chart
-helm search repo rosa-hcp/<chart-name>
+helm search repo validated-pattern/<chart-name>
 
 # View available versions
-helm search repo rosa-hcp/<chart-name> --versions
+helm search repo validated-pattern/<chart-name> --versions
 ```
 
 ---
@@ -127,8 +131,8 @@ helm search repo rosa-hcp/<chart-name> --versions
 
 | Chart | Version | Description | Deployment Method |
 |-------|---------|-------------|-------------------|
-| [cluster-bootstrap](./cluster-bootstrap/README.md) | 0.4.0 | Core GitOps infrastructure and ArgoCD setup | Terraform via `bootstrap.tftpl` |
-| [cluster-bootstrap-acm-spoke](./cluster-bootstrap-acm-spoke/README.md) | 0.4.0 | ACM spoke cluster bootstrap variant | Terraform via `bootstrap.tftpl` |
+| [cluster-bootstrap](./charts/cluster-bootstrap/README.md) | 0.4.0 | Core GitOps infrastructure and ArgoCD setup | Terraform via `bootstrap.tftpl` |
+| [cluster-bootstrap-acm-spoke](./charts/cluster-bootstrap-acm-spoke/README.md) | 0.4.0 | ACM spoke cluster bootstrap variant | Terraform via `bootstrap.tftpl` |
 
 **Key Features**:
 - OpenShift GitOps operator installation
@@ -144,9 +148,9 @@ helm search repo rosa-hcp/<chart-name> --versions
 
 | Chart | Version | Description | Deployment Method |
 |-------|---------|-------------|-------------------|
-| [app-of-apps-infrastructure](./app-of-apps-infrastructure/README.md) | 0.1.2 | Infrastructure component orchestration | ArgoCD via cluster-bootstrap |
-| [app-of-apps-application](./app-of-apps-application/README.md) | 1.5.4 | Team application namespace orchestration | ArgoCD via cluster-bootstrap |
-| [app-of-apps-namespaces](./app-of-apps-namespaces/README.md) | 0.3.2 | Individual namespace deployment coordination | ArgoCD via app-of-apps-application |
+| [app-of-apps-infrastructure](./charts/app-of-apps-infrastructure/README.md) | 0.1.2 | Infrastructure component orchestration | ArgoCD via cluster-bootstrap |
+| [app-of-apps-application](./charts/app-of-apps-application/README.md) | 1.5.4 | Team application namespace orchestration | ArgoCD via cluster-bootstrap |
+| [app-of-apps-namespaces](./charts/app-of-apps-namespaces/README.md) | 0.3.2 | Individual namespace deployment coordination | ArgoCD via app-of-apps-application |
 
 **GitOps Flow**:
 1. **Infrastructure Layer**: Deploys platform components (storage, logging, security)
@@ -165,9 +169,9 @@ helm search repo rosa-hcp/<chart-name> --versions
 
 | Chart | Version | Description | Usage | Annotation Type |
 |-------|---------|-------------|-------|-----------------|
-| [helper-operator](./helper-operator/README.md) | 1.0.26 | OpenShift operator installation automation | Sub-chart dependency | ArgoCD annotations |
-| [helper-status-checker](./helper-status-checker/README.md) | 1.0.7 | Operator readiness verification | Sub-chart dependency | ArgoCD annotations |
-| [helper-installplan-approver](./helper-installplan-approver/README.md) | 0.1.2 | InstallPlan approval automation | Standalone or sub-chart | Helm annotations |
+| [helper-operator](./charts/helper-operator/README.md) | 1.0.26 | OpenShift operator installation automation | Sub-chart dependency | ArgoCD annotations |
+| [helper-status-checker](./charts/helper-status-checker/README.md) | 1.0.7 | Operator readiness verification | Sub-chart dependency | ArgoCD annotations |
+| [helper-installplan-approver](./charts/helper-installplan-approver/README.md) | 0.1.2 | InstallPlan approval automation | Standalone or sub-chart | Helm annotations |
 
 **Annotation Differences**:
 - **helper-operator & helper-status-checker**: Use ArgoCD annotations (`argocd.argoproj.io/sync-wave`, `argocd.argoproj.io/hook`) for GitOps deployment orchestration
@@ -191,35 +195,38 @@ dependencies:
 #### Storage & Persistence
 | Chart | Version | Description | Namespace |
 |-------|---------|-------------|-----------|
-| [cluster-efs](./cluster-efs/README.md) | 0.3.0 | AWS EFS storage classes and CSI driver | openshift-cluster-csi-drivers |
+| [cluster-efs](./charts/cluster-efs/README.md) | 0.3.0 | AWS EFS storage classes and CSI driver | openshift-cluster-csi-drivers |
 
 #### Security & Compliance
 | Chart | Version | Description | Namespace |
 |-------|---------|-------------|-----------|
-| [compliance-operator](./compliance-operator/README.md) | 1.0.47 | OpenShift compliance scanning | openshift-compliance |
-| [rhacs-operator](./rhacs-operator/README.md) | 0.0.4 | Red Hat Advanced Cluster Security | rhacs-operator |
-| [aws-privateca-issuer](./aws-privateca-issuer/README.md) | 1.0.2 | AWS Private CA certificate issuer | cert-manager |
+| [compliance-operator](./charts/compliance-operator/README.md) | 1.0.47 | OpenShift compliance scanning | openshift-compliance |
+| [rhacs-operator](./charts/rhacs-operator/README.md) | 0.0.4 | Red Hat Advanced Cluster Security | rhacs-operator |
+| [aws-privateca-issuer](./charts/aws-privateca-issuer/README.md) | 1.0.2 | AWS Private CA certificate issuer | cert-manager |
 
 #### Logging & Monitoring
 | Chart | Version | Description | Namespace |
 |-------|---------|-------------|-----------|
-| [cluster-logging](./cluster-logging/README.md) | 0.4.0 | Centralized logging with CloudWatch | openshift-logging |
+| [cluster-logging](./charts/cluster-logging/README.md) | 0.4.0 | Centralized logging with CloudWatch | openshift-logging |
 
 #### Management & Operations
 | Chart | Version | Description | Namespace |
 |-------|---------|-------------|-----------|
-| [acm-operator](./acm-operator/README.md) | 0.2.0 | Multi-cluster management hub | open-cluster-management |
-| [overprovisioning](./overprovisioning/README.md) | 0.0.6 | Pod overprovisioning for autoscaling | overprovisioning |
+| [deploy-operator](./charts/deploy-operator/README.md) | 0.2.0 | Generic chart for lightweight operators (web-terminal, openshift-pipelines, devspaces, kiali, servicemesh, serverless, authorino) | openshift-operators |
+| [acm-operator](./charts/acm-operator/README.md) | 0.2.0 | Multi-cluster management hub | open-cluster-management |
+| [overprovisioning](./charts/overprovisioning/README.md) | 0.0.6 | Pod overprovisioning for autoscaling | overprovisioning |
+
+**Deprecated** (use [deploy-operator](./charts/deploy-operator/README.md) instead): [tekton-pipelines](./charts/tekton-pipelines/README.md), [openshift-pipelines-operator](./charts/openshift-pipelines-operator/README.md), [devspaces-operator](./charts/devspaces-operator/README.md), [kiali-operator](./charts/kiali-operator/README.md), [servicemesh-operator](./charts/servicemesh-operator/README.md), [serverless-operator](./charts/serverless-operator/README.md), [authorino-operator](./charts/authorino-operator/README.md)
 
 #### AI/ML Platform
 | Chart | Version | Description | Namespace |
 |-------|---------|-------------|-----------|
-| [rhods-operator](./rhods-operator/README.md) | 1.0.3 | Red Hat OpenShift Data Science | redhat-ods-operator |
+| [rhods-operator](./charts/rhods-operator/README.md) | 1.0.3 | Red Hat OpenShift Data Science | redhat-ods-operator |
 
 #### Network & Ingress
 | Chart | Version | Description | Namespace |
 |-------|---------|-------------|-----------|
-| [cluster-ingress](./cluster-ingress/README.md) | 0.2.0 | Custom ingress controllers and certificates | openshift-ingress-operator |
+| [cluster-ingress](./charts/cluster-ingress/README.md) | 0.2.0 | Custom ingress controllers and certificates | openshift-ingress-operator |
 
 ---
 
@@ -228,8 +235,8 @@ dependencies:
 
 | Chart | Version | Description | Deployment Method |
 |-------|---------|-------------|-------------------|
-| [namespaces](./namespaces/README.md) | 1.4.9 | Kubernetes namespace creation with governance | ArgoCD via app-of-apps-namespaces |
-| [application-gitops](./application-gitops/README.md) | 1.3.8 | Team-specific ArgoCD instance setup | ArgoCD or sub-chart dependency |
+| [namespaces](./charts/namespaces/README.md) | 1.4.9 | Kubernetes namespace creation with governance | ArgoCD via app-of-apps-namespaces |
+| [application-gitops](./charts/application-gitops/README.md) | 1.3.8 | Team-specific ArgoCD instance setup | ArgoCD or sub-chart dependency |
 
 **Namespace Chart Features**:
 - Namespace creation with labels and annotations
@@ -377,6 +384,8 @@ oc get storageclass
 ```
 
 ## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute.
 
 ### Chart Development Guidelines
 1. **Use Helper Charts**: Leverage helper-operator and helper-status-checker for operators

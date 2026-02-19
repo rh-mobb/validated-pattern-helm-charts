@@ -1,0 +1,120 @@
+# deploy-operator: Generic chart to install multiple lightweight OLM operators (no operands)
+# Enable operators via helper-operator.operators.<name>.enabled: true
+# Add corresponding entries to helper-status-checker.checks for each enabled operator
+
+syncwave: 1
+
+helper-operator:
+  operators:
+    web-terminal:
+      enabled: false
+      syncwave: '0'
+      namespace:
+        name: openshift-operators
+        create: false
+      operatorgroup:
+        create: false
+        notownnamespace: true
+      subscription:
+        channel: stable
+        approval: Automatic
+        operatorName: web-terminal
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+    openshift-pipelines-operator-rh:
+      enabled: false
+      syncwave: '0'
+      namespace:
+        name: openshift-operators
+        create: false
+      operatorgroup:
+        create: false
+        notownnamespace: true
+      subscription:
+        channel: latest
+        approval: Manual
+        operatorName: openshift-pipelines-operator-rh
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+        # startingCSV: openshift-pipelines-operator-rh.v1.17.0  # optional, pin version
+    devspaces:
+      enabled: false
+      syncwave: '0'
+      namespace:
+        name: openshift-operators
+        create: false
+      operatorgroup:
+        create: false
+        notownnamespace: true
+      subscription:
+        channel: stable
+        approval: Automatic
+        operatorName: devspaces
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+    kiali-ossm:
+      enabled: false
+      syncwave: '0'
+      namespace:
+        name: openshift-operators
+        create: false
+      operatorgroup:
+        create: false
+        notownnamespace: true
+      subscription:
+        channel: stable
+        approval: Manual
+        operatorName: kiali-ossm
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+    servicemeshoperator:
+      enabled: false
+      syncwave: '0'
+      namespace:
+        name: openshift-operators
+        create: false
+      operatorgroup:
+        create: false
+        notownnamespace: true
+      subscription:
+        channel: stable
+        approval: Manual
+        operatorName: servicemeshoperator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+    serverless-operator:
+      enabled: false
+      syncwave: '0'
+      namespace:
+        name: openshift-serverless
+        create: true
+      operatorgroup:
+        create: true
+        notownnamespace: true
+      subscription:
+        channel: stable
+        approval: Manual
+        operatorName: serverless-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+    authorino-operator:
+      enabled: false
+      syncwave: '0'
+      namespace:
+        name: openshift-operators
+        create: false
+      operatorgroup:
+        create: false
+        notownnamespace: true
+      subscription:
+        channel: stable
+        approval: Automatic
+        operatorName: authorino-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+        csv: authorino-operator.v1.2.3  # optional, pin version
+
+helper-status-checker:
+  enabled: true
+  approver: true   # Required when any operator uses Manual approval (e.g. openshift-pipelines)
+  checks: []       # Add one entry per enabled operator; see README for examples

@@ -1,8 +1,8 @@
 # Chart Releaser configuration
 # This ensures chart-releaser only processes the specific chart in the matrix
-owner: rosa-hcp-dedicated-vpc
-git-repo: helm-repository
-charts-repo-url: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+owner: rh-mobb
+git-repo: validated-pattern-helm-charts
+charts-repo-url: https://rh-mobb.github.io/validated-pattern-helm-charts/
 index-path: index.yaml
 packages-with-index: true
 skip-existing: true
