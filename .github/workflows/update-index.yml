@@ -29,7 +29,7 @@ jobs:
         uses: azure/setup-helm@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Add Helm repositories
         run: |
           helm repo add openshift-charts https://charts.openshift.io
@@ -37,8 +37,10 @@ jobs:
           helm repo add backstage https://backstage.github.io/charts
           helm repo add helm-repository https://rh-mobb.github.io/validated-pattern-helm-charts/
           helm repo update
-      
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
+        with:
+          config: .github/cr-config.yaml
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
