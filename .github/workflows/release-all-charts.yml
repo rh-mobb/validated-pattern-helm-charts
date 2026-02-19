@@ -1,0 +1,54 @@
+# Manual workflow to publish ALL charts (not just changed ones).
+# Use when: migrating to a new repo, or after emptying gh-pages.
+name: Release All Charts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release-all:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "root"
+          git config user.email "root@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        env:
+          GITHUB_TOKEN: "${{ secrets.HELM }}"
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add openshift-charts https://charts.openshift.io
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add backstage https://backstage.github.io/charts
+          helm repo add helm-repository https://rh-mobb.github.io/validated-pattern-helm-charts/
+          helm repo update
+
+      - name: Package all charts
+        run: |
+          mkdir -p .cr-release-packages
+          for chart in charts/*/; do
+            if [[ -f "${chart}Chart.yaml" ]]; then
+              echo "Packaging $chart..."
+              helm dependency update "$chart" 2>/dev/null || true
+              helm package "$chart" -d .cr-release-packages
+            fi
+          done
+          ls -la .cr-release-packages/
+
+      - name: Run chart-releaser (upload + index)
+        uses: helm/chart-releaser-action@v1.7.0
+        with:
+          skip_packaging: true
+        env:
+          CR_TOKEN: "${{ secrets.HELM }}"
