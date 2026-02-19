@@ -1,3 +1,152 @@
 apiVersion: v1
-entries: {}
-generated: "2026-02-19T00:00:00Z"
+entries:
+  app-of-apps-application:
+  - apiVersion: v2
+    created: "2026-02-19T14:31:00.082065+10:00"
+    description: Chart to generate argocd apps for each team and gitops set up
+    digest: 5b4ecb01244cdc24da87686789d3901b1d3686f5eb1db24cecfaee7c848347c2
+    name: app-of-apps-application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-application-1.5.5/app-of-apps-application-1.5.5.tgz
+    version: 1.5.5
+  app-of-apps-infrastructure:
+  - apiVersion: v1
+    created: "2026-02-19T14:31:00.43771+10:00"
+    description: Chart to generate argocd apps
+    digest: 4f5e04354d746bd2b8ab45890fc7fb4b8c7046933aa3711d68cb544c7a98321d
+    name: app-of-apps-infrastructure
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-infrastructure-0.2.2/app-of-apps-infrastructure-0.2.2.tgz
+    version: 0.2.2
+  app-of-apps-namespaces:
+  - apiVersion: v1
+    created: "2026-02-19T14:31:00.78168+10:00"
+    description: Chart to generate namespaces apps.
+    digest: 802ea985cefa1d6a2e3e1f33e149e8570dfc71aba2a10c2e265c6805c47a78c9
+    name: app-of-apps-namespaces
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-namespaces-0.3.4/app-of-apps-namespaces-0.3.4.tgz
+    version: 0.3.4
+  application-gitops:
+  - apiVersion: v1
+    created: "2026-02-19T14:31:01.119296+10:00"
+    description: Chart to generate argocd apps
+    digest: 1c7f1d34bad6fe7ba9d314fb528b8274a6d775d25c3ad4622e69ac7ba5270643
+    name: application-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.4.0/application-gitops-1.4.0.tgz
+    version: 1.4.0
+  helper-installplan-approver:
+  - apiVersion: v2
+    created: "2026-02-19T14:31:01.474841+10:00"
+    description: Dependency chart to automatically approve operator InstallPlans via
+      Kubernetes Job for Terraform deployments
+    digest: 04c24800346412f9157cfc042e79232ae1e0bedbbedd42fd6bd8ba39e4c46396
+    keywords:
+    - operator
+    - installplan
+    - approval
+    - terraform
+    - dependency
+    maintainers:
+    - email: pafoster@redhat.com
+      name: Paul Foster
+    name: helper-installplan-approver
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/helper-installplan-approver-0.1.2/helper-installplan-approver-0.1.2.tgz
+    version: 0.1.2
+  helper-operator:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
+          description: Signing Chart
+        - kind: added
+          description: Added Job that will enable Console Plugins if they are defined.
+        - kind: added
+          description: Possibility to configure config.tolerations, config.nodeSelector and config.env for the subscription, updated inline documentation and README
+        - kind: fixed
+          description: Fix Job _enable_console_plugin_ in a way that it first verifies if the plugin has been added previously already and if it does not exist the Job will add it.
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/signKey: |
+        fingerprint: B677CB52F8358FA091044E375D24D6846DBA8F8A
+        url: https://keys.openpgp.org/vks/v1/by-fingerprint/B677CB52F8358FA091044E375D24D6846DBA8F8A
+    apiVersion: v2
+    created: "2026-02-19T14:31:01.810883+10:00"
+    description: A helper Chart to reduce code repetition. This Chart should be called
+      as a dependency by other charts in order to install Operators.
+    digest: e223227f6c231d2877e10ab367009442b97d155ce5dbc4e0e0d1d8b175d12f83
+    home: https://github.com/tjungbauer/helm-charts/tree/main/charts/helper-operator
+    icon: https://github.com/tjungbauer/helm-charts/raw/gh-pages/images/helping.png
+    keywords:
+    - helper
+    - subchart
+    - operator
+    maintainers:
+    - email: tjungbau@redhat.com
+      name: tjungbauer
+      url: https://blog.stderr.at/
+    name: helper-operator
+    sources:
+    - https://github.com/tjungbauer/helm-charts
+    - https://charts.stderr.at/
+    - https://github.com/tjungbauer/openshift-clusterconfig-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/helper-operator-1.1.0/helper-operator-1.1.0.tgz
+    version: 1.1.0
+  helper-status-checker:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
+          description: Signing Chart
+        - kind: added
+          description: "Version 4.0.0: It is now possible to use a range of status checks to verify multiple operators."
+        - kind: added
+          description: added new option subscriptionName in case the subscription name is different to the operator name
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/signKey: |
+        fingerprint: B677CB52F8358FA091044E375D24D6846DBA8F8A
+        url: https://keys.openpgp.org/vks/v1/by-fingerprint/B677CB52F8358FA091044E375D24D6846DBA8F8A
+    apiVersion: v2
+    created: "2026-02-19T14:31:02.175076+10:00"
+    description: A helper Chart that creates a job to verify if the deployments of
+      an operator are running. To do so it creates a service account with a role to
+      read the status of the Deployments.
+    digest: 3af319c115c2f16d2b8bc11e3e1c02c223bb6d88152d3ca66cff1b2c71ce24c4
+    home: https://github.com/tjungbauer/helm-charts/tree/main/charts/helper-status-checker
+    icon: https://github.com/tjungbauer/helm-charts/raw/gh-pages/images/helping.png
+    keywords:
+    - helper
+    - subchart
+    maintainers:
+    - email: tjungbau@redhat.com
+      name: tjungbauer
+      url: https://blog.stderr.at/
+    name: helper-status-checker
+    sources:
+    - https://github.com/tjungbauer/helm-charts
+    - https://charts.stderr.at/
+    - https://github.com/tjungbauer/openshift-clusterconfig-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/helper-status-checker-4.4.3/helper-status-checker-4.4.3.tgz
+    version: 4.4.3
+  namespaces:
+  - apiVersion: v2
+    created: "2026-02-19T14:31:02.52914+10:00"
+    description: Chart to generate argocd apps
+    digest: ea177d890a2f61138a3fe3e125f4a9ebb5aac7a9a9e4e46691061b90f9ddd2f7
+    name: namespaces
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/namespaces-1.5.2/namespaces-1.5.2.tgz
+    version: 1.5.2
+  overprovisioning:
+  - apiVersion: v2
+    created: "2026-02-19T14:31:02.868998+10:00"
+    description: overprovisioning pods
+    digest: f33ea44d509f33029d7c1b250be9442c6f64bafba7e58a16b60712ce368f78ca
+    name: overprovisioning
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
+    version: 0.0.7
+generated: "2026-02-19T14:31:02.869013+10:00"
