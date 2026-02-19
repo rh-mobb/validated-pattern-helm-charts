@@ -67,6 +67,17 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.7/cluster-bootstrap-0.5.7.tgz
     version: 0.5.7
+  cluster-bootstrap-acm-hub-registration:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-02-19T05:00:50.688548921Z"
+    description: Helm chart to register spoke clusters with ACM hub
+    digest: 16d6202fb6edeec9972da04df56aa1b209381d0d67e629ea97e46c154981da3c
+    name: cluster-bootstrap-acm-hub-registration
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-hub-registration-0.1.2/cluster-bootstrap-acm-hub-registration-0.1.2.tgz
+    version: 0.1.2
   cluster-bootstrap-acm-spoke:
   - apiVersion: v2
     created: "2026-02-19T14:44:22.641949+10:00"
@@ -293,4 +304,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
     version: 0.0.7
-generated: "2026-02-19T14:51:04.134091+10:00"
+generated: "2026-02-19T05:00:50.831391679Z"
