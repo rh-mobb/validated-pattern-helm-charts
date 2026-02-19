@@ -4,5 +4,5 @@ owner: rh-mobb
 git-repo: validated-pattern-helm-charts
 charts-repo-url: https://rh-mobb.github.io/validated-pattern-helm-charts/
 index-path: index.yaml
-packages-with-index: true
+packages-with-index: false
 skip-existing: true

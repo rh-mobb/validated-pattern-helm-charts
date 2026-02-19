@@ -1,3 +1,6 @@
+# Chart releaser output
+.cr-release-packages/
+
 # Helm Chart Lock Files
 Chart.lock
 *.lock
