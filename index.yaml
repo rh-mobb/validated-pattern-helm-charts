@@ -39,7 +39,7 @@ entries:
   aws-privateca-issuer:
   - apiVersion: v2
     appVersion: v1.4.2
-    created: "2026-02-19T14:44:21.893168+10:00"
+    created: "2026-02-19T14:46:55.327389+10:00"
     dependencies:
     - name: helper-installplan-approver
       repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
@@ -53,7 +53,7 @@ entries:
     version: 1.6.1
   cluster-bootstrap:
   - apiVersion: v2
-    created: "2026-02-19T14:44:22.270914+10:00"
+    created: "2026-02-19T14:46:55.690511+10:00"
     dependencies:
     - name: helper-installplan-approver
       repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
@@ -69,7 +69,7 @@ entries:
     version: 0.5.7
   cluster-bootstrap-acm-spoke:
   - apiVersion: v2
-    created: "2026-02-19T14:44:22.641949+10:00"
+    created: "2026-02-19T14:46:56.033311+10:00"
     dependencies:
     - name: helper-installplan-approver
       repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
@@ -85,7 +85,7 @@ entries:
     version: 0.6.5
   cluster-efs:
   - apiVersion: v2
-    created: "2026-02-19T14:44:23.044471+10:00"
+    created: "2026-02-19T14:46:56.395627+10:00"
     dependencies:
     - name: helper-status-checker
       repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
@@ -113,7 +113,7 @@ entries:
         fingerprint: B677CB52F8358FA091044E375D24D6846DBA8F8A
         url: https://keys.openpgp.org/vks/v1/by-fingerprint/B677CB52F8358FA091044E375D24D6846DBA8F8A
     apiVersion: v2
-    created: "2026-02-19T14:44:23.485169+10:00"
+    created: "2026-02-19T14:46:56.748756+10:00"
     dependencies:
     - name: helper-operator
       repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
@@ -237,7 +237,7 @@ entries:
     version: 4.4.3
   loki-operator:
   - apiVersion: v2
-    created: "2026-02-19T14:44:23.820217+10:00"
+    created: "2026-02-19T14:46:57.086931+10:00"
     dependencies:
     - name: helper-operator
       repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
@@ -273,4 +273,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
     version: 0.0.7
-generated: "2026-02-19T14:44:23.820258+10:00"
+generated: "2026-02-19T14:46:57.086963+10:00"
