@@ -38,14 +38,40 @@ jobs:
 
       - name: Package all charts
         run: |
+          set -e
+          REPO_URL="https://rh-mobb.github.io/validated-pattern-helm-charts/"
           mkdir -p .cr-release-packages
-          for chart in charts/*/; do
-            if [[ -f "${chart}Chart.yaml" ]]; then
-              echo "Packaging $chart..."
-              helm dependency update "$chart" 2>/dev/null || true
-              helm package "$chart" -d .cr-release-packages
+
+          # Phase 1: Package charts with no internal dependencies (can resolve from remote or have none)
+          BASE_CHARTS="helper-installplan-approver helper-operator helper-status-checker application-gitops app-of-apps-application app-of-apps-infrastructure app-of-apps-namespaces namespaces overprovisioning"
+          for chart in $BASE_CHARTS; do
+            if [[ -d "charts/$chart" ]]; then
+              echo "Packaging base chart: $chart..."
+              helm dependency update "charts/$chart" 2>/dev/null || true
+              helm package "charts/$chart" -d .cr-release-packages
             fi
           done
+
+          # Phase 2: Package charts that depend on our repo - patch to use local file:// paths
+          for chart in aws-privateca-issuer cluster-bootstrap cluster-bootstrap-acm-spoke cluster-efs cluster-logging compliance-operator loki-operator; do
+            if [[ -d "charts/$chart" ]]; then
+              echo "Packaging dependent chart: $chart..."
+              chart_yaml="charts/$chart/Chart.yaml"
+              if grep -q "$REPO_URL" "$chart_yaml"; then
+                # Replace repo URL with file:// for each dependency (name comes before repository in YAML)
+                awk -v url="https://rh-mobb.github.io/validated-pattern-helm-charts/" '
+                  /^[[:space:]]*-[[:space:]]*name:/ { dep=$NF }
+                  /repository:.*validated-pattern/ { sub(url, "file://../" dep) }
+                  { print }
+                ' "$chart_yaml" > "$chart_yaml.tmp" && mv "$chart_yaml.tmp" "$chart_yaml"
+              fi
+              helm dependency update "charts/$chart" 2>/dev/null || true
+              helm package "charts/$chart" -d .cr-release-packages
+              git checkout "$chart_yaml" 2>/dev/null || true
+            fi
+          done
+
+          git checkout -- charts/ 2>/dev/null || true
           ls -la .cr-release-packages/
 
       - name: Run chart-releaser (upload + index)
