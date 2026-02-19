@@ -36,6 +36,111 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.4.0/application-gitops-1.4.0.tgz
     version: 1.4.0
+  aws-privateca-issuer:
+  - apiVersion: v2
+    appVersion: v1.4.2
+    created: "2026-02-19T14:44:21.893168+10:00"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    description: An addon for cert-manager to sign certificates using AWS PCA
+    digest: 75e685a9a61ff613f9c17b70fdc46e3c4ed0cf1c61714a1dffff654f71466545
+    name: aws-privateca-issuer
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/aws-privateca-issuer-1.6.1/aws-privateca-issuer-1.6.1.tgz
+    version: 1.6.1
+  cluster-bootstrap:
+  - apiVersion: v2
+    created: "2026-02-19T14:44:22.270914+10:00"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.4.0
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: ca292e7c07128f69096c0f40affd5e221b3e6265ca3eb92fcf972fc0a478a311
+    name: cluster-bootstrap
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.7/cluster-bootstrap-0.5.7.tgz
+    version: 0.5.7
+  cluster-bootstrap-acm-spoke:
+  - apiVersion: v2
+    created: "2026-02-19T14:44:22.641949+10:00"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.4.0
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 2d94dbdec702e4793819f2f2788472678728ea20950d2fe3d01e918332beaa4b
+    name: cluster-bootstrap-acm-spoke
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-spoke-0.6.5/cluster-bootstrap-acm-spoke-0.6.5.tgz
+    version: 0.6.5
+  cluster-efs:
+  - apiVersion: v2
+    created: "2026-02-19T14:44:23.044471+10:00"
+    dependencies:
+    - name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.1.0
+    description: Chart to deploy the efs operator and supporting componenets
+    digest: c124dea5629fc5bccceaebc8aeb11a6eee2f73b5309116886d38fa92b7ccf8b6
+    name: cluster-efs
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-efs-0.4.14/cluster-efs-0.4.14.tgz
+    version: 0.4.14
+  compliance-operator:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
+          description: Signing Chart
+        - kind: added
+          description: README.md
+        - kind: added
+          description: updated to helper-status-checker v4
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/signKey: |
+        fingerprint: B677CB52F8358FA091044E375D24D6846DBA8F8A
+        url: https://keys.openpgp.org/vks/v1/by-fingerprint/B677CB52F8358FA091044E375D24D6846DBA8F8A
+    apiVersion: v2
+    created: "2026-02-19T14:44:23.485169+10:00"
+    dependencies:
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.1.0
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    description: Master chart to deploy and configure the Compliance Operator
+    digest: d49736863eb2900ad82238cde3548e13bb5e77761b2b79e710acc1b5ae13e19a
+    home: https://github.com/tjungbauer/helm-charts/tree/main/charts/compliance-operator-full-stack
+    icon: https://github.com/tjungbauer/helm-charts/raw/gh-pages/images/compliance-operator.png
+    keywords:
+    - security
+    - compliance
+    maintainers:
+    - email: tjungbau@redhat.com
+      name: tjungbauer
+      url: https://blog.stderr.at/
+    name: compliance-operator
+    sources:
+    - https://github.com/tjungbauer/helm-charts
+    - https://charts.stderr.at/
+    - https://github.com/tjungbauer/openshift-clusterconfig-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/compliance-operator-1.2.12/compliance-operator-1.2.12.tgz
+    version: 1.2.12
   helper-installplan-approver:
   - apiVersion: v2
     created: "2026-02-19T14:31:01.474841+10:00"
@@ -130,6 +235,25 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/helper-status-checker-4.4.3/helper-status-checker-4.4.3.tgz
     version: 4.4.3
+  loki-operator:
+  - apiVersion: v2
+    created: "2026-02-19T14:44:23.820217+10:00"
+    dependencies:
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.1.0
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    description: Deploys the Loki Operator for OpenShift log aggregation and storage
+      using Grafana Loki
+    digest: 48411579b0d6bafa352ea8c49b967d21272908e6d1b00e3c5bf29e18027318eb
+    name: loki-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/loki-operator-0.1.17/loki-operator-0.1.17.tgz
+    version: 0.1.17
   namespaces:
   - apiVersion: v2
     created: "2026-02-19T14:31:02.52914+10:00"
@@ -149,4 +273,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
     version: 0.0.7
-generated: "2026-02-19T14:31:02.869013+10:00"
+generated: "2026-02-19T14:44:23.820258+10:00"
