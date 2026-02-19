@@ -53,15 +53,16 @@ jobs:
           done
 
           # Phase 2: Package charts that depend on our repo - patch to use local file:// paths
+          # (helm resolves file:// from CWD = repo root, so use absolute path to charts/)
+          CHARTS_ABS="$(pwd)/charts"
           for chart in aws-privateca-issuer cluster-bootstrap cluster-bootstrap-acm-spoke cluster-efs cluster-logging compliance-operator loki-operator; do
             if [[ -d "charts/$chart" ]]; then
               echo "Packaging dependent chart: $chart..."
               chart_yaml="charts/$chart/Chart.yaml"
               if grep -q "$REPO_URL" "$chart_yaml"; then
-                # Replace repo URL with file:// for each dependency (name comes before repository in YAML)
-                awk -v url="https://rh-mobb.github.io/validated-pattern-helm-charts/" '
+                awk -v url="https://rh-mobb.github.io/validated-pattern-helm-charts/" -v base="$CHARTS_ABS" '
                   /^[[:space:]]*-[[:space:]]*name:/ { dep=$NF }
-                  /repository:.*validated-pattern/ { sub(url, "file://../" dep) }
+                  /repository:.*validated-pattern/ { sub(url, "file://" base "/" dep) }
                   { print }
                 ' "$chart_yaml" > "$chart_yaml.tmp" && mv "$chart_yaml.tmp" "$chart_yaml"
               fi
