@@ -29,6 +29,17 @@ entries:
     version: 0.3.4
   application-gitops:
   - apiVersion: v1
+    created: "2026-02-23T01:30:52.506220034Z"
+    description: Chart to generate argocd apps
+    digest: cb2d548e2cdf2766bd7fd3ab1fac8317cac109d0cf4a140c2d8cc0a002644567
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: application-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.5.0/application-gitops-1.5.0.tgz
+    version: 1.5.0
+  - apiVersion: v1
     created: "2026-02-19T14:31:01.119296+10:00"
     description: Chart to generate argocd apps
     digest: 1c7f1d34bad6fe7ba9d314fb528b8274a6d775d25c3ad4622e69ac7ba5270643
@@ -111,6 +122,28 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-efs-0.4.14/cluster-efs-0.4.14.tgz
     version: 0.4.14
   cluster-logging:
+  - apiVersion: v2
+    created: "2026-02-23T01:30:52.747961474Z"
+    dependencies:
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~1.1.0
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    - condition: loki-operator.enabled
+      name: loki-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.5
+    digest: cf05e587cd4e030d0a574654cad19c37822f29601c0ab59d879aa2e04450e045
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: cluster-logging
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-logging-0.5.15/cluster-logging-0.5.15.tgz
+    version: 0.5.15
   - apiVersion: v2
     created: "2026-02-19T14:51:04.134056+10:00"
     dependencies:
@@ -304,4 +337,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
     version: 0.0.7
-generated: "2026-02-19T05:00:50.831391679Z"
+generated: "2026-02-23T01:30:52.747976342Z"
