@@ -1,7 +1,7 @@
 apiVersion: logging.openshift.io/v1alpha1
 kind: LogFileMetricExporter
 metadata:
-  name: vector-metric-exporter
+  name: instance
   namespace: openshift-logging
   annotations:
     argocd.argoproj.io/sync-wave: {{ .Values.syncwave | default 3 | quote }}
