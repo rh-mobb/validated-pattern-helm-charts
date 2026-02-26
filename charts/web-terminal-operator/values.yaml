@@ -1,0 +1,28 @@
+---
+helper-operator:
+  operators:
+    web-terminal:
+      enabled: true
+      syncwave: '0'
+      namespace:
+        name: openshift-operators
+        create: false
+      subscription:
+        channel: fast
+        approval: Manual
+        operatorName: web-terminal
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+        csv: ""
+      operatorgroup:
+        create: false
+
+helper-status-checker:
+  enabled: true
+  approver: true
+  checks:
+    - operatorName: web-terminal
+      namespace:
+        name: openshift-operators
+      serviceAccount:
+        name: "sa-web-terminal"

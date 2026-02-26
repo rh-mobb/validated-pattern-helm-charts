@@ -77,6 +77,8 @@ charts/<chart-name>/
 ### Chart.yaml Conventions
 
 - Use `apiVersion: v2` (Helm 3).
+- Include `home` and `maintainers` fields (required by chart-tester). Example: see `charts/cluster-logging/Chart.yaml`.
+- End `Chart.yaml` with a trailing newline.
 - The `version` field uses strict semver (`MAJOR.MINOR.PATCH`). No `v` prefix.
 - Dependencies reference the Helm repository URL: `https://rh-mobb.github.io/validated-pattern-helm-charts/`.
 - Use tilde ranges (`~1.1.0`) for helper chart dependency versions to allow patch updates.

@@ -7,7 +7,7 @@ Chart.lock
 
 # Helm Chart Dependencies
 charts/*.tgz
-charts/*/
+charts/*/charts/
 
 # Helm Package Output
 *.tgz
