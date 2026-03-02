@@ -337,4 +337,24 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
     version: 0.0.7
-generated: "2026-02-23T01:30:52.747976342Z"
+  web-terminal-operator:
+  - apiVersion: v2
+    created: "2026-03-02T02:03:30.759652847Z"
+    dependencies:
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~1.1.0
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    description: Helm chart to deploy the Web Terminal Operator on OpenShift
+    digest: 326fd89f2e08f26beadd2ac90ce874d486d8cc8dd2ec381b39ee315881c8015d
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: web-terminal-operator
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
+    version: 1.0.0
+generated: "2026-03-02T02:03:30.759671912Z"
