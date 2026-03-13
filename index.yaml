@@ -149,6 +149,24 @@ entries:
     version: 0.1.2
   cluster-bootstrap-acm-spoke:
   - apiVersion: v2
+    created: "2026-03-13T07:23:29.369345355Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.4.0
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 4965de7497498cb7b102a9a96be7f7c78446008316a1f59e8c7c3be8debb4bc7
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap-acm-spoke
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-spoke-0.6.6/cluster-bootstrap-acm-spoke-0.6.6.tgz
+    version: 0.6.6
+  - apiVersion: v2
     created: "2026-02-19T14:44:22.641949+10:00"
     dependencies:
     - name: helper-installplan-approver
@@ -415,4 +433,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-13T04:58:29.164846699Z"
+generated: "2026-03-13T07:23:29.369369921Z"
