@@ -2,6 +2,25 @@ apiVersion: v1
 entries:
   acm-operator:
   - apiVersion: v2
+    created: "2026-03-15T23:37:28.692325293Z"
+    dependencies:
+    - name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.1.0
+    description: Chart to deploy Red Hat Advanced Cluster Management (RHACM) with
+      ArgoCD ApplicationSets for spoke cluster management
+    digest: f081030185a3229030a632e7f9aed2ee44bf5ba6c2fe328cfce43aae25adbf70
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: acm-operator
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/acm-operator-0.5.17/acm-operator-0.5.17.tgz
+    version: 0.5.17
+  - apiVersion: v2
     created: "2026-03-15T23:20:27.018452868Z"
     dependencies:
     - name: helper-status-checker
@@ -483,4 +502,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-15T23:20:27.234629991Z"
+generated: "2026-03-15T23:37:28.69236601Z"
