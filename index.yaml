@@ -115,6 +115,19 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/acm-operator-0.5.13/acm-operator-0.5.13.tgz
     version: 0.5.13
+  app-of-apps-acm-team-onboarding:
+  - apiVersion: v2
+    created: "2026-03-16T01:46:38.639997472Z"
+    description: Chart to onboard teams on an ACM hub with AppProjects, RBAC, and
+      placement infrastructure for spoke deployment via ApplicationSets
+    digest: 35a37efc8159e29c502f04534fada6b4ebd6c805ba3ac2b90336a7f0370368e5
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: app-of-apps-acm-team-onboarding
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-acm-team-onboarding-0.1.0/app-of-apps-acm-team-onboarding-0.1.0.tgz
+    version: 0.1.0
   app-of-apps-application:
   - apiVersion: v2
     created: "2026-02-19T14:31:00.082065+10:00"
@@ -143,6 +156,17 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-namespaces-0.3.4/app-of-apps-namespaces-0.3.4.tgz
     version: 0.3.4
   application-gitops:
+  - apiVersion: v1
+    created: "2026-03-16T01:46:38.779448819Z"
+    description: Chart to generate argocd apps
+    digest: ce3071f0496ab2edb1575a97bafb4199a6c0a3326dd897c447b5f6b396d4f3ed
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: application-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.5.1/application-gitops-1.5.1.tgz
+    version: 1.5.1
   - apiVersion: v1
     created: "2026-02-23T01:30:52.506220034Z"
     description: Chart to generate argocd apps
@@ -178,6 +202,21 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/aws-privateca-issuer-1.6.1/aws-privateca-issuer-1.6.1.tgz
     version: 1.6.1
   cluster-bootstrap:
+  - apiVersion: v2
+    created: "2026-03-16T01:46:38.932191705Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.4.0
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 5f57b539609aac6bbaa260091be58b3d0e46dce23d68d5f76824930dc57b3a33
+    name: cluster-bootstrap
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.8/cluster-bootstrap-0.5.8.tgz
+    version: 0.5.8
   - apiVersion: v2
     created: "2026-02-19T14:44:22.270914+10:00"
     dependencies:
@@ -521,4 +560,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-15T23:48:30.279193288Z"
+generated: "2026-03-16T01:46:38.932232079Z"
