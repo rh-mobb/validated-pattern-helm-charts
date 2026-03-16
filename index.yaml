@@ -188,6 +188,17 @@ entries:
     version: 0.3.4
   application-gitops:
   - apiVersion: v1
+    created: "2026-03-16T09:38:35.836869843Z"
+    description: Chart to generate argocd apps
+    digest: 740d0d7a045eb6e8f7386565146599cb62f19e76f8e51753be0ae168b39b20b7
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: application-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.5.2/application-gitops-1.5.2.tgz
+    version: 1.5.2
+  - apiVersion: v1
     created: "2026-03-16T01:46:38.779448819Z"
     description: Chart to generate argocd apps
     digest: ce3071f0496ab2edb1575a97bafb4199a6c0a3326dd897c447b5f6b396d4f3ed
@@ -639,4 +650,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-16T09:10:37.879421596Z"
+generated: "2026-03-16T09:38:35.836940085Z"
