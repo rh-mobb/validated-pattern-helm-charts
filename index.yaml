@@ -287,6 +287,23 @@ entries:
     version: 1.6.1
   cluster-bootstrap:
   - apiVersion: v2
+    created: "2026-03-16T10:59:32.121853193Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.0
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 661144683375facb5fdd1d00ad5fd4f0ff7cbbdd0a86beb316f7054693b228e3
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.10/cluster-bootstrap-0.5.10.tgz
+    version: 0.5.10
+  - apiVersion: v2
     created: "2026-03-16T09:53:38.887427506Z"
     dependencies:
     - name: helper-installplan-approver
@@ -371,6 +388,24 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-hub-registration-0.1.2/cluster-bootstrap-acm-hub-registration-0.1.2.tgz
     version: 0.1.2
   cluster-bootstrap-acm-spoke:
+  - apiVersion: v2
+    created: "2026-03-16T10:59:32.334093849Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.0
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: f5b5c39a4b83526aa567cbb6f01fcb68baa64dea362d49dc5264ff5bb619c2ce
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap-acm-spoke
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-spoke-0.6.9/cluster-bootstrap-acm-spoke-0.6.9.tgz
+    version: 0.6.9
   - apiVersion: v2
     created: "2026-03-16T09:53:39.151035096Z"
     dependencies:
@@ -727,4 +762,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-16T10:55:09.344114453Z"
+generated: "2026-03-16T10:59:32.334166485Z"
