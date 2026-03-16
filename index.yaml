@@ -204,6 +204,14 @@ entries:
     version: 0.1.0
   app-of-apps-application:
   - apiVersion: v2
+    created: "2026-03-16T11:35:48.665522522Z"
+    description: Chart to generate argocd apps for each team and gitops set up
+    digest: a77b9a81f1d5dd2e580befd37391dbe120ca8bfbe9e2bb8a2c504cf35d55bac0
+    name: app-of-apps-application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-application-1.5.6/app-of-apps-application-1.5.6.tgz
+    version: 1.5.6
+  - apiVersion: v2
     created: "2026-02-19T14:31:00.082065+10:00"
     description: Chart to generate argocd apps for each team and gitops set up
     digest: 5b4ecb01244cdc24da87686789d3901b1d3686f5eb1db24cecfaee7c848347c2
@@ -774,4 +782,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-16T11:06:27.759610681Z"
+generated: "2026-03-16T11:35:48.665601169Z"
