@@ -307,6 +307,23 @@ entries:
     version: 1.6.1
   cluster-bootstrap:
   - apiVersion: v2
+    created: "2026-03-16T11:39:01.412509755Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.0
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 5ac0db91174bed5350beb60c619894650474b18f7ab8f1f42a26fa3fd4469ed3
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.11/cluster-bootstrap-0.5.11.tgz
+    version: 0.5.11
+  - apiVersion: v2
     created: "2026-03-16T10:59:32.121853193Z"
     dependencies:
     - name: helper-installplan-approver
@@ -782,4 +799,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-16T11:35:48.665601169Z"
+generated: "2026-03-16T11:39:01.412595616Z"
