@@ -155,6 +155,18 @@ entries:
     version: 0.5.13
   app-of-apps-acm-team-onboarding:
   - apiVersion: v2
+    created: "2026-03-16T11:06:27.759528385Z"
+    description: Chart to onboard teams on an ACM hub with AppProjects, RBAC, and
+      placement infrastructure for spoke deployment via ApplicationSets
+    digest: 37dae38124189d02fd309a120970c26193bc8da354d673de2867bebfde7948fb
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: app-of-apps-acm-team-onboarding
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-acm-team-onboarding-0.3.1/app-of-apps-acm-team-onboarding-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     created: "2026-03-16T10:55:09.138400595Z"
     description: Chart to onboard teams on an ACM hub with AppProjects, RBAC, and
       placement infrastructure for spoke deployment via ApplicationSets
@@ -762,4 +774,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-16T10:59:32.334166485Z"
+generated: "2026-03-16T11:06:27.759610681Z"
