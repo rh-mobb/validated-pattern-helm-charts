@@ -174,6 +174,18 @@ entries:
     version: 0.5.13
   app-of-apps-acm-team-onboarding:
   - apiVersion: v2
+    created: "2026-03-17T08:20:27.270670868Z"
+    description: Chart to onboard teams on an ACM hub with AppProjects, RBAC, and
+      placement infrastructure for spoke deployment via ApplicationSets
+    digest: ccaaa409b4b51c37cb7645293b6cc2f3503055809078e256218a3df5aebca3e1
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: app-of-apps-acm-team-onboarding
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-acm-team-onboarding-0.4.1/app-of-apps-acm-team-onboarding-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
     created: "2026-03-16T23:02:58.885583584Z"
     description: Chart to onboard teams on an ACM hub with AppProjects, RBAC, and
       placement infrastructure for spoke deployment via ApplicationSets
@@ -269,6 +281,17 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-namespaces-0.3.4/app-of-apps-namespaces-0.3.4.tgz
     version: 0.3.4
   application-gitops:
+  - apiVersion: v1
+    created: "2026-03-17T08:20:27.485293354Z"
+    description: Chart to generate argocd apps
+    digest: fc892968f2ade8819cb23ebd36d8df4d33cd205e1a893abe90e2197edf60039d
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: application-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.6.2/application-gitops-1.6.2.tgz
+    version: 1.6.2
   - apiVersion: v1
     created: "2026-03-17T01:53:55.117902888Z"
     description: Chart to generate argocd apps
@@ -908,4 +931,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-17T07:19:08.613051781Z"
+generated: "2026-03-17T08:20:27.485367652Z"
