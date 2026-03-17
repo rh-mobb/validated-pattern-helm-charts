@@ -251,6 +251,17 @@ entries:
     version: 0.3.4
   application-gitops:
   - apiVersion: v1
+    created: "2026-03-17T01:53:55.117902888Z"
+    description: Chart to generate argocd apps
+    digest: e2d83204b02d57a86b42843ed56d061a86bc7505e754f2e9369b315a026d973c
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: application-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.6.1/application-gitops-1.6.1.tgz
+    version: 1.6.1
+  - apiVersion: v1
     created: "2026-03-16T10:55:09.344029574Z"
     description: Chart to generate argocd apps
     digest: e17ab945e829cb2b1c8672010a450acb8a90db4c0b8d3728f8fc679b00136c3b
@@ -769,6 +780,25 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
     version: 0.0.7
+  service-interconnect-operator:
+  - apiVersion: v2
+    appVersion: "2.0"
+    created: "2026-03-17T01:53:55.294101127Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Red Hat Service Interconnect Operator (Skupper
+      v2)
+    digest: 6f675b527fb1aa4c73c5bc8a24f130e359185a7dedb1f7c1e5ab698edd5640fc
+    maintainers:
+    - name: rh-mobb
+    name: service-interconnect-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/service-interconnect-operator-1.0.0/service-interconnect-operator-1.0.0.tgz
+    version: 1.0.0
   servicemesh-operator-ambient:
   - apiVersion: v2
     appVersion: "3.0"
@@ -824,4 +854,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-16T23:02:59.035197195Z"
+generated: "2026-03-17T01:53:55.294192348Z"
