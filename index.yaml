@@ -2,6 +2,25 @@ apiVersion: v1
 entries:
   acm-operator:
   - apiVersion: v2
+    created: "2026-03-18T00:48:52.11176059Z"
+    dependencies:
+    - name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.1.0
+    description: Chart to deploy Red Hat Advanced Cluster Management (RHACM) with
+      ArgoCD ApplicationSets for spoke cluster management
+    digest: 877b78e88047d67b2595c755b473fae5b9719122b5020985f4e38f1b01652b1f
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: acm-operator
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/acm-operator-0.5.22/acm-operator-0.5.22.tgz
+    version: 0.5.22
+  - apiVersion: v2
     created: "2026-03-17T07:19:08.612945261Z"
     dependencies:
     - name: helper-status-checker
@@ -281,6 +300,17 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-namespaces-0.3.4/app-of-apps-namespaces-0.3.4.tgz
     version: 0.3.4
   application-gitops:
+  - apiVersion: v1
+    created: "2026-03-18T00:48:52.261443819Z"
+    description: Chart to generate argocd apps
+    digest: 4ac5ec204ac9c19ce23d8d5b454c106e692f881214bf592dabc3756cdc769ebe
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: application-gitops
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.6.3/application-gitops-1.6.3.tgz
+    version: 1.6.3
   - apiVersion: v1
     created: "2026-03-17T08:20:27.485293354Z"
     description: Chart to generate argocd apps
@@ -879,6 +909,23 @@ entries:
   servicemesh-operator-ambient:
   - apiVersion: v2
     appVersion: "3.0"
+    created: "2026-03-18T00:48:52.39955484Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Red Hat OpenShift Service Mesh 3 Operator
+    digest: 211ed80d2de8e8aa10370ada39936814dcfd59b8b7bde13883a15a20028b57a5
+    maintainers:
+    - name: rh-mobb
+    name: servicemesh-operator-ambient
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/servicemesh-operator-ambient-1.0.2/servicemesh-operator-ambient-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: "3.0"
     created: "2026-03-16T05:50:34.226377004Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -931,4 +978,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-17T08:20:27.485367652Z"
+generated: "2026-03-18T00:48:52.399657895Z"
