@@ -870,6 +870,17 @@ entries:
     version: 0.1.17
   namespaces:
   - apiVersion: v2
+    created: "2026-03-18T04:51:14.109791775Z"
+    description: Chart to generate argocd apps
+    digest: ae62b1363ae4a1241154c2bb0ac158a3ecb0e66f29283174be237af09440f7b2
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: namespaces
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/namespaces-1.5.3/namespaces-1.5.3.tgz
+    version: 1.5.3
+  - apiVersion: v2
     created: "2026-02-19T14:31:02.52914+10:00"
     description: Chart to generate argocd apps
     digest: ea177d890a2f61138a3fe3e125f4a9ebb5aac7a9a9e4e46691061b90f9ddd2f7
@@ -1012,4 +1023,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-18T03:46:38.381196661Z"
+generated: "2026-03-18T04:51:14.10989054Z"
