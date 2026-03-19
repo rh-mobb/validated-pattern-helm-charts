@@ -757,6 +757,24 @@ entries:
     version: 1.2.12
   external-secrets-operator:
   - apiVersion: v2
+    created: "2026-03-19T02:36:03.526390056Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: External Secrets Operator with AWS Secrets Manager integration via
+      IRSA
+    digest: 18d96139886d39339e05e5ed1c1dc2802e684ae8af4fc94a827aed8e128046a7
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: external-secrets-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/external-secrets-operator-1.1.2/external-secrets-operator-1.1.2.tgz
+    version: 1.1.2
+  - apiVersion: v2
     created: "2026-03-19T02:26:15.133629425Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -1174,4 +1192,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-19T02:26:15.133734982Z"
+generated: "2026-03-19T02:36:03.526513898Z"
