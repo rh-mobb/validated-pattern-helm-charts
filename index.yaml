@@ -955,6 +955,24 @@ entries:
     version: 4.4.3
   letsencrypt-clusterissuer:
   - apiVersion: v2
+    created: "2026-03-19T03:36:19.436414824Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Installs cert-manager operator and creates a Let's Encrypt ACME ClusterIssuer
+      with DNS-01 Route 53 solver (uses IRSA, no static credentials)
+    digest: ef3263c30ccd3ea479de580356e56eca25c7ee9dfc39715080af37a315e80042
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: letsencrypt-clusterissuer
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/letsencrypt-clusterissuer-1.0.2/letsencrypt-clusterissuer-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
     created: "2026-03-19T01:35:22.572196543Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -1210,4 +1228,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-19T02:44:34.674333173Z"
+generated: "2026-03-19T03:36:19.436534316Z"
