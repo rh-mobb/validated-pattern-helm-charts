@@ -955,6 +955,24 @@ entries:
     version: 4.4.3
   letsencrypt-clusterissuer:
   - apiVersion: v2
+    created: "2026-03-19T06:51:50.973620515Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Installs cert-manager operator and creates a Let's Encrypt ACME ClusterIssuer
+      with DNS-01 Route 53 solver (uses IRSA, no static credentials)
+    digest: fdea62680d1ae4f834b5fad6d91f2e7165c26cbe8af76488c100f9b98d241dff
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: letsencrypt-clusterissuer
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/letsencrypt-clusterissuer-1.0.3/letsencrypt-clusterissuer-1.0.3.tgz
+    version: 1.0.3
+  - apiVersion: v2
     created: "2026-03-19T03:36:19.436414824Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -1089,6 +1107,23 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/service-interconnect-operator-1.0.0/service-interconnect-operator-1.0.0.tgz
     version: 1.0.0
   servicemesh-operator-ambient:
+  - apiVersion: v2
+    appVersion: "3.0"
+    created: "2026-03-19T06:51:51.152979367Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Red Hat OpenShift Service Mesh 3 Operator
+    digest: 94547c95db9bfa6a86473f47738098172e99083e7d2ce4de60a281bb4fc66ff6
+    maintainers:
+    - name: rh-mobb
+    name: servicemesh-operator-ambient
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/servicemesh-operator-ambient-1.1.2/servicemesh-operator-ambient-1.1.2.tgz
+    version: 1.1.2
   - apiVersion: v2
     appVersion: "3.0"
     created: "2026-03-19T01:04:42.80378095Z"
@@ -1228,4 +1263,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-19T03:36:19.436534316Z"
+generated: "2026-03-19T06:51:51.15313243Z"
