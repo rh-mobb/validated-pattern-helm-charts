@@ -757,6 +757,24 @@ entries:
     version: 1.2.12
   external-secrets-operator:
   - apiVersion: v2
+    created: "2026-03-19T01:35:22.454047902Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: External Secrets Operator with AWS Secrets Manager integration via
+      IRSA
+    digest: b9d34875cca939e7e751d059a24a01135db7cb2f20f51eaf2de4f2a460319ace
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: external-secrets-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/external-secrets-operator-1.0.1/external-secrets-operator-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
     created: "2026-03-19T00:24:44.659367369Z"
     description: External Secrets Operator with AWS Secrets Manager integration via
       IRSA
@@ -864,6 +882,24 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/helper-status-checker-4.4.3/helper-status-checker-4.4.3.tgz
     version: 4.4.3
   letsencrypt-clusterissuer:
+  - apiVersion: v2
+    created: "2026-03-19T01:35:22.572196543Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Installs cert-manager operator and creates a Let's Encrypt ACME ClusterIssuer
+      with DNS-01 Route 53 solver (uses IRSA, no static credentials)
+    digest: 7f62172573fe8b80bcfff5bb110148d3cf18561b480fb91c10b07010d6379320
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: letsencrypt-clusterissuer
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/letsencrypt-clusterissuer-1.0.1/letsencrypt-clusterissuer-1.0.1.tgz
+    version: 1.0.1
   - apiVersion: v2
     created: "2026-03-19T00:24:44.766805851Z"
     description: Let's Encrypt ACME ClusterIssuer with DNS-01 Route 53 solver (uses
@@ -1102,4 +1138,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-19T01:04:42.803882038Z"
+generated: "2026-03-19T01:35:22.572295998Z"
