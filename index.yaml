@@ -755,6 +755,20 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/compliance-operator-1.2.12/compliance-operator-1.2.12.tgz
     version: 1.2.12
+  external-secrets-operator:
+  - apiVersion: v2
+    created: "2026-03-19T00:24:44.659367369Z"
+    description: External Secrets Operator with AWS Secrets Manager integration via
+      IRSA
+    digest: a8b2e99ede90d84695054f820884552202e6436986ae5ca6305bcb02f1f50ae4
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: external-secrets-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/external-secrets-operator-1.0.0/external-secrets-operator-1.0.0.tgz
+    version: 1.0.0
   helper-installplan-approver:
   - apiVersion: v2
     created: "2026-02-19T14:31:01.474841+10:00"
@@ -849,6 +863,20 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/helper-status-checker-4.4.3/helper-status-checker-4.4.3.tgz
     version: 4.4.3
+  letsencrypt-clusterissuer:
+  - apiVersion: v2
+    created: "2026-03-19T00:24:44.766805851Z"
+    description: Let's Encrypt ACME ClusterIssuer with DNS-01 Route 53 solver (uses
+      IRSA, no static credentials)
+    digest: 4b6de0e3b72a123ca0adeaf9a159341a31ad63b7fc0d3ebf3bdae51f698a4f63
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: letsencrypt-clusterissuer
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/letsencrypt-clusterissuer-1.0.0/letsencrypt-clusterissuer-1.0.0.tgz
+    version: 1.0.0
   loki-operator:
   - apiVersion: v2
     created: "2026-02-19T14:44:23.820217+10:00"
@@ -898,6 +926,23 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
     version: 0.0.7
+  rhcl-operator:
+  - apiVersion: v2
+    created: "2026-03-19T00:24:44.893046618Z"
+    dependencies:
+    - name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Chart to deploy Red Hat Connectivity Link (RHCL/Kuadrant) operator
+      for DNS-based traffic management
+    digest: 945b74a229c230f8f2c0630f563fb6da488fee69a430d57a9a87754504394711
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: rhcl-operator
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/rhcl-operator-1.0.0/rhcl-operator-1.0.0.tgz
+    version: 1.0.0
   service-interconnect-operator:
   - apiVersion: v2
     appVersion: "2.0"
@@ -918,6 +963,23 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/service-interconnect-operator-1.0.0/service-interconnect-operator-1.0.0.tgz
     version: 1.0.0
   servicemesh-operator-ambient:
+  - apiVersion: v2
+    appVersion: "3.0"
+    created: "2026-03-19T00:24:45.05162603Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Red Hat OpenShift Service Mesh 3 Operator
+    digest: 9454b684c5cbe900e64b2fb8a74d8d8a7dd82f249e3686916509d83fdaa4cab3
+    maintainers:
+    - name: rh-mobb
+    name: servicemesh-operator-ambient
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/servicemesh-operator-ambient-1.1.0/servicemesh-operator-ambient-1.1.0.tgz
+    version: 1.1.0
   - apiVersion: v2
     appVersion: "3.0"
     created: "2026-03-18T03:46:38.380041269Z"
@@ -1023,4 +1085,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-18T04:51:14.10989054Z"
+generated: "2026-03-19T00:24:45.051725736Z"
