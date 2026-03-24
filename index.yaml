@@ -1063,6 +1063,24 @@ entries:
   network-observability-operator:
   - apiVersion: v2
     appVersion: "1.11"
+    created: "2026-03-24T00:30:03.668086438Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying the Network Observability Operator for network
+      traffic flow monitoring
+    digest: 390c43ed4cebd205a84c377764c00772d87737c6993db55ad9a4692b42ff10d1
+    maintainers:
+    - name: rh-mobb
+    name: network-observability-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/network-observability-operator-1.0.2/network-observability-operator-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: "1.11"
     created: "2026-03-23T22:59:39.381376976Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -1300,4 +1318,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-23T22:59:39.38152362Z"
+generated: "2026-03-24T00:30:03.66819681Z"
