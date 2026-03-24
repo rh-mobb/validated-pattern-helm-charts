@@ -1063,6 +1063,24 @@ entries:
   network-observability-operator:
   - apiVersion: v2
     appVersion: "1.11"
+    created: "2026-03-24T07:07:23.321005381Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    description: Helm chart for deploying the Network Observability Operator with
+      Loki-backed flow storage
+    digest: 8b8178c0bd0967bc10d5847dc7f702343fb673284d1f5f6d4bf10e6a1ed0f858
+    maintainers:
+    - name: rh-mobb
+    name: network-observability-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/network-observability-operator-2.0.1/network-observability-operator-2.0.1.tgz
+    version: 2.0.1
+  - apiVersion: v2
+    appVersion: "1.11"
     created: "2026-03-24T03:40:40.879837209Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -1336,4 +1354,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-24T03:40:40.879937577Z"
+generated: "2026-03-24T07:07:23.321153928Z"
