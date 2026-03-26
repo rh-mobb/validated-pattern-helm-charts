@@ -2,6 +2,25 @@ apiVersion: v1
 entries:
   acm-operator:
   - apiVersion: v2
+    created: "2026-03-26T03:41:46.330442677Z"
+    dependencies:
+    - name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.1.0
+    description: Chart to deploy Red Hat Advanced Cluster Management (RHACM) with
+      ArgoCD ApplicationSets for spoke cluster management
+    digest: 010ba87b4de8fec914b4960d81aba7494a7dd57eafc2f100880927c2adf17c56
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: acm-operator
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/acm-operator-0.5.23/acm-operator-0.5.23.tgz
+    version: 0.5.23
+  - apiVersion: v2
     created: "2026-03-18T00:48:52.11176059Z"
     dependencies:
     - name: helper-status-checker
@@ -266,6 +285,14 @@ entries:
     version: 0.1.0
   app-of-apps-application:
   - apiVersion: v2
+    created: "2026-03-26T03:41:46.482615572Z"
+    description: Chart to generate argocd apps for each team and gitops set up
+    digest: e949bb7b071ab0000929235e47ddc935026b4cc29dc0a9963c219c391d095f9c
+    name: app-of-apps-application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-application-1.5.7/app-of-apps-application-1.5.7.tgz
+    version: 1.5.7
+  - apiVersion: v2
     created: "2026-03-16T11:35:48.665522522Z"
     description: Chart to generate argocd apps for each team and gitops set up
     digest: a77b9a81f1d5dd2e580befd37391dbe120ca8bfbe9e2bb8a2c504cf35d55bac0
@@ -401,6 +428,23 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/aws-privateca-issuer-1.6.1/aws-privateca-issuer-1.6.1.tgz
     version: 1.6.1
   cluster-bootstrap:
+  - apiVersion: v2
+    created: "2026-03-26T03:41:46.808105193Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.1
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 50058c2723a699dbba3dc0e9f95e870db7a5893f0825d76facab21f3b060378e
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.13/cluster-bootstrap-0.5.13.tgz
+    version: 0.5.13
   - apiVersion: v2
     created: "2026-03-17T01:55:44.064710016Z"
     dependencies:
@@ -1063,6 +1107,24 @@ entries:
   network-observability-operator:
   - apiVersion: v2
     appVersion: "1.11"
+    created: "2026-03-26T03:41:46.957125587Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    description: Helm chart for deploying the Network Observability Operator with
+      Loki-backed flow storage
+    digest: de18767ae558d8e4a50c3e4ca1705a9e4b2b29f1b8966ce6ce233f099ec93c22
+    maintainers:
+    - name: rh-mobb
+    name: network-observability-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/network-observability-operator-2.1.2/network-observability-operator-2.1.2.tgz
+    version: 2.1.2
+  - apiVersion: v2
+    appVersion: "1.11"
     created: "2026-03-25T10:09:42.7636622Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -1290,6 +1352,25 @@ entries:
   servicemesh-operator-ambient:
   - apiVersion: v2
     appVersion: "3.0"
+    created: "2026-03-26T03:41:47.128626047Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Red Hat OpenShift Service Mesh 3 Operator
+    digest: 731f1aab30eb531c18c1f1376f601cf96162712e012a13c4a7da8f382cd4d389
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: servicemesh-operator-ambient
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/servicemesh-operator-ambient-1.2.0/servicemesh-operator-ambient-1.2.0.tgz
+    version: 1.2.0
+  - apiVersion: v2
+    appVersion: "3.0"
     created: "2026-03-19T06:51:51.152979367Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -1444,4 +1525,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-25T10:09:42.763927006Z"
+generated: "2026-03-26T03:41:47.128781968Z"
