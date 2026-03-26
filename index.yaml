@@ -1305,6 +1305,19 @@ entries:
     version: 1.0.0
   overprovisioning:
   - apiVersion: v2
+    created: "2026-03-26T06:58:25.145797482Z"
+    description: Overprovisioning DaemonSet to reserve spare capacity on every node
+    digest: a93fbc05644c110ba2c70554c77ada4d60441560921f0096d89c09f47e331913
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: overprovisioning
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.8/overprovisioning-0.0.8.tgz
+    version: 0.0.8
+  - apiVersion: v2
     created: "2026-02-19T14:31:02.868998+10:00"
     description: overprovisioning pods
     digest: f33ea44d509f33029d7c1b250be9442c6f64bafba7e58a16b60712ce368f78ca
@@ -1525,4 +1538,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-26T03:41:47.128781968Z"
+generated: "2026-03-26T06:58:25.145926823Z"
