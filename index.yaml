@@ -1069,6 +1069,25 @@ entries:
     version: 4.4.3
   letsencrypt-clusterissuer:
   - apiVersion: v2
+    created: "2026-04-02T04:20:16.659598755Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Installs cert-manager operator and creates a Let's Encrypt ACME ClusterIssuer
+      with DNS-01 Route 53 solver (uses IRSA, no static credentials)
+    digest: 592d56dfc511062552fc55347a34f376b5a46ceb6f34582280897510a3eacfdf
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: letsencrypt-clusterissuer
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/letsencrypt-clusterissuer-1.0.5/letsencrypt-clusterissuer-1.0.5.tgz
+    version: 1.0.5
+  - apiVersion: v2
     created: "2026-04-01T23:29:09.381194576Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -1194,6 +1213,26 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/namespaces-1.5.2/namespaces-1.5.2.tgz
     version: 1.5.2
   network-observability-operator:
+  - apiVersion: v2
+    appVersion: "1.11"
+    created: "2026-04-02T04:20:16.823103477Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    description: Helm chart for deploying the Network Observability Operator with
+      Loki-backed flow storage
+    digest: 555359cf94540cf226fbbed47cbb91daf903e6763a8f588e0e40cf4b89224d9b
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: network-observability-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/network-observability-operator-2.1.4/network-observability-operator-2.1.4.tgz
+    version: 2.1.4
   - apiVersion: v2
     appVersion: "1.11"
     created: "2026-03-30T02:06:56.943398771Z"
@@ -1660,4 +1699,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-04-01T23:29:09.381382008Z"
+generated: "2026-04-02T04:20:16.823296757Z"
