@@ -1,0 +1,14 @@
+apiVersion: v2
+name: autonode
+description: Sample Karpenter NodePools for ROSA HCP AutoNode
+type: application
+version: 0.1.0
+appVersion: "4.19"
+home: https://github.com/rh-mobb/validated-pattern-helm-charts
+maintainers:
+  - name: rh-mobb
+keywords:
+  - autonode
+  - karpenter
+  - openshift
+  - rosa

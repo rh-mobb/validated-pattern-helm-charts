@@ -1,0 +1,32 @@
+# Sample manifests for ROSA HCP AutoNode (Karpenter).
+# Requires AutoNode enabled on the cluster and default EC2NodeClass name "default" unless overridden.
+
+enabled: true
+
+# Each entry renders one karpenter.sh/v1 NodePool (cluster-scoped).
+nodePools:
+  - name: default-np
+    labels:
+      autonode: "true"
+    instanceTypes:
+      - c5.xlarge
+    capacityTypes:
+      - on-demand
+    nodeClassRef:
+      group: karpenter.k8s.aws
+      kind: EC2NodeClass
+      name: default
+
+  - name: sample-general
+    labels:
+      autonode: "true"
+      workload: general
+    instanceTypes:
+      - m5.xlarge
+    capacityTypes:
+      - on-demand
+    nodeClassRef:
+      group: karpenter.k8s.aws
+      kind: EC2NodeClass
+      name: default
+
