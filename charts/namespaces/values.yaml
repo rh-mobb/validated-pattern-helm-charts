@@ -31,3 +31,37 @@
 #   automount: true
 #   annotations: 
 #   name: pipeline
+
+# Minimal defaults so lint/template work without explicit values files.
+project:
+  name: "example-namespace"
+  annotations:
+    comments: "example"
+    description: "example"
+    display_name: "Example"
+  labels:
+    domain: "example"
+    egressip: "0.0.0.0"
+    ingress: "example"
+    primary_owner: "example@example.com"
+    zone: "example"
+
+groupname:
+  admin_group: "example-admins"
+  edit_group: ""
+  view_group: ""
+
+resourceQuota:
+  limits_cpu: "250m"
+  limits_memory: "1Gi"
+  requests_cpu: "200m"
+  requests_memory: "500Mi"
+  persistentvolumeclaims: "5"
+  limits_ephemeral_storage: "4Gi"
+  pods: "50"
+
+serviceAccount:
+  create: false
+  automount: true
+  annotations: {}
+  name: ""
