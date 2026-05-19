@@ -464,6 +464,25 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/application-gitops-1.4.0/application-gitops-1.4.0.tgz
     version: 1.4.0
+  autonode:
+  - apiVersion: v2
+    appVersion: "4.19"
+    created: "2026-05-19T03:09:09.517677782Z"
+    description: Sample Karpenter NodePools for ROSA HCP AutoNode
+    digest: 9e2acc8804e4e24e26dd345bae105256ac3bce6aaef9504adbdf007156e5a9a2
+    home: https://github.com/rh-mobb/validated-pattern-helm-charts
+    keywords:
+    - autonode
+    - karpenter
+    - openshift
+    - rosa
+    maintainers:
+    - name: rh-mobb
+    name: autonode
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/autonode-0.1.0/autonode-0.1.0.tgz
+    version: 0.1.0
   aws-privateca-issuer:
   - apiVersion: v2
     appVersion: v1.4.2
@@ -1213,6 +1232,17 @@ entries:
     version: 0.1.17
   namespaces:
   - apiVersion: v2
+    created: "2026-05-19T03:09:09.71160546Z"
+    description: Chart to generate argocd apps
+    digest: 6ad16d96d49a1f7dfe4eef6241b34f19d70d3782a4558d7429e8aa26971ada42
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: namespaces
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/namespaces-1.5.4/namespaces-1.5.4.tgz
+    version: 1.5.4
+  - apiVersion: v2
     created: "2026-03-18T04:51:14.109791775Z"
     description: Chart to generate argocd apps
     digest: ae62b1363ae4a1241154c2bb0ac158a3ecb0e66f29283174be237af09440f7b2
@@ -1775,4 +1805,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-04-08T06:56:24.795347963Z"
+generated: "2026-05-19T03:09:09.711813172Z"
