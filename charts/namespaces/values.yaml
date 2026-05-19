@@ -15,9 +15,9 @@
 #     zone: test
 #     apm-number: 1234
 # groupname:
-#   admin_group: pa_admins  
-#   edit_group:  
-#   view_group:  
+#   admin_group: pa_admins
+#   edit_group:
+#   view_group:
 # resourceQuota:
 #   limits_cpu: 250m
 #   limits_memory: 1Gi
@@ -29,7 +29,7 @@
 # serviceAccount:
 #   create: true
 #   automount: true
-#   annotations: 
+#   annotations:
 #   name: pipeline
 
 # Minimal defaults so lint/template work without explicit values files.
