@@ -3,6 +3,34 @@ entries:
   acm-observability:
   - apiVersion: v2
     appVersion: "2.16"
+    created: "2026-06-01T04:15:54.41417372Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Red Hat Advanced Cluster Management Multi-Cluster Observability Stack
+    digest: 91f1f6af8c0c98d2994dafe7a6ca23806e73df371d1a246771c0105784497511
+    home: https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/2.16/html/observability/observing-environments-intro
+    keywords:
+    - acm
+    - observability
+    - multicluster
+    - thanos
+    - grafana
+    - prometheus
+    - openshift
+    - rosa
+    kubeVersion: '>=1.25.0-0'
+    name: acm-observability
+    sources:
+    - https://github.com/stolostron/multicluster-observability-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/acm-observability-0.2.0/acm-observability-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: "2.16"
     created: "2026-06-01T04:01:24.592479581Z"
     description: Red Hat Advanced Cluster Management Multi-Cluster Observability Stack
     digest: ef1284c24be3700036867fb2bb65b38fc50931730c609b47bf039226628bede0
@@ -1849,4 +1877,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-06-01T04:01:24.736752467Z"
+generated: "2026-06-01T04:15:54.414350707Z"
