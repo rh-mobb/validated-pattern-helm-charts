@@ -1,5 +1,29 @@
 apiVersion: v1
 entries:
+  acm-observability:
+  - apiVersion: v2
+    appVersion: "2.16"
+    created: "2026-06-01T04:01:24.592479581Z"
+    description: Red Hat Advanced Cluster Management Multi-Cluster Observability Stack
+    digest: ef1284c24be3700036867fb2bb65b38fc50931730c609b47bf039226628bede0
+    home: https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/2.16/html/observability/observing-environments-intro
+    keywords:
+    - acm
+    - observability
+    - multicluster
+    - thanos
+    - grafana
+    - prometheus
+    - openshift
+    - rosa
+    kubeVersion: '>=1.25.0-0'
+    name: acm-observability
+    sources:
+    - https://github.com/stolostron/multicluster-observability-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/acm-observability-0.1.0/acm-observability-0.1.0.tgz
+    version: 0.1.0
   acm-operator:
   - apiVersion: v2
     created: "2026-03-30T02:15:07.277439901Z"
@@ -1553,6 +1577,26 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/rhcl-operator-1.0.0/rhcl-operator-1.0.0.tgz
     version: 1.0.0
+  rosa-virtualization:
+  - apiVersion: v2
+    appVersion: "4.17"
+    created: "2026-06-01T04:01:24.736581049Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying OpenShift Virtualization operator on ROSA
+    digest: 0d187d02ccddc152e1f3b31591ece316fe79d77d8ad0eb0ea08eb95c3c7454bd
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: rosa-virtualization
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/rosa-virtualization-1.0.0/rosa-virtualization-1.0.0.tgz
+    version: 1.0.0
   service-interconnect-operator:
   - apiVersion: v2
     appVersion: "2.0"
@@ -1805,4 +1849,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-19T03:09:09.711813172Z"
+generated: "2026-06-01T04:01:24.736752467Z"
