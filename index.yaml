@@ -1719,6 +1719,25 @@ entries:
   portworx-operator:
   - apiVersion: v2
     appVersion: "3.2"
+    created: "2026-06-05T05:47:44.51000362Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Portworx Enterprise operator on ROSA HCP
+      with workload identity (IRSA)
+    digest: 6b1d93b41c71b27a6752bfcb3290394dc955fefa3ffe41f43d85293d2d6de325
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: portworx-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/portworx-operator-0.1.3/portworx-operator-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: "3.2"
     created: "2026-06-05T05:15:25.086151908Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -2101,4 +2120,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-06-05T05:15:25.086321303Z"
+generated: "2026-06-05T05:47:44.510205578Z"
