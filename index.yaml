@@ -82,6 +82,26 @@ entries:
     version: 0.1.0
   acm-operator:
   - apiVersion: v2
+    created: "2026-06-05T02:15:17.683237545Z"
+    dependencies:
+    - name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.1.0
+    description: Chart to deploy Red Hat Advanced Cluster Management (RHACM) with
+      ArgoCD ApplicationSets for spoke cluster management
+    digest: 6f951d3f4decc9b9c397a049b402c2ae6d7ddfd0aa781bf169240654304e5062
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: acm-operator
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/acm-operator-0.5.29/acm-operator-0.5.29.tgz
+    version: 0.5.29
+  - apiVersion: v2
     created: "2026-06-01T06:42:56.931282325Z"
     dependencies:
     - name: helper-status-checker
@@ -1350,6 +1370,26 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/loki-operator-0.1.17/loki-operator-0.1.17.tgz
     version: 0.1.17
+  mtv-operator:
+  - apiVersion: v2
+    appVersion: "2.7"
+    created: "2026-06-05T02:15:17.834530238Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Migration Toolkit for Virtualization (MTV)
+      on OpenShift
+    digest: ea4f9e3f8044a83b1e10f1aa51f97765f392ce719df95a982e6c5b51c00582ae
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: mtv-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/mtv-operator-0.1.0/mtv-operator-0.1.0.tgz
+    version: 0.1.0
   namespaces:
   - apiVersion: v2
     created: "2026-05-19T03:09:09.71160546Z"
@@ -1656,6 +1696,26 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/overprovisioning-0.0.7/overprovisioning-0.0.7.tgz
     version: 0.0.7
+  portworx-operator:
+  - apiVersion: v2
+    appVersion: "3.2"
+    created: "2026-06-05T02:15:17.972136072Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Portworx Enterprise operator on ROSA HCP
+      with workload identity (IRSA)
+    digest: 3b76db5b7f95df8f0fcc5bef23a84498f926b11583b85e783cb812c4d7b816e8
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: portworx-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/portworx-operator-0.1.0/portworx-operator-0.1.0.tgz
+    version: 0.1.0
   rhcl-operator:
   - apiVersion: v2
     created: "2026-03-19T00:24:44.893046618Z"
@@ -1674,6 +1734,25 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/rhcl-operator-1.0.0/rhcl-operator-1.0.0.tgz
     version: 1.0.0
   rosa-virtualization:
+  - apiVersion: v2
+    appVersion: "4.20"
+    created: "2026-06-05T02:15:18.133186647Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying OpenShift Virtualization operator on ROSA
+    digest: 9d7730d6d5d957f3a8c539b3036e7c730cbca6b368180634558dd68ec7250aae
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: rosa-virtualization
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/rosa-virtualization-1.0.2/rosa-virtualization-1.0.2.tgz
+    version: 1.0.2
   - apiVersion: v2
     appVersion: "4.17"
     created: "2026-06-01T06:42:57.08681991Z"
@@ -1964,4 +2043,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-06-01T06:42:57.087103379Z"
+generated: "2026-06-05T02:15:18.133453767Z"
