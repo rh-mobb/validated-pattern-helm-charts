@@ -86,20 +86,20 @@ spec:
         cpu: 250m
         memory: 128Mi
   repo:
-    initContainers:
-    - args:
-      - curl -Lo /custom-tools/argocd-vault-plugin https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v{{ .Values.argocd.plugin.version }}/argocd-vault-plugin_{{ .Values.argocd.plugin.version }}_linux_amd64
-        && chmod +x /custom-tools/argocd-vault-plugin
-      command:
-      - /bin/bash
-      - -c
-      # image: "{{ $.Values.ecr_account }}.dkr.ecr.{{ $.Values.aws_region }}.amazonaws.com/platform_image"
-      image: "{{ .Values.defaultImage }}"
-      name: download-tools
-      resources: {}
-      volumeMounts:
-      - mountPath: /custom-tools
-        name: custom-tools
+    # initContainers:
+    # - args:
+    #   - curl -Lo /custom-tools/argocd-vault-plugin https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v{{ .Values.argocd.plugin.version }}/argocd-vault-plugin_{{ .Values.argocd.plugin.version }}_linux_amd64
+    #     && chmod +x /custom-tools/argocd-vault-plugin
+    #   command:
+    #   - /bin/bash
+    #   - -c
+    #   # image: "{{ $.Values.ecr_account }}.dkr.ecr.{{ $.Values.aws_region }}.amazonaws.com/platform_image"
+    #   image: "{{ .Values.defaultImage }}"
+    #   name: download-tools
+    #   resources: {}
+    #   volumeMounts:
+    #   - mountPath: /custom-tools
+    #     name: custom-tools
     mountsatoken: true
     resources:
       limits:
@@ -131,15 +131,10 @@ spec:
       - mountPath: /home/argocd/cmp-server/config/plugin.yaml
         name: cmp-plugin
         subPath: avp-helm.yaml
-      - mountPath: /usr/local/bin/argocd-vault-plugin
-        name: custom-tools
-        subPath: argocd-vault-plugin
     volumes:
     - configMap:
         name: cmp-plugin
       name: cmp-plugin
-    - emptyDir: {}
-      name: custom-tools
   resourceHealthChecks:
   - check: |
       health_status = {}

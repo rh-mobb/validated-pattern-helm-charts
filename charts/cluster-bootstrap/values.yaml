@@ -1,5 +1,5 @@
 # Using sub-chart helper-installplan-approver
-defaultImage: ghcr.io/rh-mobb/validated-pattern-terraform-rosa/gitops-tools:5507548
+defaultImage: ghcr.io/rh-mobb/validated-pattern-terraform-rosa/gitops-tools:9e983e6
 helper-installplan-approver:
   namespace: openshift-gitops-operator
 nameOverride: ""
