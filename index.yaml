@@ -899,6 +899,19 @@ entries:
   cluster-bootstrap-acm-hub-registration:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-06-16T03:32:50.150493712Z"
+    description: Helm chart to register spoke clusters with ACM hub
+    digest: 2b0d668b6c7b5fc3e4ef21b32ed861f7e02976496decbeedb0bf9572e10dd877
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap-acm-hub-registration
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-hub-registration-0.2.2/cluster-bootstrap-acm-hub-registration-0.2.2.tgz
+    version: 0.2.2
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-03-16T23:02:59.035109042Z"
     description: Helm chart to register spoke clusters with ACM hub
     digest: 7130d723f618cddcd6c2fe43c76cc294176600c261b25b0cad44fd8a39d23261
@@ -2716,4 +2729,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-06-12T08:33:43.351993791Z"
+generated: "2026-06-16T03:32:50.150872832Z"
