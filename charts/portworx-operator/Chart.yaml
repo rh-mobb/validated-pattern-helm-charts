@@ -2,7 +2,7 @@ apiVersion: v2
 name: portworx-operator
 description: Helm chart for deploying Portworx Enterprise operator on ROSA HCP with workload identity (IRSA)
 type: application
-version: 0.2.24
+version: 0.2.25
 appVersion: "3.6"
 dependencies:
   - name: helper-status-checker
