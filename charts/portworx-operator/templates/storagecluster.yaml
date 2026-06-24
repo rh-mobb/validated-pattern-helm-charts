@@ -45,7 +45,6 @@ spec:
     enabled: true
     args:
       webhook-controller: "true"
-      admin-namespace: {{ .Values.namespace }}
   csi:
     enabled: true
   monitoring:
