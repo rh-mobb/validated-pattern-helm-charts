@@ -13,7 +13,7 @@ helper-status-checker:
       subscriptionName: multicluster-engine
       namespace:
         name: multicluster-engine
-      syncwave: 3
+      syncwave: 5
       serviceAccount:
         name: "mce-status-checker"
 # acm-operator.v2.13.3
@@ -35,6 +35,7 @@ helper-operator:
         sourceNamespace: openshift-marketplace
 namespaces:
   - name: open-cluster-management
+  - name: multicluster-engine
 
 # Sync wave for MultiClusterHub deployment
 syncwave: 4
