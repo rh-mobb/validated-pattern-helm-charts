@@ -44,11 +44,10 @@ spec:
               description: {{ $nsAnnotations.description | default $defaultsAnnotations.description }}
               display_name: {{ $nsAnnotations.display_name | default $defaultsAnnotations.display_name }}
             labels:
-              domain: {{ $nsLabels.domain | default $defaultsLabels.domain }}
-              egressip: {{ $nsLabels.egressip | default $defaultsLabels.egressip }}
-              ingress: {{ $nsLabels.ingress | default $defaultsLabels.ingress }}
-              primary_owner: {{ $nsLabels.primary_owner | default $defaultsLabels.primary_owner }}
-              zone: {{ $nsLabels.zone | default $defaultsLabels.zone }}
+              {{- $mergedLabelsPlugin := merge ($nsLabels | default dict) ($defaultsLabels | default dict) }}
+              {{- range $key, $value := $mergedLabelsPlugin }}
+              {{ $key }}: {{ $value }}
+              {{- end }}
           groupname:
             admin_group: {{ $nsGroupname.admin_group | default $defaultsGroupname.admin_group }}  
           resourceQuota:
@@ -77,11 +76,10 @@ spec:
             description: {{ $nsAnnotations.description | default $defaultsAnnotations.description }}
             display_name: {{ $nsAnnotations.display_name | default $defaultsAnnotations.display_name }}
           labels:
-            domain: {{ $nsLabels.domain | default $defaultsLabels.domain }}
-            egressip: {{ $nsLabels.egressip | default $defaultsLabels.egressip }}
-            ingress: {{ $nsLabels.ingress | default $defaultsLabels.ingress }}
-            primary_owner: {{ $nsLabels.primary_owner | default $defaultsLabels.primary_owner }}
-            zone: {{ $nsLabels.zone | default $defaultsLabels.zone }}
+            {{- $mergedLabels := merge ($nsLabels | default dict) ($defaultsLabels | default dict) }}
+            {{- range $key, $value := $mergedLabels }}
+            {{ $key }}: {{ $value }}
+            {{- end }}
             apm-number: {{ $apmnum }}
         groupname:
           admin_group: {{ $nsGroupname.admin_group | default $defaultsGroupname.admin_group }}  
