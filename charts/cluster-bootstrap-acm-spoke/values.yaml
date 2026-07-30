@@ -33,6 +33,8 @@ operatorGroups:
   namespace: openshift-gitops-operator
 catalogSources: []
 argocd:
+  # Deprecated: AVP sidecar/plugin path is being phased out.
+  # Prefer native Helm rendering (plugin: false) with the external-secrets-operator chart.
   plugin:
     version: "1.18.1"
     AVP_TYPE: awssecretsmanager
