@@ -15,8 +15,9 @@
 #   # namespaces chart defaults
 #   namespaceChart: namespaces
 #   namespaceChartRevision: 1.0.3
-#   # Vault plugin defaults.
-#   plugin: true
+#   # Native Helm + External Secrets Operator defaults.
+#   plugin: false
+#   # AVP_TYPE / AWS_REGION are only needed if plugin: true (deprecated path).
 #   AWS_REGION: "ap-southeast-2"
 #   AVP_TYPE: "awssecretsmanager"
 # #################################################################

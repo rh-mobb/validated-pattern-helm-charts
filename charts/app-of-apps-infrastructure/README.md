@@ -77,7 +77,8 @@ defaults:
   finalizers: resources-finalizer.argocd.argoproj.io
   gitopsNamespace: openshift-gitops
   helmRepoUrl: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
-  plugin: true
+  plugin: false
+  # AVP_TYPE and AWS_REGION are only needed for the deprecated AVP path (plugin: true)
   AWS_REGION: "ap-southeast-2"
   AVP_TYPE: "awssecretsmanager"
 
@@ -218,7 +219,7 @@ oc get storageclass | grep efs
 1. **Application not syncing**: Check Helm repository connectivity and chart versions
 2. **Operator installation fails**: Verify CSV versions in helper-operator configuration
 3. **AWS IAM errors**: Confirm roleArn values are correct for the environment
-4. **Secret access issues**: Check AWS Secrets Manager permissions and vault plugin config
+4. **Secret access issues**: Confirm ESO `serviceAccount.roleArn` permissions, or validate AVP settings when using `plugin: true`
 
 ## Environment-Specific Configuration
 
@@ -246,9 +247,9 @@ oc get storageclass | grep efs
 - **finalizers**: ArgoCD finalizer configuration
 - **gitopsNamespace**: Target namespace for ArgoCD applications
 - **helmRepoUrl**: Helm repository URL for charts
-- **plugin**: Enable/disable ArgoCD vault plugin
-- **AWS_REGION**: AWS region for cloud integrations
-- **AVP_TYPE**: Vault plugin type (awssecretsmanager)
+- **plugin**: Optional AVP path toggle (`false` by default, native Helm + ESO recommended)
+- **AWS_REGION**: AWS region used only when `plugin: true`
+- **AVP_TYPE**: AVP backend type used only when `plugin: true` (typically `awssecretsmanager`)
 
 ### Infrastructure Section
 Array of infrastructure components, each with:
