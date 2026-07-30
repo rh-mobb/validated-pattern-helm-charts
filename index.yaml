@@ -610,6 +610,16 @@ entries:
     version: 1.5.5
   app-of-apps-infrastructure:
   - apiVersion: v1
+    created: "2026-07-30T06:05:50.977432556Z"
+    description: Chart to generate argocd apps
+    digest: 77bec807b13d81411fbfc61fa6473ed0eb6b15499951c1f4a185abfed3368d4d
+    maintainers:
+    - name: rh-mobb
+    name: app-of-apps-infrastructure
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-infrastructure-0.2.3/app-of-apps-infrastructure-0.2.3.tgz
+    version: 0.2.3
+  - apiVersion: v1
     created: "2026-02-19T14:31:00.43771+10:00"
     description: Chart to generate argocd apps
     digest: 4f5e04354d746bd2b8ab45890fc7fb4b8c7046933aa3711d68cb544c7a98321d
@@ -755,6 +765,24 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/aws-privateca-issuer-1.6.1/aws-privateca-issuer-1.6.1.tgz
     version: 1.6.1
   cluster-bootstrap:
+  - apiVersion: v2
+    created: "2026-07-30T06:05:51.150813672Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.1
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 980c6de2043f95608ab23f9276fc7aebb69ed579978b491cb529b53d37869925
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.17/cluster-bootstrap-0.5.17.tgz
+    version: 0.5.17
   - apiVersion: v2
     created: "2026-06-10T01:28:38.348543601Z"
     dependencies:
@@ -988,6 +1016,24 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-hub-registration-0.1.2/cluster-bootstrap-acm-hub-registration-0.1.2.tgz
     version: 0.1.2
   cluster-bootstrap-acm-spoke:
+  - apiVersion: v2
+    created: "2026-07-30T06:05:51.311468586Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.1
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 3866fc704a08de4ed1c273a70a7d119cd2be95c587578bb1bae0220b0527c19f
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap-acm-spoke
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-spoke-0.6.13/cluster-bootstrap-acm-spoke-0.6.13.tgz
+    version: 0.6.13
   - apiVersion: v2
     created: "2026-06-10T01:28:38.531087339Z"
     dependencies:
@@ -1230,6 +1276,24 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/compliance-operator-1.2.12/compliance-operator-1.2.12.tgz
     version: 1.2.12
   external-secrets-operator:
+  - apiVersion: v2
+    created: "2026-07-30T06:05:51.450831738Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: External Secrets Operator with AWS Secrets Manager integration via
+      IRSA
+    digest: cebeb6a3f18cda6241e73c0db173c29b37edcb64e66e032dd14efd2305c9c36b
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: external-secrets-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/external-secrets-operator-1.1.4/external-secrets-operator-1.1.4.tgz
+    version: 1.1.4
   - apiVersion: v2
     created: "2026-03-19T02:44:34.674226033Z"
     dependencies:
@@ -2947,4 +3011,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-28T04:20:03.519861517Z"
+generated: "2026-07-30T06:05:51.452369746Z"
