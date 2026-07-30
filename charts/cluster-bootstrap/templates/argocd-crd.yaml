@@ -108,6 +108,7 @@ spec:
       requests:
         cpu: 250m
         memory: 256Mi
+{{- if .Values.argocd.plugin.enabled }}
     serviceaccount: vplugin
     sidecarContainers:
     - command:
@@ -135,6 +136,7 @@ spec:
     - configMap:
         name: cmp-plugin
       name: cmp-plugin
+{{- end }}
   resourceHealthChecks:
   - check: |
       health_status = {}

@@ -1,3 +1,4 @@
+{{- if .Values.argocd.plugin.enabled }}
 apiVersion: v1
 data:
   avp-helm.yaml: |
@@ -38,3 +39,4 @@ metadata:
     helm.sh/hook: post-install
   name: cmp-plugin
   namespace: openshift-gitops
+{{- end }}
