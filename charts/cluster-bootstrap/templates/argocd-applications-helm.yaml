@@ -41,7 +41,8 @@ spec:
             values: |
               appTeam: {{ $applications.name }}
         - repoURL: {{ $applications.gitRepoUrl }}
-          targetRevision: HEAD
+          # cluster-config git ref: per-app gitTargetRevision, else chart gitTargetRevision, else HEAD
+          targetRevision: {{ $applications.gitTargetRevision | default $.Values.gitTargetRevision | default "HEAD" }}
           ref: values
       syncPolicy:
         automated:
