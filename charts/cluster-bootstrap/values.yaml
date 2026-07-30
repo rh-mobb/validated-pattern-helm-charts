@@ -7,6 +7,9 @@ fullnameOverride: ""
 aws_region: <region>
 aws_account: <account-id>
 domain: <domain>
+# Git revision (branch/tag/commit) for cluster-config values source in ApplicationSets.
+# Override via Terraform gitops_git_target_revision / bootstrap values gitTargetRevision.
+gitTargetRevision: HEAD
 namespaces:
   - name: openshift-gitops
   - name: openshift-gitops-operator
