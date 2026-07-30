@@ -766,6 +766,24 @@ entries:
     version: 1.6.1
   cluster-bootstrap:
   - apiVersion: v2
+    created: "2026-07-30T06:34:16.541266688Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.1
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 6a5e76f50303b2dcb7cdd44f5d40ef8e0dedc99a1d53f8970c189f506c1de4cc
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.19/cluster-bootstrap-0.5.19.tgz
+    version: 0.5.19
+  - apiVersion: v2
     created: "2026-07-30T06:05:51.150813672Z"
     dependencies:
     - name: helper-installplan-approver
@@ -1016,6 +1034,24 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-hub-registration-0.1.2/cluster-bootstrap-acm-hub-registration-0.1.2.tgz
     version: 0.1.2
   cluster-bootstrap-acm-spoke:
+  - apiVersion: v2
+    created: "2026-07-30T06:34:16.731103364Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.1
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 22392e0176e3b7d093a2905e4e32067aa46c2f327a24e0c9a9de6238ae3d2695
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap-acm-spoke
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-acm-spoke-0.6.14/cluster-bootstrap-acm-spoke-0.6.14.tgz
+    version: 0.6.14
   - apiVersion: v2
     created: "2026-07-30T06:05:51.311468586Z"
     dependencies:
@@ -3011,4 +3047,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-30T06:05:51.452369746Z"
+generated: "2026-07-30T06:34:16.731284772Z"
