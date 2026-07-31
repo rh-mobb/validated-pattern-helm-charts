@@ -46,7 +46,7 @@ spec:
             labels:
               {{- $mergedLabelsPlugin := merge ($nsLabels | default dict) ($defaultsLabels | default dict) }}
               {{- range $key, $value := $mergedLabelsPlugin }}
-              {{ $key }}: {{ $value }}
+              {{ $key }}: {{ $value | quote }}
               {{- end }}
           groupname:
             admin_group: {{ $nsGroupname.admin_group | default $defaultsGroupname.admin_group }}  
@@ -78,7 +78,7 @@ spec:
           labels:
             {{- $mergedLabels := merge ($nsLabels | default dict) ($defaultsLabels | default dict) }}
             {{- range $key, $value := $mergedLabels }}
-            {{ $key }}: {{ $value }}
+            {{ $key }}: {{ $value | quote }}
             {{- end }}
             apm-number: {{ $apmnum }}
         groupname:
