@@ -629,6 +629,14 @@ entries:
     version: 0.2.2
   app-of-apps-namespaces:
   - apiVersion: v1
+    created: "2026-07-31T12:14:44.59963331Z"
+    description: Chart to generate namespaces apps.
+    digest: 27d5d38af2a13212d5b65434cd048cf7301cbcf059b51daa978a850c7e246210
+    name: app-of-apps-namespaces
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-namespaces-0.3.6/app-of-apps-namespaces-0.3.6.tgz
+    version: 0.3.6
+  - apiVersion: v1
     created: "2026-07-28T04:20:03.309025629Z"
     description: Chart to generate namespaces apps.
     digest: d15362ced46a5741100c7ecb3c6a10b7b9da1d3045b0a7c39ffcdde70fe4e5d2
@@ -3047,4 +3055,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-30T06:34:16.731284772Z"
+generated: "2026-07-31T12:14:44.600001549Z"
