@@ -4,20 +4,18 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.18.0
-  name: cudnbgproutings.networking.openshift.io
+    argocd.argoproj.io/sync-wave: "-2"
+  name: cudnbgpconfigs.networking.openshift.io
 spec:
   group: networking.openshift.io
   names:
-    kind: CUDNBgpRouting
-    listKind: CUDNBgpRoutingList
-    plural: cudnbgproutings
-    singular: cudnbgprouting
+    kind: CUDNBgpConfig
+    listKind: CUDNBgpConfigList
+    plural: cudnbgpconfigs
+    singular: cudnbgpconfig
   scope: Cluster
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.network.name
-      name: Network
-      type: string
     - jsonPath: .status.phase
       name: Phase
       type: string
@@ -27,8 +25,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: CUDNBgpRouting declares a single CUDN network to create and advertise
-          via BGP.
+        description: CUDNBgpConfig is the singleton cluster-scoped BGP infrastructure
+          configuration.
         properties:
           apiVersion:
             description: |-
@@ -49,25 +47,109 @@ spec:
             type: object
           spec:
             properties:
-              network:
+              aws:
                 properties:
-                  name:
+                  region:
                     type: string
-                  subnets:
+                  routeServerIDs:
                     items:
                       type: string
-                    maxItems: 2
                     minItems: 1
                     type: array
                 required:
-                - name
-                - subnets
+                - region
+                - routeServerIDs
+                type: object
+              bgp:
+                properties:
+                  availabilityZones:
+                    items:
+                      properties:
+                        neighbors:
+                          items:
+                            properties:
+                              address:
+                                type: string
+                              remoteASN:
+                                format: int64
+                                maximum: 4294967295
+                                minimum: 0
+                                type: integer
+                            required:
+                            - address
+                            - remoteASN
+                            type: object
+                          minItems: 1
+                          type: array
+                        nodeSelector:
+                          additionalProperties:
+                            type: string
+                          type: object
+                      required:
+                      - neighbors
+                      - nodeSelector
+                      type: object
+                    type: array
+                  livenessDetection:
+                    default: bgp-keepalive
+                    enum:
+                    - bfd
+                    - bgp-keepalive
+                    type: string
+                  localASN:
+                    format: int64
+                    maximum: 4294967295
+                    minimum: 0
+                    type: integer
+                required:
+                - localASN
+                type: object
+              routerNodeSelector:
+                additionalProperties:
+                  type: string
                 type: object
             required:
-            - network
+            - bgp
+            - routerNodeSelector
             type: object
+            x-kubernetes-validations:
+            - message: spec.aws and spec.bgp.availabilityZones are mutually exclusive
+              rule: "!(has(self.aws) && has(self.bgp.availabilityZones) && size(self.bgp.availabilityZones) > 0)"
+            - message: spec.bgp.availabilityZones is required when spec.aws is not configured
+              rule: "has(self.aws) || (has(self.bgp.availabilityZones) && size(self.bgp.availabilityZones) > 0)"
           status:
             properties:
+              aws:
+                properties:
+                  routeServers:
+                    items:
+                      properties:
+                        endpoints:
+                          items:
+                            properties:
+                              address:
+                                type: string
+                              availabilityZone:
+                                type: string
+                              endpointID:
+                                type: string
+                            required:
+                            - address
+                            - availabilityZone
+                            - endpointID
+                            type: object
+                          type: array
+                        remoteASN:
+                          format: int64
+                          type: integer
+                        routeServerID:
+                          type: string
+                      required:
+                      - remoteASN
+                      - routeServerID
+                      type: object
+                    type: array
+                type: object
               conditions:
                 items:
                   description: Condition contains details for one aspect of the current
