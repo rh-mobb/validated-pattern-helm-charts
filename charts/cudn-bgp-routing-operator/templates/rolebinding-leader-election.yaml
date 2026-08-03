@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: {{ include "cudn-bgp.namePrefix" . }}leader-election-rolebinding
+  namespace: {{ include "cudn-bgp.namespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "cudn-bgp.namePrefix" . }}leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: {{ include "cudn-bgp.namePrefix" . }}{{ .Values.serviceAccount.name }}
+  namespace: {{ include "cudn-bgp.namespace" . }}

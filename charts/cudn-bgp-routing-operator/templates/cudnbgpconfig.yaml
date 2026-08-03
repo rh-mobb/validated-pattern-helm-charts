@@ -1,0 +1,21 @@
+{{- if .Values.cudnBgpConfig.enabled }}
+apiVersion: networking.openshift.io/v1alpha1
+kind: CUDNBgpConfig
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  bgp:
+    localASN: {{ .Values.cudnBgpConfig.localASN }}
+    livenessDetection: {{ .Values.cudnBgpConfig.livenessDetection }}
+  routerNodeSelector:
+    {{- toYaml .Values.cudnBgpConfig.routerNodeSelector | nindent 4 }}
+  {{- if and .Values.cudnBgpConfig.aws .Values.cudnBgpConfig.aws.region }}
+  aws:
+    region: {{ .Values.cudnBgpConfig.aws.region }}
+    routeServerIDs:
+      {{- toYaml .Values.cudnBgpConfig.aws.routeServerIDs | nindent 6 }}
+  {{- end }}
+{{- end }}
