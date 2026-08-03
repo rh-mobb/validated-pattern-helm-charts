@@ -1,0 +1,15 @@
+{{- range .Values.cudnBgpRoutings }}
+---
+apiVersion: networking.openshift.io/v1alpha1
+kind: CUDNBgpRouting
+metadata:
+  name: {{ .name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  network:
+    name: {{ .network.name }}
+    subnets:
+      {{- toYaml .network.subnets | nindent 6 }}
+{{- end }}

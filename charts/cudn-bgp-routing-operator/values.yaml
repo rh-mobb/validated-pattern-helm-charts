@@ -1,0 +1,35 @@
+namespace: openshift-cudn-bgp-routing
+namePrefix: openshift-cudn-bgp-routing-
+
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/openshift-cudn-bgp-routing/operator
+  tag: dev
+  pullPolicy: Always
+
+replicaCount: 1
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 64Mi
+
+serviceAccount:
+  name: controller-manager
+  annotations: {}
+
+metricsPort: 8443
+
+cudnBgpConfig:
+  enabled: false
+  localASN: 65001
+  livenessDetection: bgp-keepalive
+  routerNodeSelector:
+    bgp_router: "true"
+  aws:
+    region: ""
+    routeServerIDs: []
+
+cudnBgpRoutings: []
