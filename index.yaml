@@ -2859,6 +2859,25 @@ entries:
   servicemesh-operator-ambient:
   - apiVersion: v2
     appVersion: "3.0"
+    created: "2026-08-04T07:02:59.204136626Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying Red Hat OpenShift Service Mesh 3 Operator
+    digest: 6f1dc4cb699cd9aa152aea62992245cb1be3d03f257b3e3935793fbec1461436
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: servicemesh-operator-ambient
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/servicemesh-operator-ambient-1.3.6/servicemesh-operator-ambient-1.3.6.tgz
+    version: 1.3.6
+  - apiVersion: v2
+    appVersion: "3.0"
     created: "2026-08-04T03:12:17.843160969Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -3127,4 +3146,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-08-04T03:12:17.843590973Z"
+generated: "2026-08-04T07:02:59.204531873Z"
