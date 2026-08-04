@@ -1,0 +1,17 @@
+{{- if and .Values.ambient.enabled .Values.observability.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: ztunnel-monitor
+  namespace: {{ .Values.ambient.ztunnel.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  selector:
+    matchLabels:
+      app: ztunnel
+  podMetricsEndpoints:
+  - targetPort: 15020
+    path: /stats/prometheus
+{{- end }}

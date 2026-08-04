@@ -1,0 +1,14 @@
+{{- if and .Values.ambient.enabled .Values.observability.enabled }}
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: mesh-default
+  namespace: {{ .Values.ambient.istio.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+{{- end }}

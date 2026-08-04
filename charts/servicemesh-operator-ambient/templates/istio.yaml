@@ -13,4 +13,8 @@ spec:
   values:
     pilot:
       trustedZtunnelNamespace: {{ .Values.ambient.ztunnel.namespace }}
+    meshConfig:
+      defaultProviders:
+        metrics:
+        - prometheus
 {{- end }}
