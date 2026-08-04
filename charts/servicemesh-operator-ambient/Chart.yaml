@@ -3,7 +3,7 @@ name: servicemesh-operator-ambient
 description: Helm chart for deploying Red Hat OpenShift Service Mesh 3 Operator
 icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
 type: application
-version: 1.3.3
+version: 1.3.5
 appVersion: "3.0"
 dependencies:
   - name: helper-status-checker
