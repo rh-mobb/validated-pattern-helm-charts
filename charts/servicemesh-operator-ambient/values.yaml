@@ -30,6 +30,11 @@ ambient:
     namespace: ztunnel
     version: ""
 
+observability:
+  enabled: true
+  userWorkloadMonitoring:
+    enabled: true
+
 helper-status-checker:
   enabled: true
   approver: true
