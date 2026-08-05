@@ -1,0 +1,12 @@
+{{- if .Values.createNamespace }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "cudn-bgp.namespace" . }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+    openshift.io/cluster-monitoring: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+    openshift.io/description: "CUDN BGP Routing Operator"
+{{- end }}
