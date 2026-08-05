@@ -7,7 +7,14 @@ metadata:
     control-plane: controller-manager
     {{- include "cudn-bgp.labels" . | nindent 4 }}
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    # When buildOperator is on, deploy after Namespace/ImageStream/BuildConfig.
+    # Argo does not wait for the build to finish; pods may ImagePullBackOff until
+    # the first successful build populates the ImageStream tag.
+    argocd.argoproj.io/sync-wave: {{ if .Values.buildOperator.enabled }}"10"{{ else }}"1"{{ end }}
+    {{- if .Values.buildOperator.enabled }}
+    image.openshift.io/triggers: |
+      [{"from":{"kind":"ImageStreamTag","name":"{{ .Values.buildOperator.imageStreamName }}:{{ .Values.image.tag }}","namespace":"{{ include "cudn-bgp.namespace" . }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"manager\")].image"}]
+    {{- end }}
 spec:
   selector:
     matchLabels:
@@ -31,7 +38,7 @@ spec:
         - --metrics-bind-address=:{{ .Values.metricsPort }}
         - --leader-elect
         - --health-probe-bind-address=:8081
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ include "cudn-bgp.managerImage" . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: manager
         ports: []

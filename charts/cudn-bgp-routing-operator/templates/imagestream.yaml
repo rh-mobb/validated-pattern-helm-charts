@@ -1,0 +1,14 @@
+{{- if .Values.buildOperator.enabled }}
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ .Values.buildOperator.imageStreamName }}
+  namespace: {{ include "cudn-bgp.namespace" . }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  lookupPolicy:
+    local: true
+{{- end }}

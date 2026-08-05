@@ -1,10 +1,44 @@
+# Destination namespace for the operator. app-of-apps-infrastructure sets
+# CreateNamespace=false, so the chart must create this when createNamespace=true.
 namespace: openshift-cudn-bgp-routing
+createNamespace: true
+
 namePrefix: openshift-cudn-bgp-routing-
 
 image:
+  # Used when buildOperator.enabled=false. When buildOperator is enabled the
+  # deployment image is derived from the in-cluster ImageStream instead.
   repository: image-registry.openshift-image-registry.svc:5000/openshift-cudn-bgp-routing/operator
   tag: dev
   pullPolicy: Always
+
+# Optional in-cluster build of the operator image into the local registry.
+# Intended for PoC / demo clusters that do not yet consume a published image.
+# Requires the OpenShift image registry (managementState=Managed).
+buildOperator:
+  enabled: false
+  imageStreamName: operator
+  git:
+    uri: https://github.com/jingczhang/rosa-bgp-operator.git
+    # Upstream default branch is master (not main).
+    ref: master
+  contextDir: ""
+  dockerfilePath: Dockerfile
+  runPolicy: Serial
+  # Optional GitHub webhook trigger secret name (in this namespace).
+  githubTriggerSecret: ""
+  buildArgs: {}
+  # Go module + multi-stage Docker builds need generous memory.
+  # Local podman needed ~8Gi VM for `go build -a` (aws-sdk); 4Gi was too tight.
+  resources:
+    requests:
+      cpu: "2"
+      memory: 4Gi
+    limits:
+      cpu: "4"
+      memory: 8Gi
+  successfulBuildsHistoryLimit: 3
+  failedBuildsHistoryLimit: 3
 
 replicaCount: 1
 

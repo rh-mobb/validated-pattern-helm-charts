@@ -1,0 +1,49 @@
+{{- if .Values.buildOperator.enabled }}
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.buildOperator.imageStreamName }}
+  namespace: {{ include "cudn-bgp.namespace" . }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+    # Kick a build when this BuildConfig is first applied / updated.
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  runPolicy: {{ .Values.buildOperator.runPolicy | default "Serial" }}
+  source:
+    type: Git
+    git:
+      uri: {{ .Values.buildOperator.git.uri | quote }}
+      ref: {{ .Values.buildOperator.git.ref | quote }}
+    {{- with .Values.buildOperator.contextDir }}
+    contextDir: {{ . | quote }}
+    {{- end }}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: {{ .Values.buildOperator.dockerfilePath | default "Dockerfile" | quote }}
+      {{- with .Values.buildOperator.buildArgs }}
+      buildArgs:
+        {{- range $name, $value := . }}
+        - name: {{ $name | quote }}
+          value: {{ $value | quote }}
+        {{- end }}
+      {{- end }}
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ printf "%s:%s" .Values.buildOperator.imageStreamName .Values.image.tag | quote }}
+  resources:
+    {{- toYaml .Values.buildOperator.resources | nindent 4 }}
+  successfulBuildsHistoryLimit: {{ .Values.buildOperator.successfulBuildsHistoryLimit | default 3 }}
+  failedBuildsHistoryLimit: {{ .Values.buildOperator.failedBuildsHistoryLimit | default 3 }}
+  triggers:
+    - type: ConfigChange
+    {{- if .Values.buildOperator.githubTriggerSecret }}
+    - type: GitHub
+      github:
+        secret: {{ .Values.buildOperator.githubTriggerSecret | quote }}
+    {{- end }}
+{{- end }}
