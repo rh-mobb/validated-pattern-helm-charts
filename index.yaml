@@ -1332,6 +1332,20 @@ entries:
   cudn-bgp-routing-operator:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2026-08-06T05:43:48.62368882Z"
+    description: CUDN BGP Routing Operator for OpenShift
+    digest: c0cb97e45f667d31bb746147c6d5f6787efaf6bb86ce51d51400dacd59747e28
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    kubeVersion: '>=1.28.0-0'
+    maintainers:
+    - name: rh-mobb
+    name: cudn-bgp-routing-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cudn-bgp-routing-operator-0.1.5/cudn-bgp-routing-operator-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2026-08-06T03:33:57.605887772Z"
     description: CUDN BGP Routing Operator for OpenShift
     digest: e4f051896acb7ade4b68d9ec67ef00b5f1ee6149d1f13b0dfe0f0f52847df45c
@@ -1381,6 +1395,24 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cudn-bgp-routing-operator-0.1.0/cudn-bgp-routing-operator-0.1.0.tgz
     version: 0.1.0
   external-secrets-operator:
+  - apiVersion: v2
+    created: "2026-08-06T05:43:48.82030908Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: External Secrets Operator with AWS Secrets Manager integration via
+      IRSA
+    digest: c0dc879e3a38840dc19eaa983d976bf26526145b55d816eeadd0cdd40f03d3e7
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: external-secrets-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/external-secrets-operator-1.1.6/external-secrets-operator-1.1.6.tgz
+    version: 1.1.6
   - apiVersion: v2
     created: "2026-08-06T03:33:57.768292654Z"
     dependencies:
@@ -3202,4 +3234,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-08-06T05:36:53.164843727Z"
+generated: "2026-08-06T05:43:48.820581158Z"
