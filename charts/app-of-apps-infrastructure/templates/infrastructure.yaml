@@ -35,10 +35,16 @@ spec:
         {{- toYaml $infra.values | nindent 8 }}
       {{- end }}
     {{- end }}
+    {{- if $infra.gitRepoUrl }}
+    repoURL: {{ $infra.gitRepoUrl }}
+    {{- else }}
     repoURL: {{ $infra.helmRepoUrl | default $defaults.helmRepoUrl }}
+    {{- end }}
     targetRevision: '{{ $infra.targetRevision }}'
     path: {{ $infra.path | default $defaults.path }}
+    {{- if not $infra.gitRepoUrl }}
     chart: {{ $infra.chart }}
+    {{- end }}
   destination:
     server: https://kubernetes.default.svc
     {{- if $infra.namespace}}
@@ -52,6 +58,7 @@ spec:
     - Validate=false  
     - CreateNamespace=false
     - RespectIgnoreDifferences=true
+    - SkipDryRunOnMissingResource=true
     retry:
       limit: 5
       backoff:
