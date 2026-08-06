@@ -11,7 +11,7 @@ Bootstrap publishes ConfigMap `rosa-platform-metadata` with `secretsManagerRoleA
 ```yaml
 infrastructure:
   - chart: external-secrets-operator
-    targetRevision: 1.1.5
+    targetRevision: 1.1.6
     namespace: external-secrets-operator
     values:
       platformMetadata:
@@ -23,7 +23,7 @@ infrastructure:
         enabled: false
 ```
 
-A sync Job annotates `external-secrets-sa` from the ConfigMap.
+A sync Job annotates `external-secrets-sa` from the ConfigMap. Another Sync-wave Job waits until the ESO validating webhook (`external-secrets/external-secrets-webhook`) has Endpoints before `ClusterSecretStore` is applied (avoids admission failures while the operand is still starting).
 
 ## Legacy / break-glass
 
