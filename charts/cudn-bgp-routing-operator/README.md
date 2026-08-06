@@ -59,6 +59,6 @@ cudnBgpConfig:
   # aws.* omitted — owned by the bgp-config-apply Job
 ```
 
-When `externalSecret.enabled=true`, Helm does **not** render `CUDNBgpConfig` (CRD requires `spec.aws` or `availabilityZones`). An Argo Sync Job waits for the ESO Secret, annotates the manager ServiceAccount, applies `CUDNBgpConfig`, and restarts the deployment.
+When `externalSecret.enabled=true`, Helm does **not** render `CUDNBgpConfig` (CRD requires `spec.aws` or `availabilityZones`). An Argo **PostSync** Job waits for the ESO Secret, annotates the manager ServiceAccount, applies `CUDNBgpConfig`, and restarts the deployment (PostSync avoids blocking the manager Deployment on the Job).
 
 If `externalSecret.remoteKey` is empty, the Job reads `bgpConfigSecretName` from bootstrap ConfigMap `rosa-platform-metadata` and creates the ExternalSecret (preferred — no cluster-specific secret name in git). See [platform-metadata-irsa.md](https://github.com/rh-mobb/validated-pattern-terraform-rosa/blob/main/docs/architecture/platform-metadata-irsa.md).

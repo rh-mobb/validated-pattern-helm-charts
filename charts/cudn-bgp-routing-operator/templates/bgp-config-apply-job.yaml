@@ -10,7 +10,10 @@ metadata:
   labels:
     {{- include "cudn-bgp.labels" . | nindent 4 }}
   annotations:
-    argocd.argoproj.io/hook: Sync
+    # PostSync: do not block Deployment/CRDs on this Job (Sync hooks hung e2e when
+    # the Job waited on ESO Secret / got stuck Terminating). Apply IRSA + CUDNBgpConfig
+    # after the chart resources are synced; Job already polls for Secret/CRD readiness.
+    argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
     argocd.argoproj.io/sync-wave: "5"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true

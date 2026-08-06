@@ -27,6 +27,13 @@ secretStore:
   name: aws-secrets-manager
   region: ap-southeast-4
   secretName: connectivity-link-route53-credentials
+  # Wait for OpenShift ESO validating webhook Endpoints before ClusterSecretStore.
+  webhookWait:
+    namespace: external-secrets
+    serviceName: external-secrets-webhook
+    image: registry.redhat.io/openshift4/ose-cli:latest
+    maxAttempts: "60"
+    sleepSeconds: "5"
 
 target:
   # When false, skip the Kuadrant aws-credentials ExternalSecret (ClusterSecretStore still created).

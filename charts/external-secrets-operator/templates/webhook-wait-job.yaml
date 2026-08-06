@@ -1,0 +1,62 @@
+{{- if or .Values.serviceAccount.roleArn .Values.platformMetadata.enabled }}
+# OpenShift ESO creates the validating webhook asynchronously after the Subscription.
+# ClusterSecretStore apply fails until external-secrets-webhook has Endpoints.
+# Sync hook wave 5 runs before the CSS resource (also wave 5).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: eso-webhook-wait
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eso-webhook-wait
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: eso-webhook-wait
+      containers:
+        - name: wait
+          image: {{ .Values.secretStore.webhookWait.image | quote }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WEBHOOK_NS
+              value: {{ .Values.secretStore.webhookWait.namespace | quote }}
+            - name: WEBHOOK_SERVICE
+              value: {{ .Values.secretStore.webhookWait.serviceName | quote }}
+            - name: MAX_ATTEMPTS
+              value: {{ .Values.secretStore.webhookWait.maxAttempts | quote }}
+            - name: SLEEP_SECONDS
+              value: {{ .Values.secretStore.webhookWait.sleepSeconds | quote }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              set -euo pipefail
+              echo "Waiting for ${WEBHOOK_NS}/${WEBHOOK_SERVICE} Endpoints..."
+              for i in $(seq 1 "${MAX_ATTEMPTS}"); do
+                # Prefer classic Endpoints; fall back to EndpointSlice addresses.
+                IPS=$(oc -n "${WEBHOOK_NS}" get endpoints "${WEBHOOK_SERVICE}" \
+                  -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)
+                if [[ -z "${IPS}" ]]; then
+                  IPS=$(oc -n "${WEBHOOK_NS}" get endpointslices \
+                    -l kubernetes.io/service-name="${WEBHOOK_SERVICE}" \
+                    -o jsonpath='{.items[*].endpoints[*].addresses[*]}' 2>/dev/null || true)
+                fi
+                if [[ -n "${IPS}" ]]; then
+                  echo "Webhook Endpoints ready: ${IPS}"
+                  exit 0
+                fi
+                echo "attempt ${i}/${MAX_ATTEMPTS}: no webhook endpoints yet"
+                sleep "${SLEEP_SECONDS}"
+              done
+              echo "Timed out waiting for ${WEBHOOK_NS}/${WEBHOOK_SERVICE} Endpoints" >&2
+              exit 1
+{{- end }}
