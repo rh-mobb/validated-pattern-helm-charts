@@ -1,0 +1,66 @@
+{{- if .Values.platformMetadata.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eso-irsa-from-metadata
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: eso-irsa-from-metadata
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+rules:
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eso-irsa-from-metadata
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: eso-irsa-from-metadata
+subjects:
+  - kind: ServiceAccount
+    name: eso-irsa-from-metadata
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: eso-irsa-from-metadata-read
+  namespace: {{ .Values.platformMetadata.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: [{{ .Values.platformMetadata.name | quote }}]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eso-irsa-from-metadata-read
+  namespace: {{ .Values.platformMetadata.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: eso-irsa-from-metadata-read
+subjects:
+  - kind: ServiceAccount
+    name: eso-irsa-from-metadata
+    namespace: {{ .Values.namespace }}
+{{- end }}

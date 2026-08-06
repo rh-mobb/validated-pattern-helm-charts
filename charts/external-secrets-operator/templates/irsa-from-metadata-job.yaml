@@ -1,0 +1,67 @@
+{{- if .Values.platformMetadata.enabled }}
+# Annotate ESO SA with secretsManagerRoleArn from bootstrap ConfigMap.
+# See: validated-pattern-terraform-rosa docs/architecture/platform-metadata-irsa.md
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: eso-irsa-from-metadata
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eso-irsa-from-metadata
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: eso-irsa-from-metadata
+      containers:
+        - name: apply
+          image: {{ .Values.platformMetadata.applyJob.image | quote }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: METADATA_NS
+              value: {{ .Values.platformMetadata.namespace | quote }}
+            - name: METADATA_NAME
+              value: {{ .Values.platformMetadata.name | quote }}
+            - name: ROLE_ARN_KEY
+              value: {{ .Values.platformMetadata.roleArnKey | quote }}
+            - name: ESO_NS
+              value: {{ .Values.namespace | quote }}
+            - name: ESO_SA
+              value: {{ .Values.serviceAccount.name | quote }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              set -euo pipefail
+              echo "Waiting for ConfigMap ${METADATA_NS}/${METADATA_NAME}..."
+              for i in $(seq 1 60); do
+                if oc -n "${METADATA_NS}" get configmap "${METADATA_NAME}" >/dev/null 2>&1; then
+                  break
+                fi
+                sleep 5
+              done
+              oc -n "${METADATA_NS}" get configmap "${METADATA_NAME}" >/dev/null
+
+              ROLE_ARN=$(oc -n "${METADATA_NS}" get configmap "${METADATA_NAME}" -o "jsonpath={.data.${ROLE_ARN_KEY}}")
+              # Fallback if jsonpath key expansion failed
+              if [[ -z "${ROLE_ARN}" ]]; then
+                ROLE_ARN=$(oc -n "${METADATA_NS}" get configmap "${METADATA_NAME}" -o jsonpath='{.data.secretsManagerRoleArn}')
+              fi
+              if [[ -z "${ROLE_ARN}" ]]; then
+                echo "ConfigMap ${METADATA_NAME} missing data.${ROLE_ARN_KEY} (run bootstrap with enable_secrets_manager_iam)" >&2
+                exit 1
+              fi
+
+              echo "Annotating ${ESO_NS}/${ESO_SA} with IRSA role"
+              oc -n "${ESO_NS}" annotate serviceaccount "${ESO_SA}" \
+                "eks.amazonaws.com/role-arn=${ROLE_ARN}" --overwrite
+              echo "ESO IRSA annotation applied from platform metadata"
+{{- end }}

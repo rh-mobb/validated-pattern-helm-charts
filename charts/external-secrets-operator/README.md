@@ -4,36 +4,43 @@
 
 The `external-secrets-operator` chart installs the OpenShift External Secrets Operator and configures AWS Secrets Manager access through IRSA. This is the preferred replacement for the Argo CD Vault Plugin (AVP) path.
 
-## Recommended Usage
+## Recommended Usage (platform metadata)
 
-Use this chart from `app-of-apps-infrastructure` with `defaults.plugin: false` so Argo CD uses native Helm rendering.
+Bootstrap publishes ConfigMap `rosa-platform-metadata` with `secretsManagerRoleArn` (see [platform-metadata-irsa.md](https://github.com/rh-mobb/validated-pattern-terraform-rosa/blob/main/docs/architecture/platform-metadata-irsa.md)). Prefer that over hardcoding account ARNs in cluster-config:
 
 ```yaml
-teamName: cluster-config
-defaults:
-  gitopsNamespace: openshift-gitops
-  helmRepoUrl: https://rh-mobb.github.io/validated-pattern-helm-charts/
-  path: charts
-  plugin: false
-
 infrastructure:
   - chart: external-secrets-operator
-    targetRevision: 1.1.3
+    targetRevision: 1.1.5
     namespace: external-secrets-operator
     values:
-      serviceAccount:
-        roleArn: arn:aws:iam::123456789012:role/test-rosa-secretsmanager-role-iam
+      platformMetadata:
+        enabled: true
+      secretStore:
+        name: aws-secrets-manager
+        region: ap-southeast-2
+      target:
+        enabled: false
+```
+
+A sync Job annotates `external-secrets-sa` from the ConfigMap.
+
+## Legacy / break-glass
+
+```yaml
+values:
+  serviceAccount:
+    roleArn: arn:aws:iam::123456789012:role/test-rosa-secretsmanager-role-iam
 ```
 
 ## Important Values
 
-- `namespace`: Namespace where the operator resources are installed
-- `serviceAccount.roleArn`: IAM role ARN used by IRSA (for example the Task 2 role naming pattern `*-rosa-secretsmanager-role-iam`)
+- `platformMetadata.enabled`: Bind IRSA from bootstrap ConfigMap (preferred)
+- `serviceAccount.roleArn`: Explicit IRSA ARN (optional if platform metadata enabled)
 - `secretStore.region`: AWS region for Secrets Manager access
-- `secretStore.secretName`: Source secret name in AWS Secrets Manager
-- `target.namespace`: Namespace where the synced Kubernetes secret is created
+- `target.enabled`: When false, skip the Kuadrant `aws-credentials` ExternalSecret
 
 ## Notes
 
-- If `serviceAccount.roleArn` is empty, this chart intentionally skips IRSA-dependent resources.
+- IRSA-dependent resources are created when `serviceAccount.roleArn` **or** `platformMetadata.enabled` is set.
 - AVP remains available for compatibility this release, but new application onboarding should prefer ESO with `plugin: false`.

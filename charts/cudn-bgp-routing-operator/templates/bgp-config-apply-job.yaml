@@ -1,0 +1,145 @@
+{{- if .Values.externalSecret.enabled }}
+# Applies ESO-synced BGP config onto the operator ServiceAccount (IRSA) and CUDNBgpConfig.
+# Resolves SM remote key from values or rosa-platform-metadata (bootstrap).
+# See: validated-pattern-terraform-rosa docs/architecture/platform-metadata-irsa.md
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+  namespace: {{ include "cudn-bgp.namespace" . }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bgp-config-apply
+        {{- include "cudn-bgp.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+      containers:
+        - name: apply
+          image: {{ .Values.externalSecret.applyJob.image | quote }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE
+              value: {{ include "cudn-bgp.namespace" . | quote }}
+            - name: SECRET_NAME
+              value: {{ .Values.externalSecret.targetSecretName | quote }}
+            - name: SECRET_STORE
+              value: {{ .Values.externalSecret.secretStore | quote }}
+            - name: REMOTE_KEY
+              value: {{ .Values.externalSecret.remoteKey | quote }}
+            - name: REFRESH_INTERVAL
+              value: {{ .Values.externalSecret.refreshInterval | default "1h" | quote }}
+            - name: PLATFORM_METADATA_ENABLED
+              value: {{ .Values.externalSecret.platformMetadata.enabled | quote }}
+            - name: PLATFORM_METADATA_NS
+              value: {{ .Values.externalSecret.platformMetadata.namespace | quote }}
+            - name: PLATFORM_METADATA_NAME
+              value: {{ .Values.externalSecret.platformMetadata.name | quote }}
+            - name: PLATFORM_METADATA_REMOTE_KEY_FIELD
+              value: {{ .Values.externalSecret.platformMetadata.remoteKeyField | quote }}
+            - name: SA_NAME
+              value: {{ printf "%s%s" (include "cudn-bgp.namePrefix" .) .Values.serviceAccount.name | quote }}
+            - name: DEPLOYMENT_NAME
+              value: {{ printf "%scontroller-manager" (include "cudn-bgp.namePrefix" .) | quote }}
+            - name: CUDNBGPCONFIG_NAME
+              value: cluster
+            - name: APPLY_CUDNBGPCONFIG
+              value: {{ .Values.cudnBgpConfig.enabled | quote }}
+            - name: LOCAL_ASN
+              value: {{ .Values.cudnBgpConfig.localASN | quote }}
+            - name: LIVENESS_DETECTION
+              value: {{ .Values.cudnBgpConfig.livenessDetection | quote }}
+            - name: ROUTER_NODE_SELECTOR_JSON
+              value: {{ .Values.cudnBgpConfig.routerNodeSelector | toJson | quote }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              set -euo pipefail
+
+              REMOTE_KEY="${REMOTE_KEY:-}"
+              if [[ -z "${REMOTE_KEY}" && "${PLATFORM_METADATA_ENABLED}" == "true" ]]; then
+                echo "Resolving SM remote key from ${PLATFORM_METADATA_NS}/${PLATFORM_METADATA_NAME}..."
+                for i in $(seq 1 60); do
+                  if oc -n "${PLATFORM_METADATA_NS}" get configmap "${PLATFORM_METADATA_NAME}" >/dev/null 2>&1; then
+                    break
+                  fi
+                  sleep 5
+                done
+                REMOTE_KEY=$(oc -n "${PLATFORM_METADATA_NS}" get configmap "${PLATFORM_METADATA_NAME}" \
+                  -o "jsonpath={.data.${PLATFORM_METADATA_REMOTE_KEY_FIELD}}")
+                if [[ -z "${REMOTE_KEY}" ]]; then
+                  REMOTE_KEY=$(oc -n "${PLATFORM_METADATA_NS}" get configmap "${PLATFORM_METADATA_NAME}" \
+                    -o jsonpath='{.data.bgpConfigSecretName}')
+                fi
+              fi
+              if [[ -z "${REMOTE_KEY}" ]]; then
+                echo "externalSecret.remoteKey empty and platform metadata missing bgpConfigSecretName" >&2
+                exit 1
+              fi
+              echo "Using Secrets Manager remote key: ${REMOTE_KEY}"
+
+              if ! oc -n "${NAMESPACE}" get externalsecret "${SECRET_NAME}" >/dev/null 2>&1; then
+                echo "Creating ExternalSecret ${SECRET_NAME}"
+                printf '%s\n' \
+                  "{\"apiVersion\":\"external-secrets.io/v1\",\"kind\":\"ExternalSecret\",\"metadata\":{\"name\":\"${SECRET_NAME}\",\"namespace\":\"${NAMESPACE}\"},\"spec\":{\"refreshInterval\":\"${REFRESH_INTERVAL}\",\"secretStoreRef\":{\"name\":\"${SECRET_STORE}\",\"kind\":\"ClusterSecretStore\"},\"target\":{\"name\":\"${SECRET_NAME}\",\"creationPolicy\":\"Owner\",\"deletionPolicy\":\"Retain\"},\"data\":[{\"secretKey\":\"role_arn\",\"remoteRef\":{\"key\":\"${REMOTE_KEY}\",\"property\":\"role_arn\"}},{\"secretKey\":\"region\",\"remoteRef\":{\"key\":\"${REMOTE_KEY}\",\"property\":\"region\"}},{\"secretKey\":\"route_server_id\",\"remoteRef\":{\"key\":\"${REMOTE_KEY}\",\"property\":\"route_server_id\"}},{\"secretKey\":\"route_server_ids\",\"remoteRef\":{\"key\":\"${REMOTE_KEY}\",\"property\":\"route_server_ids\"}}]}}" \
+                  | oc apply -f -
+              fi
+
+              echo "Waiting for Secret ${SECRET_NAME} in ${NAMESPACE}..."
+              for i in $(seq 1 60); do
+                if oc -n "${NAMESPACE}" get secret "${SECRET_NAME}" >/dev/null 2>&1; then
+                  break
+                fi
+                sleep 5
+              done
+              oc -n "${NAMESPACE}" get secret "${SECRET_NAME}" >/dev/null
+
+              ROLE_ARN=$(oc -n "${NAMESPACE}" get secret "${SECRET_NAME}" -o jsonpath='{.data.role_arn}' | base64 -d)
+              REGION=$(oc -n "${NAMESPACE}" get secret "${SECRET_NAME}" -o jsonpath='{.data.region}' | base64 -d)
+              RS_IDS=$(oc -n "${NAMESPACE}" get secret "${SECRET_NAME}" -o jsonpath='{.data.route_server_ids}' | base64 -d)
+
+              if [[ -z "${ROLE_ARN}" || -z "${REGION}" || -z "${RS_IDS}" ]]; then
+                echo "Secret ${SECRET_NAME} missing role_arn, region, or route_server_ids" >&2
+                exit 1
+              fi
+
+              echo "Annotating ServiceAccount ${SA_NAME} with IRSA role"
+              oc -n "${NAMESPACE}" annotate serviceaccount "${SA_NAME}" \
+                "eks.amazonaws.com/role-arn=${ROLE_ARN}" --overwrite
+
+              if [[ "${APPLY_CUDNBGPCONFIG}" == "true" ]]; then
+                echo "Applying CUDNBgpConfig ${CUDNBGPCONFIG_NAME} (aws from Secret)"
+                # Wait for the API (list cudnbgpconfigs). Do NOT oc get crd — Job SA lacks
+                # apiextensions.k8s.io permissions and that hung the Job for ~5m per attempt.
+                for i in $(seq 1 60); do
+                  if oc get cudnbgpconfig --request-timeout=15s >/dev/null 2>&1; then
+                    break
+                  fi
+                  sleep 5
+                done
+                # Prefer merge patch (faster / avoids full-object apply hangs on existing CR)
+                oc patch cudnbgpconfig "${CUDNBGPCONFIG_NAME}" --type merge --request-timeout=60s \
+                  -p "{\"spec\":{\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
+                  || printf '%s\n' \
+                    "{\"apiVersion\":\"networking.openshift.io/v1alpha1\",\"kind\":\"CUDNBgpConfig\",\"metadata\":{\"name\":\"${CUDNBGPCONFIG_NAME}\"},\"spec\":{\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
+                    | oc apply --request-timeout=60s -f -
+              fi
+
+              if oc -n "${NAMESPACE}" get deploy "${DEPLOYMENT_NAME}" >/dev/null 2>&1; then
+                echo "Restarting deployment ${DEPLOYMENT_NAME} for IRSA credential refresh"
+                oc -n "${NAMESPACE}" rollout restart "deploy/${DEPLOYMENT_NAME}" || true
+              fi
+              echo "BGP config apply complete"
+{{- end }}

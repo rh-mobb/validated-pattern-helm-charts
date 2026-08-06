@@ -1,0 +1,114 @@
+{{- if .Values.externalSecret.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+  namespace: {{ include "cudn-bgp.namespace" . }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+  namespace: {{ include "cudn-bgp.namespace" . }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets", "serviceaccounts"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "patch", "update"]
+  - apiGroups: ["external-secrets.io"]
+    resources: ["externalsecrets"]
+    verbs: ["get", "list", "create", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+rules:
+  - apiGroups: ["networking.openshift.io"]
+    resources: ["cudnbgpconfigs"]
+    verbs: ["get", "list", "create", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+  namespace: {{ include "cudn-bgp.namespace" . }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+    namespace: {{ include "cudn-bgp.namespace" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+    namespace: {{ include "cudn-bgp.namespace" . }}
+{{- if .Values.externalSecret.platformMetadata.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply-metadata
+  namespace: {{ .Values.externalSecret.platformMetadata.namespace }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: [{{ .Values.externalSecret.platformMetadata.name | quote }}]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply-metadata
+  namespace: {{ .Values.externalSecret.platformMetadata.namespace }}
+  labels:
+    {{- include "cudn-bgp.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply-metadata
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "cudn-bgp.namePrefix" . }}bgp-config-apply
+    namespace: {{ include "cudn-bgp.namespace" . }}
+{{- end }}
+{{- end }}
