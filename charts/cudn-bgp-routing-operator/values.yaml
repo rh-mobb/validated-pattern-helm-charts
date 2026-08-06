@@ -52,9 +52,29 @@ resources:
 
 serviceAccount:
   name: controller-manager
+  # When externalSecret.enabled=true, omit eks.amazonaws.com/role-arn here —
+  # the bgp-config-apply Job sets it from the ESO-synced Secret (issue #51).
   annotations: {}
 
 metricsPort: 8443
+
+# Sync Terraform-owned BGP params from AWS Secrets Manager via ESO.
+# Secret JSON keys: role_arn, region, route_server_id, route_server_ids.
+# Requires external-secrets-operator + ClusterSecretStore aws-secrets-manager.
+externalSecret:
+  enabled: false
+  secretStore: aws-secrets-manager
+  # Optional; when empty, Job reads bgpConfigSecretName from platform metadata.
+  remoteKey: ""
+  targetSecretName: bgp-operator-config
+  refreshInterval: 1h
+  applyJob:
+    image: registry.redhat.io/openshift4/ose-cli:latest
+  platformMetadata:
+    enabled: true
+    name: rosa-platform-metadata
+    namespace: openshift-gitops
+    remoteKeyField: bgpConfigSecretName
 
 cudnBgpConfig:
   enabled: false
@@ -62,6 +82,8 @@ cudnBgpConfig:
   livenessDetection: bgp-keepalive
   routerNodeSelector:
     bgp_router: "true"
+  # When externalSecret.enabled=true, Helm skips CUDNBgpConfig; the Job applies
+  # the full CR including aws.* from the ESO Secret.
   aws:
     region: ""
     routeServerIDs: []

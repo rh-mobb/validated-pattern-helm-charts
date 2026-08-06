@@ -1,4 +1,5 @@
-{{- if .Values.cudnBgpConfig.enabled }}
+{{- /* When externalSecret.enabled, bgp-config-apply Job owns CUDNBgpConfig (CRD needs aws). */}}
+{{- if and .Values.cudnBgpConfig.enabled (not .Values.externalSecret.enabled) }}
 apiVersion: networking.openshift.io/v1alpha1
 kind: CUDNBgpConfig
 metadata:
