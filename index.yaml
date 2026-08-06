@@ -610,6 +610,16 @@ entries:
     version: 1.5.5
   app-of-apps-infrastructure:
   - apiVersion: v1
+    created: "2026-08-06T05:36:53.164496277Z"
+    description: Chart to generate argocd apps
+    digest: 9b543485d7d735eecadf103a9b79fbeff36cd6231c68ad08ac32f192122048df
+    maintainers:
+    - name: rh-mobb
+    name: app-of-apps-infrastructure
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/app-of-apps-infrastructure-0.3.0/app-of-apps-infrastructure-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v1
     created: "2026-07-30T06:05:50.977432556Z"
     description: Chart to generate argocd apps
     digest: 77bec807b13d81411fbfc61fa6473ed0eb6b15499951c1f4a185abfed3368d4d
@@ -3192,4 +3202,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-08-06T03:33:57.768580277Z"
+generated: "2026-08-06T05:36:53.164843727Z"
