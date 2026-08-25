@@ -1,6 +1,8 @@
 # cudn-bgp-routing-operator
 
-Deploys the [CUDN BGP Routing Operator](https://github.com/jingczhang/rosa-bgp-operator) and optional `CUDNBgpConfig` / `CUDNBgpRouting` CRs.
+Deploys the [BGP cloud connector](https://github.com/openshift/bgp-cloud-connector) (CUDN BGP operator) and optional `CUDNBgpConfig` / `CUDNBgpRouting` CRs.
+
+Chart name is unchanged so existing app-of-apps / cluster-config entries keep working.
 
 ## Namespace
 
@@ -17,8 +19,8 @@ image:
 buildOperator:
   enabled: true
   git:
-    uri: https://github.com/jingczhang/rosa-bgp-operator.git
-    ref: master
+    uri: https://github.com/openshift/bgp-cloud-connector.git
+    ref: main
 ```
 
 This creates:
@@ -29,13 +31,13 @@ This creates:
 
 Requires the cluster image registry (`configs.imageregistry.operator.openshift.io/cluster`) to be `Managed`. The first sync may show `ImagePullBackOff` on the manager until the build completes.
 
-Default BuildConfig resources are `requests: 2 CPU / 4Gi`, `limits: 4 CPU / 8Gi` (needed for `go build -a` + aws-sdk). Override via `buildOperator.resources` if required.
+Default BuildConfig resources are `requests: 2 CPU / 4Gi`, `limits: 4 CPU / 8Gi` (needed for `make build-operator` + aws-sdk). Override via `buildOperator.resources` if required.
 
 Production clusters should leave `buildOperator.enabled: false` and point `image.repository` / `image.tag` at a released image.
 
 ## External Secrets (`externalSecret`) — Terraform → ESO → operator
 
-Preferred path for ROSA HCP (issue [#51](https://github.com/rh-mobb/validated-pattern-terraform-rosa/issues/51)): Terraform publishes `{cluster}-bgp-config` to AWS Secrets Manager; this chart syncs it via External Secrets Operator and applies IRSA + `CUDNBgpConfig` `spec.aws`.
+Preferred path for ROSA HCP (issue [#51](https://github.com/rh-mobb/validated-pattern-terraform-rosa/issues/51)): Terraform publishes `{cluster}-bgp-config` to AWS Secrets Manager; this chart syncs it via External Secrets Operator and applies IRSA + `CUDNBgpConfig` `spec.platform: AWS` + `spec.aws`.
 
 Prerequisites:
 
@@ -55,10 +57,11 @@ serviceAccount:
 
 cudnBgpConfig:
   enabled: true
+  platform: AWS
   localASN: 65001
   # aws.* omitted — owned by the bgp-config-apply Job
 ```
 
-When `externalSecret.enabled=true`, Helm does **not** render `CUDNBgpConfig` (CRD requires `spec.aws` or `availabilityZones`). An Argo **PostSync** Job waits for the ESO Secret, annotates the manager ServiceAccount, applies `CUDNBgpConfig`, and restarts the deployment (PostSync avoids blocking the manager Deployment on the Job).
+When `externalSecret.enabled=true`, Helm does **not** render `CUDNBgpConfig` (CRD requires `spec.platform` plus matching `spec.aws` or `spec.bgp.peerGroups`). An Argo **PostSync** Job waits for the ESO Secret, annotates the manager ServiceAccount, applies `CUDNBgpConfig`, and restarts the deployment (PostSync avoids blocking the manager Deployment on the Job).
 
 If `externalSecret.remoteKey` is empty, the Job reads `bgpConfigSecretName` from bootstrap ConfigMap `rosa-platform-metadata` and creates the ExternalSecret (preferred — no cluster-specific secret name in git). See [platform-metadata-irsa.md](https://github.com/rh-mobb/validated-pattern-terraform-rosa/blob/main/docs/architecture/platform-metadata-irsa.md).

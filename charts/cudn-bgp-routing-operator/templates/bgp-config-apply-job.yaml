@@ -63,6 +63,8 @@ spec:
               value: {{ .Values.cudnBgpConfig.localASN | quote }}
             - name: LIVENESS_DETECTION
               value: {{ .Values.cudnBgpConfig.livenessDetection | quote }}
+            - name: PLATFORM
+              value: {{ .Values.cudnBgpConfig.platform | default "AWS" | quote }}
             - name: ROUTER_NODE_SELECTOR_JSON
               value: {{ .Values.cudnBgpConfig.routerNodeSelector | toJson | quote }}
           command:
@@ -134,9 +136,9 @@ spec:
                 done
                 # Prefer merge patch (faster / avoids full-object apply hangs on existing CR)
                 oc patch cudnbgpconfig "${CUDNBGPCONFIG_NAME}" --type merge --request-timeout=60s \
-                  -p "{\"spec\":{\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
+                  -p "{\"spec\":{\"platform\":\"${PLATFORM}\",\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
                   || printf '%s\n' \
-                    "{\"apiVersion\":\"networking.openshift.io/v1alpha1\",\"kind\":\"CUDNBgpConfig\",\"metadata\":{\"name\":\"${CUDNBGPCONFIG_NAME}\"},\"spec\":{\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
+                    "{\"apiVersion\":\"networking.openshift.io/v1alpha1\",\"kind\":\"CUDNBgpConfig\",\"metadata\":{\"name\":\"${CUDNBGPCONFIG_NAME}\"},\"spec\":{\"platform\":\"${PLATFORM}\",\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
                     | oc apply --request-timeout=60s -f -
               fi
 

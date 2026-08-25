@@ -1,8 +1,8 @@
 apiVersion: v2
 name: cudn-bgp-routing-operator
-description: CUDN BGP Routing Operator for OpenShift
-version: 0.1.5
-appVersion: "0.1.0"
+description: BGP cloud connector (CUDN BGP) operator for OpenShift
+version: 0.1.6
+appVersion: "0.0.1"
 type: application
 kubeVersion: ">=1.28.0-0"
 home: https://rh-mobb.github.io/validated-pattern-helm-charts/
