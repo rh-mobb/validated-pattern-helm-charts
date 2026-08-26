@@ -1331,6 +1331,20 @@ entries:
     version: 1.2.12
   cudn-bgp-routing-operator:
   - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2026-08-26T01:58:50.029442948Z"
+    description: BGP cloud connector (CUDN BGP) operator for OpenShift
+    digest: b6e84591a07f77f57b393b6d7a3a5cb890bc66afcf4a4679cae7c43db3bfd81a
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    kubeVersion: '>=1.28.0-0'
+    maintainers:
+    - name: rh-mobb
+    name: cudn-bgp-routing-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cudn-bgp-routing-operator-0.1.6/cudn-bgp-routing-operator-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2026-08-06T05:43:48.62368882Z"
     description: CUDN BGP Routing Operator for OpenShift
@@ -3234,4 +3248,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-08-06T05:43:48.820581158Z"
+generated: "2026-08-26T01:58:50.02977053Z"
