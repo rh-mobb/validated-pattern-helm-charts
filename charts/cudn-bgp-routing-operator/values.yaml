@@ -19,9 +19,8 @@ buildOperator:
   enabled: false
   imageStreamName: operator
   git:
-    uri: https://github.com/jingczhang/rosa-bgp-operator.git
-    # Upstream default branch is master (not main).
-    ref: master
+    uri: https://github.com/openshift/bgp-cloud-connector.git
+    ref: main
   contextDir: ""
   dockerfilePath: Dockerfile
   runPolicy: Serial
@@ -29,7 +28,7 @@ buildOperator:
   githubTriggerSecret: ""
   buildArgs: {}
   # Go module + multi-stage Docker builds need generous memory.
-  # Local podman needed ~8Gi VM for `go build -a` (aws-sdk); 4Gi was too tight.
+  # Operator Dockerfile runs `make build-operator` (Go 1.26 + aws-sdk).
   resources:
     requests:
       cpu: "2"
@@ -78,12 +77,14 @@ externalSecret:
 
 cudnBgpConfig:
   enabled: false
+  # Required by the bgp-cloud-connector CRD. AWS when using Route Server / ESO.
+  platform: AWS
   localASN: 65001
   livenessDetection: bgp-keepalive
   routerNodeSelector:
     bgp_router: "true"
   # When externalSecret.enabled=true, Helm skips CUDNBgpConfig; the Job applies
-  # the full CR including aws.* from the ESO Secret.
+  # the full CR including platform + aws.* from the ESO Secret.
   aws:
     region: ""
     routeServerIDs: []

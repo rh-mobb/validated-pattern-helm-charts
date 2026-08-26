@@ -8,6 +8,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
+  platform: {{ .Values.cudnBgpConfig.platform | default "AWS" }}
   bgp:
     localASN: {{ .Values.cudnBgpConfig.localASN }}
     livenessDetection: {{ .Values.cudnBgpConfig.livenessDetection }}
