@@ -29,6 +29,12 @@ parameters:
   provisioningMode: efs-ap
   fileSystemId: {{ .Values.fileSystemId | quote }}
   directoryPerms: {{ .Values.storageClass.directoryPerms | quote }}
+{{- if .Values.storageClass.uid }}
+  uid: {{ .Values.storageClass.uid | quote }}
+{{- end }}
+{{- if .Values.storageClass.gid }}
+  gid: {{ .Values.storageClass.gid | quote }}
+{{- end }}
 reclaimPolicy: {{ .Values.storageClass.reclaimPolicy }}
 volumeBindingMode: {{ .Values.storageClass.volumeBindingMode }}
 allowVolumeExpansion: true

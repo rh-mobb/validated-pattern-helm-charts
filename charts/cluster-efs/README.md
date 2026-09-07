@@ -223,9 +223,8 @@ The chart creates an EFS storage class with the following configuration:
 | `provisioner` | CSI driver provisioner | `efs.csi.aws.com` |
 | `provisioningMode` | EFS provisioning mode | `efs-ap` (Access Points) |
 | `directoryPerms` | Directory permissions for access points | `700` |
-| `gidRangeStart` | Starting GID for access points | `1000` |
-| `gidRangeEnd` | Ending GID for access points | `2000` |
-| `basePath` | Base path for dynamic provisioning | `/dynamic_provisioning` |
+| `uid` | POSIX UID for EFS access points (KubeVirt qemu user) | `107` |
+| `gid` | POSIX GID for EFS access points (KubeVirt qemu group) | `107` |
 | `allowVolumeExpansion` | Allow volume expansion | `true` |
 
 ### Example Production Values
@@ -650,6 +649,9 @@ This chart is part of the rosa-hcp-dedicated-vpc project. Please refer to the ma
 This chart is licensed under the Apache License 2.0. See the LICENSE file for details.
 
 ## Changelog
+
+### Version 0.5.1
+- `efs-sc` StorageClass sets EFS access-point `uid` / `gid` to `107` (qemu) by default so OpenShift Virtualization VM disks on RWX volumes provision without virt-handler chown failures
 
 ### Version 0.5.0
 - `platformMetadata.enabled` sync Job writes CSI credentials Secret and `efs-sc` StorageClass from `rosa-platform-metadata` (`efsCsiRoleArn`, `efsFileSystemId`)

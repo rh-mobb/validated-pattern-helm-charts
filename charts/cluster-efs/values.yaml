@@ -35,7 +35,11 @@ storageClass:
   name: efs-sc
   reclaimPolicy: Delete
   volumeBindingMode: Immediate
+  # EFS access-point POSIX owner for KubeVirt / qemu (UID/GID 107). Required for VM
+  # disks on efs-sc; without these, virt-handler fails chown on RWX volumes.
   directoryPerms: "700"
+  uid: "107"
+  gid: "107"
 
 # Read efsCsiRoleArn + efsFileSystemId from bootstrap ConfigMap rosa-platform-metadata.
 # Doc: validated-pattern-terraform-rosa docs/architecture/platform-metadata-irsa.md
