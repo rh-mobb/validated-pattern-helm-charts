@@ -1231,6 +1231,23 @@ entries:
     version: 0.6.5
   cluster-efs:
   - apiVersion: v2
+    created: "2026-09-07T04:52:48.474010133Z"
+    dependencies:
+    - name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.1.0
+    description: Chart to deploy the efs operator and supporting componenets
+    digest: 8bc4b37311cfba9defd8bcc03ba64f7d6930738889b5ca90039849092a726090
+    maintainers:
+    - name: rh-mobb
+    name: cluster-efs
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-efs-0.5.1/cluster-efs-0.5.1.tgz
+    version: 0.5.1
+  - apiVersion: v2
     created: "2026-09-07T01:08:09.201085636Z"
     dependencies:
     - name: helper-status-checker
@@ -3283,4 +3300,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-09-07T01:08:28.855796165Z"
+generated: "2026-09-07T04:52:48.47435624Z"
