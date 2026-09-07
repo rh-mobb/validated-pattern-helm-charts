@@ -38,6 +38,10 @@ spec:
               value: {{ .Values.storageClass.name | quote }}
             - name: DIRECTORY_PERMS
               value: {{ .Values.storageClass.directoryPerms | quote }}
+            - name: SC_UID
+              value: {{ .Values.storageClass.uid | quote }}
+            - name: SC_GID
+              value: {{ .Values.storageClass.gid | quote }}
             - name: RECLAIM_POLICY
               value: {{ .Values.storageClass.reclaimPolicy | quote }}
             - name: VOLUME_BINDING_MODE
@@ -79,19 +83,28 @@ spec:
               if [[ "${CREATE_STORAGE_CLASS}" == "true" ]]; then
                 echo "Applying StorageClass ${STORAGE_CLASS_NAME} for ${FS_ID}"
                 sc_file="$(mktemp)"
-                printf '%s\n' \
-                  'apiVersion: storage.k8s.io/v1' \
-                  'kind: StorageClass' \
-                  'metadata:' \
-                  "  name: ${STORAGE_CLASS_NAME}" \
-                  'provisioner: efs.csi.aws.com' \
-                  'parameters:' \
-                  '  provisioningMode: efs-ap' \
-                  "  fileSystemId: ${FS_ID}" \
-                  "  directoryPerms: \"${DIRECTORY_PERMS}\"" \
-                  "reclaimPolicy: ${RECLAIM_POLICY}" \
-                  "volumeBindingMode: ${VOLUME_BINDING_MODE}" \
-                  'allowVolumeExpansion: true' >"${sc_file}"
+                {
+                  printf '%s\n' \
+                    'apiVersion: storage.k8s.io/v1' \
+                    'kind: StorageClass' \
+                    'metadata:' \
+                    "  name: ${STORAGE_CLASS_NAME}" \
+                    'provisioner: efs.csi.aws.com' \
+                    'parameters:' \
+                    '  provisioningMode: efs-ap' \
+                    "  fileSystemId: ${FS_ID}" \
+                    "  directoryPerms: \"${DIRECTORY_PERMS}\""
+                  if [[ -n "${SC_UID}" ]]; then
+                    printf '%s\n' "  uid: \"${SC_UID}\""
+                  fi
+                  if [[ -n "${SC_GID}" ]]; then
+                    printf '%s\n' "  gid: \"${SC_GID}\""
+                  fi
+                  printf '%s\n' \
+                    "reclaimPolicy: ${RECLAIM_POLICY}" \
+                    "volumeBindingMode: ${VOLUME_BINDING_MODE}" \
+                    'allowVolumeExpansion: true'
+                } >"${sc_file}"
                 oc apply -f "${sc_file}"
                 rm -f "${sc_file}"
               fi
