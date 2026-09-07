@@ -43,6 +43,7 @@ The chart deploys the following components:
 
 ### Storage Configuration
 - **KMS Storage Class**: Encrypted storage class using AWS KMS for enhanced security
+- **EFS Storage Class** (`efs-sc`, when `fileSystemId` is set): EFS access-point parameters include `uid`/`gid` **107** (KubeVirt qemu) to match `cluster-efs` ≥ 0.5.1
 - **Default Storage Class**: Configuration of default storage options
 
 ### Console Integration
