@@ -9,3 +9,5 @@ name: cluster-efs
 version: 0.5.0
 apiVersion: v2
 description: Chart to deploy the efs operator and supporting componenets
+maintainers:
+  - name: rh-mobb
