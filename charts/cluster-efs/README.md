@@ -6,6 +6,15 @@ This Helm chart deploys the AWS EFS CSI Driver operator and configures Amazon El
 
 The Cluster EFS chart enables Amazon EFS integration with OpenShift by deploying the AWS EFS CSI Driver operator and creating the necessary storage classes and configurations. EFS provides scalable, shared file storage that can be mounted by multiple pods simultaneously, making it ideal for applications requiring shared data access, content management systems, and distributed workloads.
 
+**Preferred GitOps values** (no account ARNs in git):
+
+```yaml
+platformMetadata:
+  enabled: true
+```
+
+Bootstrap publishes `efsCsiRoleArn` and `efsFileSystemId` on `rosa-platform-metadata`. A sync Job writes the CSI credentials Secret and `efs-sc` StorageClass. Explicit `roleArn` / `fileSystemId` remain for break-glass.
+
 ## Prerequisites
 
 - OpenShift Container Platform 4.10 or later
@@ -187,10 +196,13 @@ helm install cluster-efs rosa-hcp-dedicated-vpc/cluster-efs \
 
 ### Required Values
 
+Happy path: set `platformMetadata.enabled: true` and leave `roleArn` / `fileSystemId` empty (bootstrap ConfigMap).
+
 | Parameter | Description | Required |
 |-----------|-------------|----------|
-| `roleArn` | IAM role ARN for EFS CSI driver authentication | Yes |
-| `fileSystemId` | AWS EFS file system ID | Yes |
+| `platformMetadata.enabled` | Read `efsCsiRoleArn` / `efsFileSystemId` from `rosa-platform-metadata` | Preferred |
+| `roleArn` | IAM role ARN for EFS CSI driver authentication | Break-glass only |
+| `fileSystemId` | AWS EFS file system ID | Break-glass only |
 
 ### Helper Chart Configuration
 
@@ -638,6 +650,11 @@ This chart is part of the rosa-hcp-dedicated-vpc project. Please refer to the ma
 This chart is licensed under the Apache License 2.0. See the LICENSE file for details.
 
 ## Changelog
+
+### Version 0.5.0
+- `platformMetadata.enabled` sync Job writes CSI credentials Secret and `efs-sc` StorageClass from `rosa-platform-metadata` (`efsCsiRoleArn`, `efsFileSystemId`)
+- Explicit `roleArn` / `fileSystemId` remain for break-glass
+- StorageClass uses `provisioningMode: efs-ap`
 
 ### Version 0.2.8
 - Current stable release
