@@ -17,7 +17,7 @@ helper-operator:
       namespace:
         name: openshift-cluster-csi-drivers
       subscription:
-        channel: stable 
+        channel: stable
         approval: Manual
         operatorName: aws-efs-csi-driver-operator
         source: redhat-operators
@@ -25,7 +25,25 @@ helper-operator:
       operatorgroup:
         create: true
         notownnamespace: true
-# roleArn, fileSystemId, csv is pulled in via the Cluster/non-prod/high-trust/<clster_name>/infrastructure.yaml
-roleArn: 
-fileSystemId: 
 
+# Break-glass / legacy: set explicitly. Prefer platformMetadata.enabled (bootstrap ConfigMap).
+roleArn: ""
+fileSystemId: ""
+
+storageClass:
+  create: true
+  name: efs-sc
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+  directoryPerms: "700"
+
+# Read efsCsiRoleArn + efsFileSystemId from bootstrap ConfigMap rosa-platform-metadata.
+# Doc: validated-pattern-terraform-rosa docs/architecture/platform-metadata-irsa.md
+platformMetadata:
+  enabled: false
+  name: rosa-platform-metadata
+  namespace: openshift-gitops
+  roleArnKey: efsCsiRoleArn
+  fileSystemIdKey: efsFileSystemId
+  applyJob:
+    image: registry.redhat.io/openshift4/ose-cli:latest

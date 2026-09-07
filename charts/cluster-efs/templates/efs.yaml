@@ -1,15 +1,16 @@
+{{- if .Values.roleArn }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: aws-efs-cloud-credentials
   namespace: openshift-cluster-csi-drivers
-  annotations:
 stringData:
   credentials: |-
     [default]
     role_arn = {{ .Values.roleArn }}
     web_identity_token_file = /var/run/secrets/openshift/serviceaccount/token
+{{- end }}
 ---
 apiVersion: operator.openshift.io/v1
 kind: ClusterCSIDriver
@@ -17,4 +18,18 @@ metadata:
   name: efs.csi.aws.com
 spec:
   managementState: Managed
-
+{{- if and .Values.fileSystemId .Values.storageClass.create }}
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.storageClass.name }}
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: {{ .Values.fileSystemId | quote }}
+  directoryPerms: {{ .Values.storageClass.directoryPerms | quote }}
+reclaimPolicy: {{ .Values.storageClass.reclaimPolicy }}
+volumeBindingMode: {{ .Values.storageClass.volumeBindingMode }}
+allowVolumeExpansion: true
+{{- end }}
