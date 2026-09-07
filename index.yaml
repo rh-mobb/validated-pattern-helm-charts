@@ -784,6 +784,24 @@ entries:
     version: 1.6.1
   cluster-bootstrap:
   - apiVersion: v2
+    created: "2026-09-07T22:54:58.994172722Z"
+    dependencies:
+    - name: helper-installplan-approver
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.0
+    - name: application-gitops
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 1.6.1
+    description: Chart to kick off gitops installation and bootstrapping of blue print
+    digest: 5044b8c8cacbe633f683aba79abaa83b28c50d4389d933187a6f403e744d8e65
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: cluster-bootstrap
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-bootstrap-0.5.20/cluster-bootstrap-0.5.20.tgz
+    version: 0.5.20
+  - apiVersion: v2
     created: "2026-07-30T06:34:16.541266688Z"
     dependencies:
     - name: helper-installplan-approver
@@ -3300,4 +3318,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-09-07T04:52:48.47435624Z"
+generated: "2026-09-07T22:54:58.994472335Z"
