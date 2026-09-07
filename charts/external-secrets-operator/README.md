@@ -11,19 +11,20 @@ Bootstrap publishes ConfigMap `rosa-platform-metadata` with `secretsManagerRoleA
 ```yaml
 infrastructure:
   - chart: external-secrets-operator
-    targetRevision: 1.1.6
+    targetRevision: 1.1.7
     namespace: external-secrets-operator
     values:
       platformMetadata:
         enabled: true
       secretStore:
         name: aws-secrets-manager
-        region: ap-southeast-2
       target:
         enabled: false
 ```
 
-A sync Job annotates `external-secrets-sa` from the ConfigMap. Another Sync-wave Job waits until the ESO validating webhook (`external-secrets/external-secrets-webhook`) has Endpoints before `ClusterSecretStore` is applied (avoids admission failures while the operand is still starting).
+A sync Job annotates `external-secrets-sa` from `secretsManagerRoleArn`. Another Job waits for the ESO validating webhook, then applies `ClusterSecretStore` with `region` from `awsRegion` on the same ConfigMap. Do not hardcode `secretStore.region` or IRSA ARNs in portable recipes (ESO cannot read Secrets Manager until CSS already has a region, so region cannot come from `{cluster}-credentials` / `{cluster}-bgp-config`).
+
+Explicit `secretStore.region` remains for break-glass; when set, Helm still renders ClusterSecretStore.
 
 ## Legacy / break-glass
 
@@ -35,9 +36,9 @@ values:
 
 ## Important Values
 
-- `platformMetadata.enabled`: Bind IRSA from bootstrap ConfigMap (preferred)
+- `platformMetadata.enabled`: Bind IRSA and ClusterSecretStore region from bootstrap ConfigMap (preferred)
 - `serviceAccount.roleArn`: Explicit IRSA ARN (optional if platform metadata enabled)
-- `secretStore.region`: AWS region for Secrets Manager access
+- `secretStore.region`: Optional explicit AWS region for ClusterSecretStore (break-glass; omit when platform metadata is enabled)
 - `target.enabled`: When false, skip the Kuadrant `aws-credentials` ExternalSecret
 
 ## Notes

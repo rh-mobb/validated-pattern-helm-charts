@@ -20,12 +20,14 @@ platformMetadata:
   name: rosa-platform-metadata
   namespace: openshift-gitops
   roleArnKey: secretsManagerRoleArn
+  regionKey: awsRegion
   applyJob:
     image: registry.redhat.io/openshift4/ose-cli:latest
 
 secretStore:
   name: aws-secrets-manager
-  region: ap-southeast-4
+  # Optional break-glass. Happy path: omit and let platformMetadata.awsRegion fill ClusterSecretStore.
+  region: ""
   secretName: connectivity-link-route53-credentials
   # Wait for OpenShift ESO validating webhook Endpoints before ClusterSecretStore.
   webhookWait:
