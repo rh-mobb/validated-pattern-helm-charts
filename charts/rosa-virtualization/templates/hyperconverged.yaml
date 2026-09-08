@@ -27,4 +27,8 @@ spec:
     progressTimeout: {{ .Values.hyperConverged.liveMigrationConfig.progressTimeout }}
   resourceRequirements:
     vmiCPUAllocationRatio: {{ .Values.hyperConverged.resourceRequirements.vmiCPUAllocationRatio }}
+    {{- with .Values.hyperConverged.resourceRequirements.storageWorkloads }}
+    storageWorkloads:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
 {{- end }}
