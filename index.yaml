@@ -2954,6 +2954,25 @@ entries:
   rosa-virtualization:
   - apiVersion: v2
     appVersion: "4.20"
+    created: "2026-09-08T03:16:06.2771215Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rosa-hcp-dedicated-vpc.github.io/helm-repository/
+      version: 4.4.3
+    description: Helm chart for deploying OpenShift Virtualization operator on ROSA
+    digest: e85619bdf1ea4469aacd85796ff9c0a16a74c890a8aea0fe5e58590e9a45e1d8
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
+    maintainers:
+    - name: rh-mobb
+    name: rosa-virtualization
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/rosa-virtualization-1.0.3/rosa-virtualization-1.0.3.tgz
+    version: 1.0.3
+  - apiVersion: v2
+    appVersion: "4.20"
     created: "2026-06-05T02:15:18.133186647Z"
     dependencies:
     - condition: helper-status-checker.enabled
@@ -3318,4 +3337,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-09-07T22:54:58.994472335Z"
+generated: "2026-09-08T03:16:06.277470804Z"
