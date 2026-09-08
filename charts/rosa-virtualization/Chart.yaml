@@ -3,7 +3,7 @@ name: rosa-virtualization
 description: Helm chart for deploying OpenShift Virtualization operator on ROSA
 icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/openshift.svg
 type: application
-version: 1.0.2
+version: 1.0.3
 appVersion: "4.20"
 dependencies:
   - name: helper-status-checker

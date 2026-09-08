@@ -27,6 +27,9 @@ hyperConverged:
     progressTimeout: 150
   resourceRequirements:
     vmiCPUAllocationRatio: 10
+    # CDI clone/upload/import pods (propagates to CDIConfig podResourceRequirements).
+    # Raise memory for large block-device clones (e.g. Fedora → EFS). Omit to use CNV defaults (~600M).
+    storageWorkloads: {}
 
 helper-status-checker:
   enabled: true
