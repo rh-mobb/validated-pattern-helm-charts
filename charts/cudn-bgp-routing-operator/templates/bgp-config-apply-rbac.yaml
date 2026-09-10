@@ -39,7 +39,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 rules:
   - apiGroups: ["networking.openshift.io"]
-    resources: ["cudnbgpconfigs"]
+    resources: ["bgpcloudconfigurations"]
     verbs: ["get", "list", "create", "patch", "update"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

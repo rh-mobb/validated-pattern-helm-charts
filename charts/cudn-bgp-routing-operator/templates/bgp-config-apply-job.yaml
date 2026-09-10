@@ -1,5 +1,5 @@
 {{- if .Values.externalSecret.enabled }}
-# Applies ESO-synced BGP config onto the operator ServiceAccount (IRSA) and CUDNBgpConfig.
+# Applies ESO-synced BGP config onto the operator ServiceAccount (IRSA) and BGPCloudConfiguration.
 # Resolves SM remote key from values or rosa-platform-metadata (bootstrap).
 # See: validated-pattern-terraform-rosa docs/architecture/platform-metadata-irsa.md
 apiVersion: batch/v1
@@ -11,7 +11,7 @@ metadata:
     {{- include "cudn-bgp.labels" . | nindent 4 }}
   annotations:
     # PostSync: do not block Deployment/CRDs on this Job (Sync hooks hung e2e when
-    # the Job waited on ESO Secret / got stuck Terminating). Apply IRSA + CUDNBgpConfig
+    # the Job waited on ESO Secret / got stuck Terminating). Apply IRSA + BGPCloudConfiguration
     # after the chart resources are synced; Job already polls for Secret/CRD readiness.
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
@@ -55,9 +55,9 @@ spec:
               value: {{ printf "%s%s" (include "cudn-bgp.namePrefix" .) .Values.serviceAccount.name | quote }}
             - name: DEPLOYMENT_NAME
               value: {{ printf "%scontroller-manager" (include "cudn-bgp.namePrefix" .) | quote }}
-            - name: CUDNBGPCONFIG_NAME
+            - name: BGPCLOUDCONFIG_NAME
               value: cluster
-            - name: APPLY_CUDNBGPCONFIG
+            - name: APPLY_BGPCLOUDCONFIG
               value: {{ .Values.cudnBgpConfig.enabled | quote }}
             - name: LOCAL_ASN
               value: {{ .Values.cudnBgpConfig.localASN | quote }}
@@ -124,21 +124,21 @@ spec:
               oc -n "${NAMESPACE}" annotate serviceaccount "${SA_NAME}" \
                 "eks.amazonaws.com/role-arn=${ROLE_ARN}" --overwrite
 
-              if [[ "${APPLY_CUDNBGPCONFIG}" == "true" ]]; then
-                echo "Applying CUDNBgpConfig ${CUDNBGPCONFIG_NAME} (aws from Secret)"
-                # Wait for the API (list cudnbgpconfigs). Do NOT oc get crd — Job SA lacks
+              if [[ "${APPLY_BGPCLOUDCONFIG}" == "true" ]]; then
+                echo "Applying BGPCloudConfiguration ${BGPCLOUDCONFIG_NAME} (aws from Secret)"
+                # Wait for the API (list bgpcloudconfigurations). Do NOT oc get crd — Job SA lacks
                 # apiextensions.k8s.io permissions and that hung the Job for ~5m per attempt.
                 for i in $(seq 1 60); do
-                  if oc get cudnbgpconfig --request-timeout=15s >/dev/null 2>&1; then
+                  if oc get bgpcloudconfiguration --request-timeout=15s >/dev/null 2>&1; then
                     break
                   fi
                   sleep 5
                 done
                 # Prefer merge patch (faster / avoids full-object apply hangs on existing CR)
-                oc patch cudnbgpconfig "${CUDNBGPCONFIG_NAME}" --type merge --request-timeout=60s \
+                oc patch bgpcloudconfiguration "${BGPCLOUDCONFIG_NAME}" --type merge --request-timeout=60s \
                   -p "{\"spec\":{\"platform\":\"${PLATFORM}\",\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
                   || printf '%s\n' \
-                    "{\"apiVersion\":\"networking.openshift.io/v1alpha1\",\"kind\":\"CUDNBgpConfig\",\"metadata\":{\"name\":\"${CUDNBGPCONFIG_NAME}\"},\"spec\":{\"platform\":\"${PLATFORM}\",\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
+                    "{\"apiVersion\":\"networking.openshift.io/v1beta1\",\"kind\":\"BGPCloudConfiguration\",\"metadata\":{\"name\":\"${BGPCLOUDCONFIG_NAME}\"},\"spec\":{\"platform\":\"${PLATFORM}\",\"bgp\":{\"localASN\":${LOCAL_ASN},\"livenessDetection\":\"${LIVENESS_DETECTION}\"},\"routerNodeSelector\":${ROUTER_NODE_SELECTOR_JSON},\"aws\":{\"region\":\"${REGION}\",\"routeServerIDs\":${RS_IDS}}}}" \
                     | oc apply --request-timeout=60s -f -
               fi
 

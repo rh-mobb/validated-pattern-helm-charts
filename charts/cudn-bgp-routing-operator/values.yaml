@@ -20,7 +20,8 @@ buildOperator:
   imageStreamName: operator
   git:
     uri: https://github.com/openshift/bgp-cloud-connector.git
-    ref: main
+    # Pin to a tested commit; bump with chart releases (do not use floating main in GitOps).
+    ref: 3a5e691e3386683de84b1bf660df8cab5185f2f0
   contextDir: ""
   dockerfilePath: Dockerfile
   runPolicy: Serial
@@ -83,7 +84,7 @@ cudnBgpConfig:
   livenessDetection: bgp-keepalive
   routerNodeSelector:
     bgp_router: "true"
-  # When externalSecret.enabled=true, Helm skips CUDNBgpConfig; the Job applies
+  # When externalSecret.enabled=true, Helm skips BGPCloudConfiguration; the Job applies
   # the full CR including platform + aws.* from the ESO Secret.
   aws:
     region: ""

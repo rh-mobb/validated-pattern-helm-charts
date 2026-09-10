@@ -1,7 +1,7 @@
-{{- /* When externalSecret.enabled, bgp-config-apply Job owns CUDNBgpConfig (CRD needs aws). */}}
+{{- /* When externalSecret.enabled, bgp-config-apply Job owns BGPCloudConfiguration (CRD needs aws). */}}
 {{- if and .Values.cudnBgpConfig.enabled (not .Values.externalSecret.enabled) }}
-apiVersion: networking.openshift.io/v1alpha1
-kind: CUDNBgpConfig
+apiVersion: networking.openshift.io/v1beta1
+kind: BGPCloudConfiguration
 metadata:
   name: cluster
   annotations:
