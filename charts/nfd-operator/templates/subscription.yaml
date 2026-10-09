@@ -1,0 +1,14 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.operatorName }}
+  namespace: {{ .Values.operatorNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "{{ .Values.syncwave }}"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  channel: {{ .Values.operatorChannel }}
+  installPlanApproval: {{ .Values.operatorInstallPlanApproval }}
+  name: {{ .Values.operatorName }}
+  source: {{ .Values.operatorSource }}
+  sourceNamespace: {{ .Values.operatorSourceNamespace }}
