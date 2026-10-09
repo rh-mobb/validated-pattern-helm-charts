@@ -2189,6 +2189,42 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/network-observability-operator-1.0.0/network-observability-operator-1.0.0.tgz
     version: 1.0.0
+  nfd-operator:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-09T04:28:28.473801327Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    description: Helm chart for deploying Node Feature Discovery Operator
+    digest: aadab615a31c40edbb0f7aa5b14b3611aea42410a1109dd3c68ec123f130d351
+    maintainers:
+    - name: rh-mobb
+    name: nfd-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/nfd-operator-0.4.0/nfd-operator-0.4.0.tgz
+    version: 0.4.0
+  nvidia-gpu-operator:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-09T04:28:28.785886803Z"
+    dependencies:
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    description: Helm chart for deploying NVIDIA GPU Operator
+    digest: bb2c4026ac32e4b603aa489d485b4c347c15d2ea288e648f9ae5978a662e5a1a
+    maintainers:
+    - name: rh-mobb
+    name: nvidia-gpu-operator
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/nvidia-gpu-operator-0.3.0/nvidia-gpu-operator-0.3.0.tgz
+    version: 0.3.0
   overprovisioning:
   - apiVersion: v2
     created: "2026-03-26T08:32:20.613399335Z"
@@ -3351,4 +3387,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-09-10T00:32:23.247728217Z"
+generated: "2026-10-09T04:28:28.786200071Z"
