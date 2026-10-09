@@ -1,0 +1,17 @@
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: MaaSAuthPolicy
+metadata:
+  name: {{ .Values.model.name }}-access
+  namespace: {{ .Values.governanceNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+    openshift.io/display-name: "{{ .Values.model.displayName }} Access"
+spec:
+  modelRefs:
+    - name: {{ .Values.model.name }}
+      namespace: {{ .Values.namespace }}
+  subjects:
+    groups:
+      - name: system:authenticated
+    users: []

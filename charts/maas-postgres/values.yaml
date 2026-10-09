@@ -1,0 +1,26 @@
+namespace: redhat-ods-applications
+gatewayInfraNamespace: redhat-ai-gateway-infra
+
+image:
+  repository: registry.redhat.io/rhel9/postgresql-16
+  tag: "1-96.1726664419"
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+storage:
+  size: 20Gi
+  storageClass: ""
+
+secretStore:
+  name: aws-secrets-manager
+  kind: ClusterSecretStore
+
+awsSecret:
+  key: ""
+  refreshInterval: 1h
