@@ -3,7 +3,7 @@ gatewayInfraNamespace: redhat-ai-gateway-infra
 
 image:
   repository: registry.redhat.io/rhel9/postgresql-16
-  tag: "1-96.1726664419"
+  tag: "latest"
 
 resources:
   requests:
