@@ -1903,6 +1903,33 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/loki-operator-0.1.17/loki-operator-0.1.17.tgz
     version: 0.1.17
+  maas-model:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-09T05:39:00.985683767Z"
+    description: Parameterized chart for deploying RHOAI MaaS models (LLMInferenceService
+      + governance)
+    digest: 0cd627f26e56e28e6382492977b17cbb1032a2b9d7bee72d7aa9494051c8b612
+    maintainers:
+    - name: rh-mobb
+    name: maas-model
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-model-0.1.0/maas-model-0.1.0.tgz
+    version: 0.1.0
+  maas-postgres:
+  - apiVersion: v2
+    appVersion: "16"
+    created: "2026-10-09T05:39:01.187342098Z"
+    description: PostgreSQL deployment for RHOAI MaaS API with ExternalSecret integration
+    digest: 813d245c43cef73b0374901889aa0af1a7d4ebde8fb950682dafe34ba2725e7a
+    maintainers:
+    - name: rh-mobb
+    name: maas-postgres
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-postgres-0.1.0/maas-postgres-0.1.0.tgz
+    version: 0.1.0
   mtv-operator:
   - apiVersion: v2
     appVersion: "2.7"
@@ -3402,4 +3429,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-09T04:43:44.083404805Z"
+generated: "2026-10-09T05:39:01.187586382Z"
