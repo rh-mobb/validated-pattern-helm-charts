@@ -1,0 +1,8 @@
+apiVersion: v2
+name: maas-postgres
+description: PostgreSQL deployment for RHOAI MaaS API with ExternalSecret integration
+type: application
+version: 0.1.0
+appVersion: "16"
+maintainers:
+  - name: rh-mobb

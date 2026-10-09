@@ -1,0 +1,47 @@
+{{- if .Values.subscription.free.enabled }}
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: MaaSSubscription
+metadata:
+  name: {{ .Values.model.name }}-free
+  namespace: {{ .Values.governanceNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+    openshift.io/display-name: "{{ .Values.model.displayName }} Free Tier"
+spec:
+  owner:
+    groups:
+      - name: system:authenticated
+    users: []
+  modelRefs:
+    - name: {{ .Values.model.name }}
+      namespace: {{ .Values.namespace }}
+      tokenRateLimits:
+        - limit: {{ .Values.subscription.free.tokenLimit }}
+          window: {{ .Values.subscription.free.tokenWindow }}
+  priority: {{ .Values.subscription.free.priority }}
+{{- end }}
+{{- if .Values.subscription.premium.enabled }}
+---
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: MaaSSubscription
+metadata:
+  name: {{ .Values.model.name }}-premium
+  namespace: {{ .Values.governanceNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+    openshift.io/display-name: "{{ .Values.model.displayName }} Premium Tier"
+spec:
+  owner:
+    groups:
+      - name: system:authenticated
+    users: []
+  modelRefs:
+    - name: {{ .Values.model.name }}
+      namespace: {{ .Values.namespace }}
+      tokenRateLimits:
+        - limit: {{ .Values.subscription.premium.tokenLimit }}
+          window: {{ .Values.subscription.premium.tokenWindow }}
+  priority: {{ .Values.subscription.premium.priority }}
+{{- end }}
