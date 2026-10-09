@@ -1920,6 +1920,18 @@ entries:
   maas-postgres:
   - apiVersion: v2
     appVersion: "16"
+    created: "2026-10-09T06:17:30.541054554Z"
+    description: PostgreSQL deployment for RHOAI MaaS API with ExternalSecret integration
+    digest: 5b898453061c1d3a2ba8c6ff60486c77d3c35a8a8cc2a3ca0218e81603be5534
+    maintainers:
+    - name: rh-mobb
+    name: maas-postgres
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-postgres-0.1.1/maas-postgres-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: "16"
     created: "2026-10-09T05:39:01.187342098Z"
     description: PostgreSQL deployment for RHOAI MaaS API with ExternalSecret integration
     digest: 813d245c43cef73b0374901889aa0af1a7d4ebde8fb950682dafe34ba2725e7a
@@ -3429,4 +3441,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-09T05:39:01.187586382Z"
+generated: "2026-10-09T06:17:30.541406431Z"
