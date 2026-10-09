@@ -498,6 +498,21 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/acm-operator-0.5.13/acm-operator-0.5.13.tgz
     version: 0.5.13
+  amazon-cloudwatch-observability:
+  - apiVersion: v2
+    created: "2026-10-09T04:43:44.083231765Z"
+    description: A Helm chart for Amazon CloudWatch Observability
+    digest: a3933eaabe26a12bb84e501d49eedb99016e8d49a11ce3e5571edbfe77b1eb39
+    home: https://aws.amazon.com/cloudwatch/
+    maintainers:
+    - name: rh-mobb
+    name: amazon-cloudwatch-observability
+    sources:
+    - https://github.com/aws-observability/helm-charts/tree/main/charts/amazon-cloudwatch-observability
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/amazon-cloudwatch-observability-0.0.1/amazon-cloudwatch-observability-0.0.1.tgz
+    version: 0.0.1
   app-of-apps-acm-team-onboarding:
   - apiVersion: v2
     created: "2026-03-17T08:20:27.270670868Z"
@@ -3387,4 +3402,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-09T04:28:28.786200071Z"
+generated: "2026-10-09T04:43:44.083404805Z"
