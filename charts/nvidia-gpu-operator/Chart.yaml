@@ -11,4 +11,3 @@ dependencies:
     version: 4.4.3
     repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
     condition: helper-status-checker.enabled
-
