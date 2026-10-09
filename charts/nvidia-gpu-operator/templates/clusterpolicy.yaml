@@ -1,0 +1,147 @@
+{{- if .Values.clusterPolicy.enabled }}
+apiVersion: nvidia.com/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ .Values.clusterPolicy.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "{{ add .Values.syncwave 3 }}"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+spec:
+  # CDI configuration
+  cdi:
+    default: false
+    enabled: {{ .Values.clusterPolicy.cdi.enabled }}
+  # Daemonsets configuration
+  daemonsets:
+    rollingUpdate:
+      maxUnavailable: "1"
+    updateStrategy: RollingUpdate
+  # DCGM (Data Center GPU Manager)
+  dcgm:
+    enabled: {{ .Values.clusterPolicy.dcgm.enabled }}
+  # DCGM Exporter for monitoring
+  dcgmExporter:
+    config:
+      name: ""
+    enabled: {{ .Values.clusterPolicy.dcgmExporter.enabled }}
+    serviceMonitor:
+      enabled: true
+  # Device Plugin
+  devicePlugin:
+    config:
+      default: ""
+      name: ""
+    enabled: {{ .Values.clusterPolicy.devicePlugin.enabled }}
+    mps:
+      root: /run/nvidia/mps
+  # NVIDIA Driver
+  driver:
+    certConfig:
+      name: ""
+    enabled: {{ .Values.clusterPolicy.driver.enabled }}
+    {{- if .Values.clusterPolicy.driver.repository }}
+    repository: {{ .Values.clusterPolicy.driver.repository }}
+    {{- end }}
+    {{- if .Values.clusterPolicy.driver.image }}
+    image: {{ .Values.clusterPolicy.driver.image }}
+    {{- end }}
+    {{- if .Values.clusterPolicy.driver.version }}
+    version: {{ .Values.clusterPolicy.driver.version | quote }}
+    {{- end }}
+    {{- if .Values.clusterPolicy.driver.imagePullSecrets }}
+    imagePullSecrets:
+    {{- range .Values.clusterPolicy.driver.imagePullSecrets }}
+      - {{ . }}
+    {{- end }}
+    {{- end }}
+    {{- if hasKey .Values.clusterPolicy.driver "useOpenKernelModules" }}
+    useOpenKernelModules: {{ .Values.clusterPolicy.driver.useOpenKernelModules }}
+    {{- end }}
+    kernelModuleConfig:
+      name: ""
+    kernelModuleType: auto
+    licensingConfig:
+      configMapName: ""
+      nlsEnabled: true
+    repoConfig:
+      configMapName: ""
+    upgradePolicy:
+      autoUpgrade: true
+      drain:
+        deleteEmptyDir: false
+        enable: false
+        force: false
+        timeoutSeconds: 300
+      maxParallelUpgrades: 1
+      maxUnavailable: 25%
+      podDeletion:
+        deleteEmptyDir: false
+        force: false
+        timeoutSeconds: 300
+      waitForCompletion:
+        timeoutSeconds: 0
+    useNvidiaDriverCRD: false
+    virtualTopology:
+      config: ""
+  # GDRCopy
+  gdrcopy:
+    enabled: false
+  # GDS
+  gds:
+    enabled: {{ .Values.clusterPolicy.gds.enabled }}
+  # GPU Feature Discovery
+  gfd:
+    enabled: {{ .Values.clusterPolicy.gfd.enabled }}
+  # Kata Manager
+  kataManager:
+    config:
+      artifactsDir: /opt/nvidia-gpu-operator/artifacts/runtimeclasses
+  # MIG configuration
+  mig:
+    strategy: single
+  # MIG Manager
+  migManager:
+    config:
+      default: all-disabled
+      name: default-mig-parted-config
+    enabled: {{ .Values.clusterPolicy.migManager.enabled }}
+  # Node Status Exporter
+  nodeStatusExporter:
+    enabled: {{ .Values.clusterPolicy.nodeStatusExporter.enabled }}
+  # Operator configuration
+  operator:
+    defaultRuntime: {{ .Values.clusterPolicy.operator.defaultRuntime }}
+    initContainer: {}
+    runtimeClass: nvidia
+    {{- if hasKey .Values.clusterPolicy.operator "use_ocp_driver_toolkit" }}
+    use_ocp_driver_toolkit: {{ .Values.clusterPolicy.operator.use_ocp_driver_toolkit }}
+    {{- end }}
+  # Sandbox Device Plugin
+  sandboxDevicePlugin:
+    enabled: true
+  # Sandbox Workloads
+  sandboxWorkloads:
+    defaultWorkload: container
+    enabled: {{ .Values.clusterPolicy.sandboxWorkloads.enabled }}
+  # NVIDIA Container Toolkit
+  toolkit:
+    enabled: {{ .Values.clusterPolicy.toolkit.enabled }}
+    installDir: /usr/local/nvidia
+  # Validator
+  validator:
+    plugin:
+      env:
+      - name: WITH_WORKLOAD
+        value: "false"
+  # VFIO Manager
+  vfioManager:
+    enabled: {{ .Values.clusterPolicy.vfioManager.enabled }}
+  # vGPU Device Manager
+  vgpuDeviceManager:
+    config:
+      default: default
+    enabled: {{ .Values.clusterPolicy.vgpuDeviceManager.enabled }}
+  # vGPU Manager
+  vgpuManager:
+    enabled: {{ .Values.clusterPolicy.vgpuManager.enabled }}
+{{- end }}
