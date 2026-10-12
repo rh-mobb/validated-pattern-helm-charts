@@ -115,7 +115,7 @@ spec:
               phase "Phase 3: API"
 
               MODELS_RESP=$(curl -sk "${MAAS_GW}/maas-api/v1/models" -H "Authorization: Bearer ${TOKEN}" 2>/dev/null)
-              MODEL_COUNT=$(echo "$MODELS_RESP" | python3 -c "import json,sys; print(len(json.load(sys.stdin).get('data',json.load(open('/dev/stdin')).get('items',[]))))" 2>/dev/null || echo "0")
+              MODEL_COUNT=$(echo "$MODELS_RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('data',d.get('items',[]))))" 2>/dev/null || echo "0")
               [ "$MODEL_COUNT" -ge 1 ] 2>/dev/null && pass "Models listed ($MODEL_COUNT)" || fail "No models returned"
 
               API_KEY_RESP=$(curl -sk -X POST "${MAAS_GW}/maas-api/v1/api-keys" \
