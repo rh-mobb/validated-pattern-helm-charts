@@ -1,4 +1,5 @@
 namespace: llm
+createNamespace: true
 governanceNamespace: models-as-a-service
 
 gatewayRef:
