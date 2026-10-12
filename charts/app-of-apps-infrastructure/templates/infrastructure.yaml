@@ -7,7 +7,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: "{{ $teamName }}-{{ $infra.chart }}"
+  name: "{{ $teamName }}-{{ $infra.name | default $infra.chart }}"
   annotations:
     argocd.argoproj.io/sync-wave: {{ $infra.syncWave | default 0 | quote }}
   namespace: {{ $defaults.gitopsNamespace }}
