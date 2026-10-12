@@ -1,0 +1,105 @@
+{{- if .Values.dashboardConfig.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maas-dashboard-config
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: maas-dashboard-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+rules:
+  - apiGroups: ["opendatahub.io"]
+    resources: ["odhdashboardconfigs"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: maas-dashboard-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: maas-dashboard-config
+subjects:
+  - kind: ServiceAccount
+    name: maas-dashboard-config
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: maas-dashboard-config
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: maas-dashboard-config
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: patch
+          image: {{ .Values.dashboardConfig.image }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: HOME
+              value: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+              NS="{{ .Values.namespace }}"
+
+              echo "Patching OdhDashboardConfig for MaaS..."
+              for attempt in 1 2 3; do
+                oc patch odhdashboardconfig odh-dashboard-config -n "${NS}" --type merge -p '{
+                  "spec": {
+                    "dashboardConfig": {
+                      "modelAsService": true,
+                      "genAiStudio": true,
+                      "externalModels": true,
+                      "observabilityDashboard": true
+                    }
+                  }
+                }' && echo "Dashboard config patched successfully" && exit 0
+                echo "Attempt ${attempt} failed, retrying in 10s..."
+                sleep 10
+              done
+              echo "Warning: dashboard config patch failed after 3 attempts"
+              exit 1
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}
