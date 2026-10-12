@@ -1913,6 +1913,20 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/loki-operator-0.1.17/loki-operator-0.1.17.tgz
     version: 0.1.17
+  maas-additional-config:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-12T22:38:55.861478553Z"
+    description: MaaS platform config - PostgreSQL, ExternalSecrets, UWM, and dashboard
+      configuration
+    digest: b5fec0d7f300bbf114d3b36598305cc2e4457a59d4f9cb8a1da38b538e093ee3
+    maintainers:
+    - name: rh-mobb
+    name: maas-additional-config
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-additional-config-0.1.0/maas-additional-config-0.1.0.tgz
+    version: 0.1.0
   maas-model:
   - apiVersion: v2
     appVersion: "1.0"
@@ -3550,4 +3564,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-12T06:16:46.850800079Z"
+generated: "2026-10-12T22:38:55.861774498Z"
