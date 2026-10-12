@@ -1,0 +1,8 @@
+apiVersion: v2
+name: maas-additional-config
+description: MaaS platform config - PostgreSQL, ExternalSecrets, UWM, and dashboard configuration
+type: application
+version: 0.1.0
+appVersion: "1.0"
+maintainers:
+  - name: rh-mobb
