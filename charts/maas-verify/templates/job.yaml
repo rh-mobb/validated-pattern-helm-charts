@@ -1,0 +1,150 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: maas-verify-{{ now | date "20060102-150405" }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      serviceAccountName: maas-verify
+      restartPolicy: Never
+      containers:
+        - name: verify
+          image: {{ .Values.image }}
+          env:
+            - name: STARTUP_DELAY
+              value: {{ .Values.startupDelay | quote }}
+            - name: GATEWAY_NS
+              value: {{ .Values.maas.gatewayNamespace }}
+            - name: GATEWAY_NAME
+              value: {{ .Values.maas.gatewayName }}
+            - name: API_NS
+              value: {{ .Values.maas.apiNamespace }}
+            - name: PG_NS
+              value: {{ .Values.maas.postgresNamespace }}
+            - name: MODEL_NS
+              value: {{ .Values.maas.modelNamespace }}
+            - name: GOV_NS
+              value: {{ .Values.maas.governanceNamespace }}
+            - name: MODEL_NAME
+              value: {{ .Values.model.name }}
+            - name: MODEL_SUBSCRIPTION
+              value: {{ .Values.model.subscription }}
+            - name: MODEL_ID
+              value: {{ .Values.model.id }}
+            {{- if .Values.maas.gatewayHost }}
+            - name: MAAS_HOST
+              value: {{ .Values.maas.gatewayHost }}
+            {{- end }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -uo pipefail
+
+              PASSED=0
+              FAILED=0
+              pass() { echo -e "\033[0;32m[PASS]\033[0m $*"; PASSED=$((PASSED + 1)); }
+              fail() { echo -e "\033[0;31m[FAIL]\033[0m $*"; FAILED=$((FAILED + 1)); }
+              info() { echo -e "\033[0;34m[INFO]\033[0m $*"; }
+              phase() { echo -e "\n\033[1;34m══ $* ══\033[0m"; }
+
+              info "Waiting ${STARTUP_DELAY}s for platform to stabilize..."
+              sleep "$STARTUP_DELAY"
+
+              # Resolve gateway host
+              if [ -z "${MAAS_HOST:-}" ]; then
+                MAAS_HOST=$(oc get route -n "$GATEWAY_NS" -o jsonpath='{.items[?(@.spec.to.name=="'"${GATEWAY_NAME}"'-maas-gateway-class")].spec.host}' 2>/dev/null)
+                if [ -z "$MAAS_HOST" ]; then
+                  MAAS_HOST=$(oc get gateway "$GATEWAY_NAME" -n "$GATEWAY_NS" -o jsonpath='{.status.addresses[0].value}' 2>/dev/null)
+                fi
+              fi
+              MAAS_GW="https://${MAAS_HOST}"
+              info "MaaS Gateway: $MAAS_GW"
+              TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+
+              # ── Phase 1: Infrastructure ──
+              phase "Phase 1: Infrastructure"
+
+              GW_STATUS=$(oc get gateway "$GATEWAY_NAME" -n "$GATEWAY_NS" -o jsonpath='{.status.conditions[?(@.type=="Programmed")].status}' 2>/dev/null)
+              [ "$GW_STATUS" = "True" ] && pass "Gateway $GATEWAY_NAME is Programmed" || fail "Gateway not Programmed ($GW_STATUS)"
+
+              PG_READY=$(oc get deployment postgres -n "$PG_NS" -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo "0")
+              [ "$PG_READY" -ge 1 ] 2>/dev/null && pass "PostgreSQL is running ($PG_READY replicas)" || fail "PostgreSQL not ready"
+
+              API_READY=$(oc get deployment maas-api -n "$API_NS" -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo "0")
+              [ "$API_READY" -ge 1 ] 2>/dev/null && pass "maas-api is running ($API_READY replicas)" || fail "maas-api not ready"
+
+              AUTH_READY=$(oc get authorino authorino -n kuadrant-system -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null)
+              [ "$AUTH_READY" = "True" ] && pass "Authorino is ready" || fail "Authorino not ready ($AUTH_READY)"
+
+              HEALTH=$(curl -sk -o /dev/null -w '%{http_code}' "${MAAS_GW}/maas-api/health" 2>/dev/null || echo "000")
+              [ "$HEALTH" = "200" ] && pass "Health endpoint returns HTTP 200" || fail "Health endpoint returned HTTP $HEALTH"
+
+              # ── Phase 2: Model ──
+              phase "Phase 2: Model"
+
+              MODEL_PODS=$(oc get pods -n "$MODEL_NS" --no-headers 2>/dev/null | grep -c "Running" || echo "0")
+              [ "$MODEL_PODS" -ge 1 ] && pass "Model pods running ($MODEL_PODS)" || fail "No model pods running"
+
+              MODEL_PHASE=$(oc get maasmodelref "$MODEL_NAME" -n "$MODEL_NS" -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
+              [ "$MODEL_PHASE" = "Ready" ] && pass "MaaSModelRef $MODEL_NAME is Ready" || fail "MaaSModelRef $MODEL_NAME phase: $MODEL_PHASE"
+
+              AUTH_PHASE=$(oc get maasauthpolicy "${MODEL_NAME}-access" -n "$GOV_NS" -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
+              [ "$AUTH_PHASE" = "Active" ] && pass "MaaSAuthPolicy is Active" || fail "MaaSAuthPolicy phase: $AUTH_PHASE"
+
+              # ── Phase 3: API ──
+              phase "Phase 3: API"
+
+              MODELS_RESP=$(curl -sk "${MAAS_GW}/maas-api/v1/models" -H "Authorization: Bearer ${TOKEN}" 2>/dev/null)
+              MODEL_COUNT=$(echo "$MODELS_RESP" | python3 -c "import json,sys; print(len(json.load(sys.stdin).get('data',json.load(open('/dev/stdin')).get('items',[]))))" 2>/dev/null || echo "0")
+              [ "$MODEL_COUNT" -ge 1 ] 2>/dev/null && pass "Models listed ($MODEL_COUNT)" || fail "No models returned"
+
+              API_KEY_RESP=$(curl -sk -X POST "${MAAS_GW}/maas-api/v1/api-keys" \
+                -H "Authorization: Bearer ${TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "{\"name\":\"verify-job\",\"subscription\":\"${MODEL_SUBSCRIPTION}\",\"expiresIn\":\"5m\",\"ephemeral\":true}" 2>/dev/null)
+              API_KEY=$(echo "$API_KEY_RESP" | python3 -c "import json,sys; print(json.load(sys.stdin).get('key',''))" 2>/dev/null)
+              [ -n "$API_KEY" ] && pass "API key created" || fail "API key creation failed"
+
+              if [ -n "$API_KEY" ]; then
+                INF_CODE=$(curl -sk -o /dev/null -w '%{http_code}' -X POST "${MAAS_GW}/v1/chat/completions" \
+                  -H "Authorization: Bearer ${API_KEY}" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"model\":\"${MODEL_ID}\",\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}],\"max_tokens\":5}" 2>/dev/null || echo "000")
+                [ "$INF_CODE" = "200" ] && pass "Inference returned HTTP 200" || fail "Inference returned HTTP $INF_CODE"
+              fi
+
+              # ── Phase 4: Auth Enforcement ──
+              phase "Phase 4: Auth Enforcement"
+
+              NO_AUTH=$(curl -sk -o /dev/null -w '%{http_code}' -X POST "${MAAS_GW}/v1/chat/completions" \
+                -H "Content-Type: application/json" \
+                -d "{\"model\":\"${MODEL_ID}\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],\"max_tokens\":5}" 2>/dev/null || echo "000")
+              [[ "$NO_AUTH" =~ ^(401|403)$ ]] && pass "Unauthenticated request rejected (HTTP $NO_AUTH)" || fail "Unauthenticated returned HTTP $NO_AUTH (expected 401/403)"
+
+              BAD_KEY=$(curl -sk -o /dev/null -w '%{http_code}' -X POST "${MAAS_GW}/v1/chat/completions" \
+                -H "Authorization: Bearer sk-fake-invalid-key" \
+                -H "Content-Type: application/json" \
+                -d "{\"model\":\"${MODEL_ID}\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],\"max_tokens\":5}" 2>/dev/null || echo "000")
+              [[ "$BAD_KEY" =~ ^(401|403)$ ]] && pass "Invalid key rejected (HTTP $BAD_KEY)" || fail "Invalid key returned HTTP $BAD_KEY (expected 401/403)"
+
+              # ── Summary ──
+              phase "Summary"
+              TOTAL=$((PASSED + FAILED))
+              echo ""
+              info "Results: $PASSED/$TOTAL passed, $FAILED failed"
+              echo ""
+
+              if [ "$FAILED" -gt 0 ]; then
+                fail "Verification completed with failures"
+                exit 1
+              else
+                pass "All checks passed"
+              fi
