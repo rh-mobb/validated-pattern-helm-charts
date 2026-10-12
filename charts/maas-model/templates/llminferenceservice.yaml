@@ -6,6 +6,12 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+    openshift.io/display-name: {{ .Values.model.displayName | quote }}
+    opendatahub.io/model-type: generative
+    security.opendatahub.io/enable-auth: "true"
+  labels:
+    opendatahub.io/dashboard: "true"
+    opendatahub.io/genai-asset: "true"
 spec:
   model:
     uri: {{ .Values.model.uri }}
@@ -18,6 +24,12 @@ spec:
         - name: {{ .Values.gatewayRef.name }}
           namespace: {{ .Values.gatewayRef.namespace }}
   template:
+    {{- if .Values.model.gpu.enabled }}
+    tolerations:
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists
+    {{- end }}
     containers:
       - name: main
         image: {{ .Values.model.container.image | quote }}
@@ -28,42 +40,52 @@ spec:
         {{- with .Values.model.container.args }}
         args: {{ toYaml . | nindent 10 }}
         {{- end }}
+        {{- with .Values.model.container.env }}
         env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.name
-          - name: POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.namespace
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
-          - name: https
-            containerPort: 8000
+          - containerPort: 8000
+            name: http
             protocol: TCP
         livenessProbe:
           httpGet:
             path: /health
-            port: https
+            port: 8000
             scheme: HTTPS
+          initialDelaySeconds: {{ .Values.model.gpu.enabled | ternary 300 30 }}
+          periodSeconds: 30
+          timeoutSeconds: 30
+          failureThreshold: 5
         readinessProbe:
           httpGet:
-            path: /ready
-            port: https
+            path: /health
+            port: 8000
             scheme: HTTPS
+          initialDelaySeconds: {{ .Values.model.gpu.enabled | ternary 300 10 }}
+          periodSeconds: 15
+          timeoutSeconds: 15
+          failureThreshold: 30
         resources:
-          {{- toYaml .Values.model.container.resources | nindent 10 }}
-          {{- if .Values.model.gpu.enabled }}
-          {{- if not .Values.model.container.resources.limits }}
-          limits:
-          {{- end }}
+          requests:
+            {{- toYaml .Values.model.container.resources.requests | nindent 12 }}
+            {{- if .Values.model.gpu.enabled }}
             nvidia.com/gpu: {{ .Values.model.gpu.count | quote }}
-          {{- end }}
+            {{- end }}
+          limits:
+            {{- toYaml .Values.model.container.resources.limits | nindent 12 }}
+            {{- if .Values.model.gpu.enabled }}
+            nvidia.com/gpu: {{ .Values.model.gpu.count | quote }}
+            {{- end }}
+        {{- if .Values.model.gpu.enabled }}
+        volumeMounts:
+          - mountPath: /dev/shm
+            name: shm
+        {{- end }}
     {{- if .Values.model.gpu.enabled }}
-    tolerations:
-      - key: nvidia.com/gpu
-        operator: Exists
-        effect: NoSchedule
+    volumes:
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 2Gi
     {{- end }}
