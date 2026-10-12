@@ -24,3 +24,6 @@ secretStore:
 awsSecret:
   key: ""
   refreshInterval: 1h
+
+userWorkloadMonitoring:
+  enabled: false
