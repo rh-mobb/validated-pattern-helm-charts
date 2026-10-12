@@ -1,0 +1,19 @@
+namespace: maas-verify
+
+image: registry.redhat.io/openshift4/ose-cli:latest
+
+startupDelay: 120
+
+maas:
+  gatewayHost: ""
+  gatewayNamespace: openshift-ingress
+  gatewayName: maas-default-gateway
+  apiNamespace: redhat-ai-gateway-infra
+  postgresNamespace: redhat-ods-applications
+  modelNamespace: llm
+  governanceNamespace: models-as-a-service
+
+model:
+  name: simulated
+  subscription: simulated-free
+  id: "publishers/llm/models/facebook/opt-125m"
