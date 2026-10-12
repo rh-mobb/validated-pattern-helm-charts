@@ -17,7 +17,19 @@ spec:
       containers:
         - name: verify
           image: {{ .Values.image }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           env:
+            - name: HOME
+              value: /tmp
             - name: STARTUP_DELAY
               value: {{ .Values.startupDelay | quote }}
             - name: GATEWAY_NS
@@ -148,3 +160,6 @@ spec:
               else
                 pass "All checks passed"
               fi
+      volumes:
+        - name: tmp
+          emptyDir: {}
