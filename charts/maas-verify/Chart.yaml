@@ -2,7 +2,7 @@ apiVersion: v2
 name: maas-verify
 description: Post-deploy verification job for RHOAI MaaS platform
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "1.0"
 maintainers:
   - name: rh-mobb
