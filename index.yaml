@@ -1906,6 +1906,19 @@ entries:
   maas-model:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-10-12T04:13:39.394431315Z"
+    description: Parameterized chart for deploying RHOAI MaaS models (LLMInferenceService
+      + governance)
+    digest: fe7ceee4c728795fab7501782f202e4cf8e3078492a67344ee00645529e08889
+    maintainers:
+    - name: rh-mobb
+    name: maas-model
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-model-0.2.0/maas-model-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-10-09T05:39:00.985683767Z"
     description: Parameterized chart for deploying RHOAI MaaS models (LLMInferenceService
       + governance)
@@ -3514,4 +3527,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-12T02:41:06.277045129Z"
+generated: "2026-10-12T04:13:39.3948405Z"
