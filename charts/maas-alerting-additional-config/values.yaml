@@ -1,0 +1,22 @@
+monitoringNamespace: redhat-ods-monitoring
+
+telemetry:
+  enabled: true
+  captureUser: true
+
+usageLogging:
+  enabled: true
+  storageClassName: gp3-csi
+  minio:
+    image: quay.io/rh-aiservices-bu/minio:RELEASE.2025-09-07T16-13-09Z
+    mcImage: quay.io/rh-aiservices-bu/mc:latest
+    storageSize: 10Gi
+    rootUser: minio
+    rootPassword: minio123
+
+redis:
+  enabled: false
+  namespace: redis-limitador
+  image: registry.redhat.io/rhel9/redis-7
+
+patchImage: registry.redhat.io/openshift4/ose-cli:latest
