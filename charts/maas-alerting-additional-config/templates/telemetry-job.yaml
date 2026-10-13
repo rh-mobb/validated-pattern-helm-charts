@@ -1,0 +1,110 @@
+{{- if .Values.telemetry.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maas-telemetry-config
+  namespace: {{ .Values.monitoringNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: maas-telemetry-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+rules:
+  - apiGroups: ["maas.opendatahub.io"]
+    resources: ["maastenantconfigs"]
+    verbs: ["get", "patch"]
+  - apiGroups: ["maas.opendatahub.io"]
+    resources: ["configs"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: maas-telemetry-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: maas-telemetry-config
+subjects:
+  - kind: ServiceAccount
+    name: maas-telemetry-config
+    namespace: {{ .Values.monitoringNamespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: maas-telemetry-config
+  namespace: {{ .Values.monitoringNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: maas-telemetry-config
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: patch
+          image: {{ .Values.patchImage }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: HOME
+              value: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+
+              echo "Enabling telemetry on MaaSTenantConfig..."
+              oc patch maastenantconfig default-tenant -n models-as-a-service \
+                --type=merge -p '{
+                  "spec": {
+                    "telemetry": {
+                      "enabled": true,
+                      "metrics": {
+                        "captureUser": {{ .Values.telemetry.captureUser }}
+                      }
+                    }
+                  }
+                }' 2>/dev/null && echo "MaaSTenantConfig patched" || echo "MaaSTenantConfig not found (may not exist yet)"
+
+              {{- if .Values.usageLogging.enabled }}
+              echo "Enabling usage logging on MaaS Config..."
+              oc patch configs.maas.opendatahub.io default \
+                --type=merge -p '{"spec":{"usageLogging":true}}' 2>/dev/null && echo "Usage logging enabled" || echo "MaaS Config not found (may not exist yet)"
+              {{- end }}
+
+              echo "Done"
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}
