@@ -1,0 +1,33 @@
+namespace: external-models
+createNamespace: true
+governanceNamespace: models-as-a-service
+
+provider:
+  name: ""
+  type: ""
+  endpoint: ""
+  secret:
+    name: ""
+
+model:
+  name: ""
+  displayName: ""
+  description: ""
+  targetModel: ""
+  apiFormat: openai-chat
+  path: /v1/chat/completions
+
+subscription:
+  enabled: true
+  tokenLimit: 10000
+  tokenWindow: 1h
+  priority: 10
+
+secretStore:
+  enabled: false
+  name: aws-secrets-manager
+  kind: ClusterSecretStore
+
+awsSecret:
+  key: ""
+  refreshInterval: 1h

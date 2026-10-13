@@ -1,0 +1,8 @@
+apiVersion: v2
+name: maas-external-model
+description: Deploy external AI models (OpenAI, Bedrock, Gemini, Anthropic, Azure OpenAI) via MaaS
+type: application
+version: 0.1.0
+appVersion: "1.0"
+maintainers:
+  - name: rh-mobb

@@ -1,0 +1,15 @@
+apiVersion: inference.opendatahub.io/v1alpha1
+kind: ExternalProvider
+metadata:
+  name: {{ .Values.provider.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+spec:
+  provider: {{ .Values.provider.type }}
+  endpoint: {{ .Values.provider.endpoint }}
+  auth:
+    type: apikey
+    secretRef:
+      name: {{ .Values.provider.secret.name }}
