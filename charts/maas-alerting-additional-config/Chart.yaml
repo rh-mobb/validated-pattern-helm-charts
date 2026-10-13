@@ -1,0 +1,8 @@
+apiVersion: v2
+name: maas-alerting-additional-config
+description: MaaS alerting and observability - telemetry, usage logging, Redis for Limitador
+type: application
+version: 0.1.0
+appVersion: "1.0"
+maintainers:
+  - name: rh-mobb
