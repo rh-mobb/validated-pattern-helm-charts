@@ -1,0 +1,16 @@
+apiVersion: inference.opendatahub.io/v1alpha1
+kind: ExternalModel
+metadata:
+  name: {{ .Values.model.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+spec:
+  modelName: {{ .Values.model.targetModel }}
+  externalProviderRefs:
+    - ref:
+        name: {{ .Values.provider.name }}
+      targetModel: {{ .Values.model.targetModel }}
+      apiFormat: {{ .Values.model.apiFormat }}
+      path: {{ .Values.model.path }}
