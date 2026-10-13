@@ -1941,6 +1941,20 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-alerting-additional-config-0.1.0/maas-alerting-additional-config-0.1.0.tgz
     version: 0.1.0
+  maas-external-model:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-13T05:40:13.48357824Z"
+    description: Deploy external AI models (OpenAI, Bedrock, Gemini, Anthropic, Azure
+      OpenAI) via MaaS
+    digest: 2a19c3b9583b2cc29e2b7e1b35b27dfc068b6bf27b2fb14301e156d72119844b
+    maintainers:
+    - name: rh-mobb
+    name: maas-external-model
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-external-model-0.1.0/maas-external-model-0.1.0.tgz
+    version: 0.1.0
   maas-model:
   - apiVersion: v2
     appVersion: "1.0"
@@ -3578,4 +3592,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-13T02:42:34.924424443Z"
+generated: "2026-10-13T05:40:13.483767348Z"
