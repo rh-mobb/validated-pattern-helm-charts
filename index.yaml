@@ -1927,6 +1927,20 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-additional-config-0.1.0/maas-additional-config-0.1.0.tgz
     version: 0.1.0
+  maas-alerting-additional-config:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-13T02:42:34.924007237Z"
+    description: MaaS alerting and observability - telemetry, usage logging, Redis
+      for Limitador
+    digest: e2a5375411a8b0035066981fc0570fa2b4566af1d474f8586aaf6d14354f7d27
+    maintainers:
+    - name: rh-mobb
+    name: maas-alerting-additional-config
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-alerting-additional-config-0.1.0/maas-alerting-additional-config-0.1.0.tgz
+    version: 0.1.0
   maas-model:
   - apiVersion: v2
     appVersion: "1.0"
@@ -3564,4 +3578,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-12T22:38:55.861774498Z"
+generated: "2026-10-13T02:42:34.924424443Z"
