@@ -1,0 +1,132 @@
+{{- if .Values.authorinoTls.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maas-authorino-tls
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: maas-authorino-tls
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+rules:
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "create", "patch"]
+  - apiGroups: [""]
+    resources: ["secrets", "namespaces"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: maas-authorino-tls
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: maas-authorino-tls
+subjects:
+  - kind: ServiceAccount
+    name: maas-authorino-tls
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: maas-authorino-tls
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 5
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: maas-authorino-tls
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: setup
+          image: {{ .Values.jobImage }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: HOME
+              value: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+              NS="{{ .Values.authorinoTls.namespace }}"
+              SVC="authorino-authorino-authorization"
+              SECRET="{{ .Values.authorinoTls.certSecretName }}"
+
+              echo "Waiting for namespace ${NS}..."
+              for i in $(seq 1 60); do
+                if kubectl get namespace "${NS}" >/dev/null 2>&1; then
+                  echo "Namespace ${NS} exists"
+                  break
+                fi
+                sleep 5
+              done
+
+              echo "Ensuring Service ${SVC} exists in ${NS} with serving-cert annotation..."
+              printf '%s' '{
+                "apiVersion": "v1",
+                "kind": "Service",
+                "metadata": {
+                  "name": "'"${SVC}"'",
+                  "namespace": "'"${NS}"'",
+                  "annotations": {
+                    "service.beta.openshift.io/serving-cert-secret-name": "'"${SECRET}"'"
+                  }
+                },
+                "spec": {
+                  "ports": [
+                    {"name": "grpc", "port": 50051, "protocol": "TCP", "targetPort": 50051},
+                    {"name": "http", "port": 5001, "protocol": "TCP", "targetPort": 5001}
+                  ],
+                  "selector": {"authorino-resource": "authorino"},
+                  "type": "ClusterIP"
+                }
+              }' | kubectl apply --server-side --force-conflicts -f -
+
+              echo "Waiting for cert secret ${SECRET}..."
+              for i in $(seq 1 30); do
+                if kubectl get secret "${SECRET}" -n "${NS}" >/dev/null 2>&1; then
+                  echo "Cert secret ${SECRET} is ready."
+                  exit 0
+                fi
+                sleep 2
+              done
+              echo "Warning: cert secret ${SECRET} not found after 60s"
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}

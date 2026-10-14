@@ -30,4 +30,10 @@ userWorkloadMonitoring:
 
 dashboardConfig:
   enabled: false
-  image: registry.redhat.io/openshift4/ose-cli:latest
+
+authorinoTls:
+  enabled: false
+  namespace: kuadrant-system
+  certSecretName: authorino-server-cert
+
+jobImage: registry.redhat.io/openshift4/ose-cli:latest
