@@ -1916,6 +1916,19 @@ entries:
   maas-additional-config:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-10-14T21:59:19.340069503Z"
+    description: MaaS platform config - PostgreSQL, ExternalSecrets, UWM, and dashboard
+      configuration
+    digest: aacf4232bbd6d3654764a2ed845cfbe0b080cceae1c0b01c67db457e72a3794a
+    maintainers:
+    - name: rh-mobb
+    name: maas-additional-config
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-additional-config-0.2.0/maas-additional-config-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-10-12T22:38:55.861478553Z"
     description: MaaS platform config - PostgreSQL, ExternalSecrets, UWM, and dashboard
       configuration
@@ -3605,4 +3618,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-13T06:14:57.823024535Z"
+generated: "2026-10-14T21:59:19.340458931Z"
