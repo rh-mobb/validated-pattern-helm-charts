@@ -22,18 +22,20 @@ free:
 
 {{- /*
   maas-external-model.subjects — renders MaaS groups/users subject lists.
-  Input: a dict with optional "groups" and "users" lists of names. Defaults to system:authenticated.
+  Input: a dict with optional "groups" and "users" lists of names. Groups default to system:authenticated.
+  Rendered shape matches the CRDs: groups as [{name: ...}], users as plain strings.
 */ -}}
 {{- define "maas-external-model.subjects" -}}
 groups:
 {{- range (default (list "system:authenticated") .groups) }}
   - name: {{ . }}
 {{- end }}
+{{- /* users is a plain string list in the MaaS CRDs; omitted when empty because the API server
+       drops an empty list, which would otherwise leave the Argo app permanently OutOfSync. */}}
+{{- with .users }}
 users:
-{{- if .users }}
-{{- range .users }}
-  - name: {{ . }}
+{{- range . }}
+  - {{ . | quote }}
 {{- end }}
-{{- else }} []
 {{- end }}
 {{- end }}

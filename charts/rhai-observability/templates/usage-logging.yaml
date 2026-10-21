@@ -13,7 +13,8 @@
   Origin:    moved from maas-alerting-additional-config/templates/usage-logging.yaml.
              Added: optional ESO-sourced credentials (usageLogging.minio.secretStore). MinIO and the
              bucket Job now read credentials from the Secret instead of inline values. The bucket
-             Job gains a restricted securityContext.
+             Job gains a restricted securityContext. The MinIO PVC uses usageLogging.minio.storageClassName
+             (default: cluster default class, as before), separate from the LokiStack class.
 */ -}}
 {{- if .Values.usageLogging.enabled }}
 {{- $ns := .Values.monitoringNamespace }}
@@ -30,7 +31,9 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  {{- with .Values.usageLogging.storageClassName }}
+  {{- /* Only set when explicitly configured: storageClassName is immutable, and PVCs created by
+         maas-alerting-additional-config used the cluster default class. */}}
+  {{- with $minio.storageClassName }}
   storageClassName: {{ . }}
   {{- end }}
   resources:

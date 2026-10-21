@@ -2,7 +2,7 @@ apiVersion: v2
 name: rhai-observability
 description: RHAI cluster-level observability - user workload monitoring, MLflow trace store, MaaS telemetry and usage logging
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "1.0"
 home: https://rh-mobb.github.io/validated-pattern-helm-charts/
 maintainers:

@@ -2,7 +2,7 @@ apiVersion: v2
 name: maas-external-model
 description: Deploy external AI models (OpenAI, Bedrock, Gemini, Anthropic, Azure OpenAI) via MaaS
 type: application
-version: 0.2.0
+version: 0.2.1
 appVersion: "1.0"
 home: https://rh-mobb.github.io/validated-pattern-helm-charts/
 maintainers:

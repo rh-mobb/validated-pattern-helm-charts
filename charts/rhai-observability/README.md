@@ -49,7 +49,8 @@ The chart installs **no operators**. The OpenTelemetry, Tempo, Loki and Cluster 
 | `telemetry.maasNamespace` | `models-as-a-service` | Namespace of the tenant config |
 | `telemetry.tenantConfigName` | `default-tenant` | MaaSTenantConfig name |
 | `usageLogging.enabled` | `false` | MinIO + LokiStack usage logging |
-| `usageLogging.storageClassName` | `gp3-csi` | StorageClass for MinIO and Loki |
+| `usageLogging.storageClassName` | `gp3-csi` | StorageClass for the LokiStack |
+| `usageLogging.minio.storageClassName` | `""` | StorageClass for the MinIO PVC (`""` = cluster default; immutable, so keep empty when adopting an existing PVC) |
 | `usageLogging.minio.rootUser` / `rootPassword` | `minio` / `minio123` | Demo-only plaintext credentials |
 | `usageLogging.minio.secretStore.enabled` | `false` | Source credentials from AWS Secrets Manager via ESO |
 | `usageLogging.minio.awsSecret.key` | `""` | AWS SM secret with properties `rootUser` and `rootPassword` |
