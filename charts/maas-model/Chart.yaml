@@ -2,7 +2,7 @@ apiVersion: v2
 name: maas-model
 description: Parameterized chart for deploying RHOAI MaaS models (LLMInferenceService + governance)
 type: application
-version: 0.3.0
+version: 0.3.1
 appVersion: "1.0"
 home: https://rh-mobb.github.io/validated-pattern-helm-charts/
 maintainers:

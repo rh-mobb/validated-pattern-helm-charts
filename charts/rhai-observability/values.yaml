@@ -39,7 +39,7 @@ telemetry:
 usageLogging:
   # -- Enable MaaS usage logging: MinIO object store + LokiStack "usage" that receives OTLP usage logs
   enabled: false
-  # -- StorageClass for MinIO and LokiStack PVCs
+  # -- StorageClass for the LokiStack PVCs
   storageClassName: gp3-csi
   minio:
     # -- MinIO server image
@@ -48,6 +48,9 @@ usageLogging:
     mcImage: quay.io/rh-aiservices-bu/mc:latest
     # -- MinIO PVC size
     storageSize: 10Gi
+    # -- StorageClass for the MinIO PVC ("" = cluster default). Immutable once the PVC exists, so keep
+    # it empty when adopting a PVC created by maas-alerting-additional-config.
+    storageClassName: ""
     # -- Root credentials when secretStore.enabled is false (demo only — plaintext in Git)
     rootUser: minio
     rootPassword: minio123
