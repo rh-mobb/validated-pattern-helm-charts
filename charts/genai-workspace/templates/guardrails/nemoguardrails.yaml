@@ -1,0 +1,82 @@
+{{- /*
+  guardrails/nemoguardrails.yaml — the NemoGuardrails service (TrustyAI operator)
+  Why:       The operator turns this CR into Deployment/Service "nemoguardrails". The Dashboard
+             Playground calls it to check prompts and answers against the team's policies.
+               - security.opendatahub.io/enable-auth: adds the kube-rbac-proxy sidecar (HTTPS 8443).
+                 The Dashboard only talks to guardrails over this authenticated port.
+               - nemoConfigs: the policy config (default) plus the startup-patch hook (mounted at
+                 /app/config/startup-patch)
+               - OPENAI_API_KEY: the judge's MaaS API key, from the ExternalSecret
+               - PYTHONPATH: startup-patch first, then OTEL's auto-instrumentation sitecustomize, which
+                 the startup patch chains into
+               - OTEL_*: export rail traces to MLflow with headers from Secret nemoguardrails-otel-auth,
+                 written by the tracing setup Job. With tracing off, the SDK is disabled.
+             This is the FINAL spec. The script created a stub (OPENAI_API_KEY=fake) and patched it in
+             later phases.
+  Gated by:  .Values.guardrails.enabled
+  Ordering:  sync-wave 2 — after its ConfigMaps (wave 1) and API-key Secret (wave 0). With tracing on,
+             the pod waits for nemoguardrails-otel-auth from the PostSync setup Job.
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 0.1 + 3.5
+*/ -}}
+{{- if .Values.guardrails.enabled }}
+{{- $t := .Values.tracing }}
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: NemoGuardrails
+metadata:
+  name: nemoguardrails
+  namespace: {{ include "genai-workspace.namespace" . }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+    security.opendatahub.io/enable-auth: "true"
+spec:
+  replicas: 1
+  nemoConfigs:
+    - name: {{ .Values.guardrails.configName }}
+      configMaps:
+        - {{ .Values.guardrails.configName }}
+      default: true
+    - name: startup-patch
+      configMaps:
+        - nemoguardrails-startup-patch
+      default: false
+  env:
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: nemoguardrails-api-key
+          key: key
+    # Python path of the NemoGuardrails image (python3.12 venv). Update if the image's Python changes.
+    - name: PYTHONPATH
+      value: /app/config/startup-patch:/app/.venv/lib64/python3.12/site-packages/opentelemetry/instrumentation/auto_instrumentation
+    {{- if $t.enabled }}
+    - name: OTEL_SERVICE_NAME
+      value: nemoguardrails
+    - name: OTEL_EXPORTER_OTLP_ENDPOINT
+      value: {{ $t.mlflowEndpoint | quote }}
+    - name: OTEL_EXPORTER_OTLP_PROTOCOL
+      value: http/protobuf
+    - name: OTEL_EXPORTER_OTLP_HEADERS
+      valueFrom:
+        secretKeyRef:
+          name: {{ include "genai-workspace.ngrOtelSecret" . }}
+          key: header
+    # Debian image; its ca-bundle-transfer init container merges the service CA into this bundle.
+    - name: OTEL_EXPORTER_OTLP_CERTIFICATE
+      value: {{ $t.ngrCertPath | quote }}
+    - name: OTEL_TRACES_EXPORTER
+      value: otlp
+    - name: OTEL_METRICS_EXPORTER
+      value: none
+    - name: OTEL_LOGS_EXPORTER
+      value: none
+    - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
+      value: {{ $t.ngrDisabledInstrumentations | quote }}
+    {{- else }}
+    # The startup patch still initialises OTEL; disable the SDK so it doesn't export to localhost.
+    - name: OTEL_SDK_DISABLED
+      value: "true"
+    {{- end }}
+{{- end }}

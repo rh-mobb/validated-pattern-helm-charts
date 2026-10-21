@@ -1,0 +1,9 @@
+apiVersion: v2
+name: genai-workspace
+description: Per-team GenAI workspace on RHOAI - Playground (OGX), pgvector RAG store, NemoGuardrails, and MLflow tracing wired to MaaS models
+type: application
+version: 0.1.0
+appVersion: "1.0"
+home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+maintainers:
+  - name: rh-mobb

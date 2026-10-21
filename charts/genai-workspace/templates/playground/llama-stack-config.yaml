@@ -1,0 +1,41 @@
+{{- /*
+  playground/llama-stack-config.yaml — OGX server configuration for the Playground
+  Why:       Tells OGX which APIs to serve and where models live:
+               - inference provider maas-vllm-inference-1 -> <maas.gateway>/v1 (all chat models via MaaS)
+               - inline sentence-transformers + granite-embedding-125m for RAG embeddings
+               - vector_io -> the workspace pgvector store (credentials via env from the OGXServer)
+               - tool_runtime: file-search and model-context-protocol (MCP), ready for the planned mcp module
+               - registered_resources.models: playground.models[] appear in the Playground dropdown.
+                 Without this list the dropdown is empty.
+               - all SQLite stores and the uploaded-files dir under playground.storage.mountPath
+                 (the operator's ogx-storage volume), so state survives restarts
+             Ownership: this ConfigMap is Git-owned. Edits made through the Dashboard (e.g. adding a
+             model) work until the next Git-triggered sync of this workspace, then revert. Change
+             playground.models in cluster-config instead.
+             The ogx.io/watch and ogx.io/server labels are REQUIRED: the OGX operator only picks up
+             ConfigMaps labelled for its server and restarts the server when the config changes.
+             Content lives in files/playground/llama-stack-config.yaml (rendered with tpl).
+  Gated by:  .Values.playground.enabled
+  Ordering:  sync-wave 1 — before the OGXServer (wave 2) that references it via overrideConfig.
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 0.3
+*/ -}}
+{{- if .Values.playground.enabled }}
+{{- if not .Values.playground.models }}
+{{- fail "playground.models must list at least one MaaS model ({id, displayName}) when playground.enabled" }}
+{{- end }}
+{{- $_ := include "genai-workspace.gateway" . }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llama-stack-config
+  namespace: {{ include "genai-workspace.namespace" . }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+    ogx.io/watch: "true"
+    ogx.io/server: {{ .Values.playground.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+data:
+  config.yaml: |
+    {{- tpl (.Files.Get "files/playground/llama-stack-config.yaml") . | nindent 4 }}
+{{- end }}

@@ -1,0 +1,124 @@
+{{- /*
+  tracing/rbac.yaml — identities and permissions for MLflow tracing in this workspace
+  Why:       MLflow runs with kubernetes-auth: every request (including OTLP trace export) carries a
+             Kubernetes token, and MLflow authorises it against RBAC in the workspace namespace.
+               - RoleBinding genai-mlflow-writers: ClusterRole `edit` (aggregates MLflow edit) in THIS
+                 namespace for the Playground SA, NemoGuardrails SA and the setup Job SA, so they can
+                 write traces and create the experiment.
+               - RoleBinding genai-mlflow-ngr: ClusterRole mlflow-operator-mlflow-edit for the
+                 NemoGuardrails SA, scoped to this namespace. The script used a ClusterRoleBinding,
+                 which would let that SA write to every team's workspace and break isolation.
+               - SA, Role and RoleBinding genai-tracing-setup: mint tokens for the two app SAs, write
+                 their OTLP header Secrets, and restart the app Deployments after token refresh.
+                 All namespace-scoped.
+             RoleBindings to SAs that don't exist yet are valid. The operators create the SAs when
+             they reconcile the CRs.
+  Gated by:  .Values.tracing.enabled
+  Ordering:  sync-wave 0 — before the PostSync setup Job.
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 2.1, 3.0, 3.1
+*/ -}}
+{{- if .Values.tracing.enabled }}
+{{- $ns := include "genai-workspace.namespace" . }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: genai-tracing-setup
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: genai-tracing-setup
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+rules:
+  # Write the OTLP header Secrets (otel-mlflow-auth, nemoguardrails-otel-auth).
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "update"]
+  # Wait for the operator-created app ServiceAccounts and mint tokens for them.
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts/token"]
+    verbs: ["create"]
+  # Restart the app Deployments after token refresh (env from Secret only reloads on restart).
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: genai-tracing-setup
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: genai-tracing-setup
+subjects:
+  - kind: ServiceAccount
+    name: genai-tracing-setup
+    namespace: {{ $ns }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: genai-mlflow-writers
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - kind: ServiceAccount
+    name: genai-tracing-setup
+    namespace: {{ $ns }}
+  {{- if .Values.playground.enabled }}
+  - kind: ServiceAccount
+    name: {{ .Values.playground.serviceAccount }}
+    namespace: {{ $ns }}
+  {{- end }}
+  {{- if .Values.guardrails.enabled }}
+  - kind: ServiceAccount
+    name: {{ .Values.guardrails.serviceAccount }}
+    namespace: {{ $ns }}
+  {{- end }}
+{{- if .Values.guardrails.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: genai-mlflow-ngr
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: mlflow-operator-mlflow-edit
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.guardrails.serviceAccount }}
+    namespace: {{ $ns }}
+{{- end }}
+{{- end }}

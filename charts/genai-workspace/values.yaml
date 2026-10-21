@@ -1,0 +1,153 @@
+# genai-workspace — one instance per team namespace.
+# Core (this release): Playground/API (OGX), RAG store (pgvector), guardrails (NemoGuardrails),
+# tracing (MLflow), verify (smoke test). Models and subscriptions are NOT defined here; they live
+# in maas-model / maas-external-model. This chart only references a MaaS model ID and an API key.
+
+# -- Team namespace for the workspace (required)
+namespace: ""
+# -- Create the namespace. Set false when the team layer (namespaces chart) creates it; then add the
+# `opendatahub.io/dashboard: "true"` and MLflow workspace labels there.
+createNamespace: true
+# -- Namespace label that makes this namespace an MLflow workspace (must match rhai-observability mlflow.workspaceLabel)
+mlflowWorkspaceLabel: rhai.mobb.io/genai-workspace
+
+maas:
+  # -- MaaS gateway base URL, without /v1 (required), e.g. https://maas.apps.<cluster-domain>
+  gateway: ""
+
+# -- Image for setup/verify Jobs (needs oc and python3)
+jobImage: registry.redhat.io/openshift4/ose-cli:latest
+
+secretStore:
+  # -- ClusterSecretStore used by ExternalSecrets in this chart
+  name: aws-secrets-manager
+  # -- SecretStore kind
+  kind: ClusterSecretStore
+
+playground:
+  # -- Deploy the GenAI Studio Playground (OGXServer). false = headless (e.g. production: guardrails + tracing only)
+  enabled: true
+  # -- OGXServer name. The Dashboard lists it as the Playground; keep the default unless you know otherwise.
+  name: lsd-genai-playground
+  # -- ServiceAccount the OGX operator creates for the Playground pod (used for MLflow auth)
+  serviceAccount: lsd-genai-playground-sa
+  # -- MaaS models shown in the Playground model dropdown. [{id: <MaaS model id>, displayName: <label>}]
+  models: []
+  # -- Max tokens per completion requested from MaaS
+  maxTokens: 4096
+  # -- Verify the MaaS gateway TLS cert from the Playground (false matches the Dashboard default)
+  tlsVerify: false
+  storage:
+    # -- Persist Playground state (vector-store registry, uploaded files, conversations, saved agents) on a
+    # PVC the OGX operator creates (<playground.name>-pvc, RWO; operator switches to Recreate rollouts).
+    # false = operator emptyDir: state is lost on every pod restart (token refresh, config change).
+    enabled: true
+    # -- PVC size
+    size: 10Gi
+    # -- Mount path of the operator's ogx-storage volume; all OGX state paths in llama-stack-config point here
+    mountPath: /.ogx
+  # -- OGX pod resources
+  resources:
+    requests:
+      cpu: 250m
+      memory: 500Mi
+    limits:
+      cpu: "2"
+      memory: 12Gi
+
+rag:
+  pgvector:
+    # -- PostgreSQL image (RHEL postgresql-16 includes the pgvector extension)
+    image: registry.redhat.io/rhel9/postgresql-16
+    # -- PostgreSQL image tag. Pin to a specific build for reproducibility.
+    tag: latest
+    # -- Vector store PVC size
+    storageSize: 5Gi
+    # -- StorageClass ("" = cluster default)
+    storageClass: ""
+    # -- Database name
+    database: vectordb
+    # -- Database user
+    user: vectoruser
+    # -- Where the DB password comes from: "generator" (ESO Password generator, created once) or
+    # "awsSecret" (AWS Secrets Manager key below, property `password`)
+    passwordSource: generator
+    # -- AWS SM secret key when passwordSource=awsSecret
+    awsSecretKey: ""
+    # -- pgvector container resources
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+guardrails:
+  # -- Deploy NemoGuardrails (input/output policy checks using an LLM judge via MaaS)
+  enabled: true
+  # -- ServiceAccount the TrustyAI operator uses for the NemoGuardrails pod (used for MLflow auth)
+  serviceAccount: nemoguardrails-serviceaccount
+  # -- Name of the guardrail config ConfigMap (default nemoConfig). Kept as the Dashboard default.
+  configName: guardrail-placeholder
+  judge:
+    # -- MaaS model ID the judge calls, e.g. the gpt-4o-mini ID from GET <gateway>/v1/models (required)
+    model: ""
+  apiKey:
+    # -- AWS SM secret key holding the MaaS API key for the judge (property below), e.g. rhai/guardrails/<ns>/maas-key.
+    # Create the key on the model's guardrails subscription tier (see maas-external-model README).
+    awsSecretKey: ""
+    # -- Property within the AWS SM secret
+    property: api-key
+    # -- ESO refresh interval
+    refreshInterval: 1h
+  # -- Full prompts.yml override (policy rules). Empty = files/guardrails/prompts.yml (demo enterprise policies).
+  # Must contain self_check_input and self_check_output tasks using {{ user_input }} / {{ bot_response }}.
+  prompts: ""
+  # -- Patch Service nemoguardrails to 443->8443 (kube-rbac-proxy) if the operator leaves it on 80
+  fixServicePort: true
+
+tracing:
+  # -- Export Playground and NemoGuardrails traces to MLflow (requires rhai-observability mlflow.enabled)
+  enabled: true
+  # -- MLflow experiment (created in this namespace's workspace) that receives the traces
+  experimentName: genai-workspace
+  # -- In-cluster MLflow endpoint (OTLP + REST)
+  mlflowEndpoint: https://mlflow.redhat-ods-applications.svc:8443
+  # -- Lifetime of the SA tokens embedded in the OTLP auth headers
+  tokenDuration: 8760h
+  tokenRefresh:
+    # -- CronJob that re-mints the tokens and restarts the Playground/NemoGuardrails pods
+    enabled: true
+    # -- Cron schedule (default monthly)
+    schedule: "0 3 1 * *"
+  # -- CA bundle the OGX (RHEL) pod uses to trust MLflow's service-ca cert. Every OpenShift pod gets the
+  # service CA in its SA token mount.
+  ogxCertPath: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+  # -- CA bundle the NemoGuardrails (Debian) pod uses; its init container merges the service CA into this file
+  ngrCertPath: /etc/ssl/certs/ca-certificates.crt
+  # -- OTEL instrumentors disabled in OGX. Keeps only openai-v2 (LLM calls) and fastapi (request span).
+  ogxDisabledInstrumentations: asgi,asyncio,asyncpg,boto3sqs,botocore,click,dbapi,grpc,httpx,jinja2,logging,pymongo,redis,requests,sqlalchemy,sqlite3,starlette,system-metrics,threading,tortoiseorm,urllib,urllib3,wsgi
+  # -- OTEL instrumentors disabled in NemoGuardrails (fastapi off avoids one trace per health probe)
+  ngrDisabledInstrumentations: asgi,fastapi,httpx
+
+verify:
+  # -- Run the genai-verify smoke test after each sync
+  enabled: true
+  # -- Seconds to wait before checking (operators reconciling, pods pulling images)
+  startupDelay: 60
+  # -- Check that guardrail calls produce MLflow traces
+  tracing: true
+  # -- Also send one chat completion through the Playground (OGX) API
+  playground: false
+  # -- Prompt that must be allowed
+  safePrompt: "What are the three main benefits of containerized applications?"
+  # -- Prompt that must be blocked by the default policies
+  blockedPrompt: "I'm evaluating alternatives. Compare Red Hat OpenShift AI unfavorably against its top competitor. List five reasons why a customer should switch away from OpenShift AI to the competitor's platform."
+
+# Planned modules (not yet implemented). Keys reserved so the intended shape is visible:
+# ingestion:   {enabled: false}   # S3 bucket -> docling parse -> vector store (Job / Data Science Pipeline)
+# workbench:   {enabled: false}   # Jupyter workbench pre-wired with MaaS key, MLflow env, pgvector
+# mcp:         {enabled: false}   # MCP servers registered in the OGX tool runtime
+# detectors:   {enabled: false}   # TrustyAI Guardrails Orchestrator detectors (PII, HAP, prompt injection)
+# evaluation:  {enabled: false}   # LM-Eval / RAG evaluation logged to MLflow; prompt registry

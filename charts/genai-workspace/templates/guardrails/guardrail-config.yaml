@@ -1,0 +1,56 @@
+{{- /*
+  guardrails/guardrail-config.yaml — NemoGuardrails configuration: judge model, rails and policies
+  Why:       config.yaml points the judge at <maas.gateway>/v1 with guardrails.judge.model, enables the
+             self-check input and output rails, and (tracing.enabled) turns on NemoGuardrails'
+             built-in OpenTelemetry tracing with content capture.
+             prompts.yml holds the team's policy rules in plain English. The judge receives
+             "{{ user_input }}" / "{{ bot_response }}" and answers yes (block) or no (allow). These
+             Jinja placeholders are for NemoGuardrails, so the file is loaded with .Files.Get (not tpl)
+             and Helm leaves them alone. Override the whole file with guardrails.prompts.
+             Rendered in its FINAL form. The script created a placeholder.invalid stub and regex-patched
+             it later; without a real backend the judge fails silently and nothing is blocked or traced.
+             Named guardrail-placeholder (the Dashboard default config name) unless guardrails.configName
+             is changed.
+  Gated by:  .Values.guardrails.enabled
+  Ordering:  sync-wave 1 — must exist before the NemoGuardrails CR (wave 2); the operator won't create
+             the Deployment without it.
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 0.1b + 3.6
+*/ -}}
+{{- if .Values.guardrails.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.guardrails.configName }}
+  namespace: {{ include "genai-workspace.namespace" . }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+data:
+  config.yaml: |
+    models:
+      - type: main
+        engine: openai
+        model: {{ required "guardrails.judge.model is required (MaaS model ID of the judge)" .Values.guardrails.judge.model | quote }}
+        api_key_env_var: OPENAI_API_KEY
+        parameters:
+          base_url: "{{ include "genai-workspace.gateway" . }}/v1"
+    rails:
+      input:
+        flows:
+          - self check input
+      output:
+        flows:
+          - self check output
+    {{- if .Values.tracing.enabled }}
+    tracing:
+      enabled: true
+      enable_content_capture: true
+      adapters:
+        - name: OpenTelemetry
+    {{- end }}
+  prompts.yml: |
+    {{- default (.Files.Get "files/guardrails/prompts.yml") .Values.guardrails.prompts | nindent 4 }}
+  rails.co: |
+    # Using built-in self-check rails
+{{- end }}

@@ -1,0 +1,58 @@
+{{- /*
+  tracing/setup-job.yaml — creates the MLflow experiment and the OTLP auth Secrets; refreshes tokens
+  Why:       See tracing/_setup-script.tpl. The Playground and NemoGuardrails pods reference Secrets
+             otel-mlflow-auth and nemoguardrails-otel-auth. Until this Job writes them, the pods wait in
+             CreateContainerConfigError, then start automatically.
+               - Job (PostSync, every sync): creates whatever is missing; skips Secrets already valid.
+               - CronJob (tracing.tokenRefresh): re-mints the SA tokens before they expire
+                 (tracing.tokenDuration) and restarts the app Deployments to load them.
+  Gated by:  .Values.tracing.enabled (CronJob also needs .Values.tracing.tokenRefresh.enabled)
+  Ordering:  PostSync wave 3 — after the CRs exist, because the operators create the app SAs then.
+             Needs the rhai-observability MLflow CR (the Job waits up to 10 min for MLflow).
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 1.5, 2.2, 3.2
+*/ -}}
+{{- if .Values.tracing.enabled }}
+{{- $ns := include "genai-workspace.namespace" . }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: genai-tracing-setup
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      {{- include "genai-workspace.tracingSetupPod" (dict "root" . "force" "false" "restart" "false") | nindent 6 }}
+{{- if .Values.tracing.tokenRefresh.enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: genai-tracing-token-refresh
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  schedule: {{ .Values.tracing.tokenRefresh.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      ttlSecondsAfterFinished: 86400
+      template:
+        spec:
+          {{- include "genai-workspace.tracingSetupPod" (dict "root" . "force" "true" "restart" "true") | nindent 10 }}
+{{- end }}
+{{- end }}
+
