@@ -1,3 +1,13 @@
+{{- /*
+  maasauthpolicy.yaml — WHO may call this model at all
+  Why:       Authorino on the MaaS gateway only admits requests from the listed subjects, whatever
+             subscription their key belongs to. Every team that owns a subscription tier on this
+             model must also be listed here. Default system:authenticated means anyone logged in.
+             (Subscription "owners" in maassubscription.yaml decide who can create keys on each tier.)
+  Gated by:  always rendered; subjects come from .Values.access
+  Ordering:  sync-wave 3 — with the MaaSModelRef.
+  Origin:    subjects were hard-coded to system:authenticated before 0.3.0
+*/ -}}
 apiVersion: maas.opendatahub.io/v1alpha1
 kind: MaaSAuthPolicy
 metadata:
@@ -12,6 +22,4 @@ spec:
     - name: {{ .Values.model.name }}
       namespace: {{ .Values.namespace }}
   subjects:
-    groups:
-      - name: system:authenticated
-    users: []
+    {{- include "maas-model.subjects" .Values.access | nindent 4 }}

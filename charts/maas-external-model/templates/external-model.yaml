@@ -1,3 +1,9 @@
+{{- /*
+  external-model.yaml — one upstream model exposed through the provider
+  Why:       Maps the MaaS model name to the provider's model ID (targetModel), API format and path.
+             The MaaSModelRef (wave 3) then publishes it to MaaS consumers.
+  Ordering:  sync-wave 2 — after the ExternalProvider (wave 1).
+*/ -}}
 apiVersion: inference.opendatahub.io/v1alpha1
 kind: ExternalModel
 metadata:

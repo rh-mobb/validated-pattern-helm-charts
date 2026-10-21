@@ -1,3 +1,9 @@
+{{- /*
+  external-provider.yaml — the upstream API endpoint (OpenAI, Gemini, Bedrock, ...) and its credential
+  Why:       Defines where MaaS forwards requests for models from this provider and which Secret
+             holds the provider API key.
+  Ordering:  sync-wave 1 — after the key Secret (wave 0), before the ExternalModel (wave 2).
+*/ -}}
 apiVersion: inference.opendatahub.io/v1alpha1
 kind: ExternalProvider
 metadata:

@@ -1,3 +1,9 @@
+{{- /*
+  maasmodelref.yaml — publishes the LLMInferenceService in the MaaS catalogue
+  Why:       Makes the model visible to MaaS (/v1/models) and targetable by MaaSAuthPolicy and
+             MaaSSubscription.
+  Ordering:  sync-wave 3 — after the LLMInferenceService (wave 1).
+*/ -}}
 apiVersion: maas.opendatahub.io/v1alpha1
 kind: MaaSModelRef
 metadata:

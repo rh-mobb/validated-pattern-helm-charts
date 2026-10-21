@@ -1,47 +1,42 @@
-{{- if .Values.subscription.free.enabled }}
-apiVersion: maas.opendatahub.io/v1alpha1
-kind: MaaSSubscription
-metadata:
-  name: {{ .Values.model.name }}-free
-  namespace: {{ .Values.governanceNamespace }}
-  annotations:
-    argocd.argoproj.io/sync-wave: "3"
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
-    openshift.io/display-name: "{{ .Values.model.displayName }} Free Tier"
-spec:
-  owner:
-    groups:
-      - name: system:authenticated
-    users: []
-  modelRefs:
-    - name: {{ .Values.model.name }}
-      namespace: {{ .Values.namespace }}
-      tokenRateLimits:
-        - limit: {{ .Values.subscription.free.tokenLimit }}
-          window: {{ .Values.subscription.free.tokenWindow }}
-  priority: {{ .Values.subscription.free.priority }}
-{{- end }}
-{{- if .Values.subscription.premium.enabled }}
+{{- /*
+  maassubscription.yaml — one MaaSSubscription (rate-limit tier) per enabled entry
+  Why:       A subscription is a plan on this model: tokenLimit per tokenWindow, plus a priority.
+             API keys are created against ONE subscription (POST /maas-api/v1/api-keys
+             {"subscription":"<model>-<tier>"}), and every call with that key is rate-limited by
+             Limitador and metered against that subscription. Usage is recorded per subscription,
+             so a tier per team gives per-team chargeback.
+               owners  -> spec.owner: who may CREATE keys on this tier (e.g. only [support-team])
+               access  -> maasauthpolicy.yaml: who may call the model at all
+             Example tiers: "free" (low limit, everyone), "guardrails" (higher limit for
+             NemoGuardrails judge calls from genai-workspace), "support" (a team's own budget).
+  Gated by:  .Values.subscriptions.<tier>.enabled, or the legacy .Values.subscription.free/.premium blocks
+             (see _helpers.tpl)
+  Ordering:  sync-wave 3 — with the MaaSModelRef it references.
+  Origin:    fixed free/premium tiers before 0.3.0; arbitrary tiers and owners added in 0.3.0
+*/ -}}
+{{- $tiers := include "maas-model.tiers" . | fromYaml }}
+{{- range $tier := keys $tiers | sortAlpha }}
+{{- $t := get $tiers $tier }}
+{{- if $t.enabled }}
 ---
 apiVersion: maas.opendatahub.io/v1alpha1
 kind: MaaSSubscription
 metadata:
-  name: {{ .Values.model.name }}-premium
-  namespace: {{ .Values.governanceNamespace }}
+  name: {{ $.Values.model.name }}-{{ $tier }}
+  namespace: {{ $.Values.governanceNamespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
-    openshift.io/display-name: "{{ .Values.model.displayName }} Premium Tier"
+    openshift.io/display-name: {{ default (printf "%s %s Tier" $.Values.model.displayName (title $tier)) $t.displayName | quote }}
 spec:
   owner:
-    groups:
-      - name: system:authenticated
-    users: []
+    {{- include "maas-model.subjects" (default dict $t.owners) | nindent 4 }}
   modelRefs:
-    - name: {{ .Values.model.name }}
-      namespace: {{ .Values.namespace }}
+    - name: {{ $.Values.model.name }}
+      namespace: {{ $.Values.namespace }}
       tokenRateLimits:
-        - limit: {{ .Values.subscription.premium.tokenLimit }}
-          window: {{ .Values.subscription.premium.tokenWindow }}
-  priority: {{ .Values.subscription.premium.priority }}
+        - limit: {{ $t.tokenLimit }}
+          window: {{ $t.tokenWindow }}
+  priority: {{ $t.priority }}
+{{- end }}
 {{- end }}

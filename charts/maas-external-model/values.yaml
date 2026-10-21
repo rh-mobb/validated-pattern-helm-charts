@@ -1,22 +1,54 @@
+# -- Namespace for the ExternalProvider, ExternalModel and provider API key Secret
 namespace: external-models
+# -- Create the namespace (wave -1)
 createNamespace: true
+# -- Namespace holding MaaSAuthPolicy and MaaSSubscription objects
 governanceNamespace: models-as-a-service
 
 provider:
+  # -- ExternalProvider name (e.g. openai)
   name: ""
+  # -- Provider type understood by the inference gateway (e.g. openai)
   type: ""
+  # -- Provider API host (e.g. api.openai.com)
   endpoint: ""
   secret:
+    # -- Secret holding the provider API key (key `api-key`)
     name: ""
 
 model:
+  # -- MaaS model name (also the MaaSModelRef / subscription name prefix)
   name: ""
+  # -- Display name shown in the Dashboard and MaaS catalogue
   displayName: ""
+  # -- Description shown in the catalogue
   description: ""
+  # -- Model ID at the provider (e.g. gpt-4o-mini)
   targetModel: ""
+  # -- API format
   apiFormat: openai-chat
+  # -- Provider API path
   path: /v1/chat/completions
 
+# -- Who may call this model at all (MaaSAuthPolicy subjects). Must include every team that owns a tier.
+access:
+  groups:
+    - system:authenticated
+  users: []
+
+# -- Subscription tiers (one MaaSSubscription "<model.name>-<tier>" per enabled entry).
+# When set, the legacy `subscription` block below is ignored. Per tier:
+#   enabled, tokenLimit, tokenWindow, priority, displayName (optional),
+#   owners: {groups: [], users: []}  -> who may create API keys on this tier (default system:authenticated)
+# Example:
+#   subscriptions:
+#     free:       {enabled: true, tokenLimit: 100,   tokenWindow: 1m, priority: 10}
+#     guardrails: {enabled: true, tokenLimit: 20000, tokenWindow: 1m, priority: 15}
+#     support:    {enabled: true, tokenLimit: 50000, tokenWindow: 1m, priority: 20,
+#                  owners: {groups: [support-team]}}
+subscriptions: {}
+
+# -- Legacy single tier (pre-0.2.0). Rendered as "<model.name>-free" when `subscriptions` is empty.
 subscription:
   enabled: true
   tokenLimit: 10000
@@ -24,10 +56,15 @@ subscription:
   priority: 10
 
 secretStore:
+  # -- Sync the provider API key from AWS Secrets Manager via ESO
   enabled: false
+  # -- ClusterSecretStore name
   name: aws-secrets-manager
+  # -- SecretStore kind
   kind: ClusterSecretStore
 
 awsSecret:
+  # -- AWS SM secret holding property `api-key`
   key: ""
+  # -- ESO refresh interval
   refreshInterval: 1h
