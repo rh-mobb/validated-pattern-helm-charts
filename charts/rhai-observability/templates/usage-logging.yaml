@@ -1,0 +1,275 @@
+{{- /*
+  usage-logging.yaml — storage backend for MaaS per-request usage logs
+  Why:       With MaaS usage logging on (see telemetry-job.yaml), MaaS emits one OTLP log record per
+             inference request. Labels include subscription, model, response_type and namespace.
+             The records land in the LokiStack "usage" and can be queried for chargeback and
+             auditing. LokiStack needs S3-compatible object storage, so a single-replica MinIO is
+             deployed next to it (demo-sized: LokiStack size 1x.demo).
+  Gated by:  .Values.usageLogging.enabled
+  Ordering:  wave 1 PVC + credentials secret -> wave 2 MinIO Deployment/Service ->
+             PostSync wave 3 bucket Job (creates bucket "loki") -> wave 4 LokiStack.
+             LokiStack needs the Loki operator, installed by rhai-on-openshift-chart
+             (services.monitoring.dependencies.loki).
+  Origin:    moved from maas-alerting-additional-config/templates/usage-logging.yaml.
+             Added: optional ESO-sourced credentials (usageLogging.minio.secretStore). MinIO and the
+             bucket Job now read credentials from the Secret instead of inline values. The bucket
+             Job gains a restricted securityContext.
+*/ -}}
+{{- if .Values.usageLogging.enabled }}
+{{- $ns := .Values.monitoringNamespace }}
+{{- $minio := .Values.usageLogging.minio }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-data
+  namespace: {{ $ns }}
+  labels:
+    {{- include "rhai-observability.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- with .Values.usageLogging.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $minio.storageSize }}
+---
+{{- /*
+  minio-secret is shared by MinIO (root credentials), the bucket Job, and the LokiStack S3 config.
+  Key names (access_key_id, access_key_secret, bucketnames, endpoint, region) are the format the
+  Loki operator expects for a static S3 secret.
+*/}}
+{{- if $minio.secretStore.enabled }}
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: minio-secret
+  namespace: {{ $ns }}
+  labels:
+    {{- include "rhai-observability.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  refreshInterval: {{ $minio.awsSecret.refreshInterval }}
+  secretStoreRef:
+    name: {{ $minio.secretStore.name }}
+    kind: {{ $minio.secretStore.kind }}
+  target:
+    name: minio-secret
+    template:
+      data:
+        access_key_id: "{{ "{{ .rootUser }}" }}"
+        access_key_secret: "{{ "{{ .rootPassword }}" }}"
+        bucketnames: loki
+        endpoint: http://minio.{{ $ns }}.svc:9000
+        region: us-east-1
+  data:
+    - secretKey: rootUser
+      remoteRef:
+        key: {{ required "usageLogging.minio.awsSecret.key is required when secretStore.enabled" $minio.awsSecret.key }}
+        property: rootUser
+    - secretKey: rootPassword
+      remoteRef:
+        key: {{ $minio.awsSecret.key }}
+        property: rootPassword
+{{- else }}
+# Demo mode: credentials come from plaintext values. Use secretStore.enabled for anything shared.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-secret
+  namespace: {{ $ns }}
+  labels:
+    {{- include "rhai-observability.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+type: Opaque
+stringData:
+  access_key_id: {{ $minio.rootUser | quote }}
+  access_key_secret: {{ $minio.rootPassword | quote }}
+  bucketnames: loki
+  endpoint: http://minio.{{ $ns }}.svc:9000
+  region: us-east-1
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: {{ $ns }}
+  labels:
+    {{- include "rhai-observability.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: {{ $minio.image }}
+          command:
+            - minio
+            - server
+            - /data
+            - --console-address
+            - ":9001"
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: access_key_id
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: access_key_secret
+          ports:
+            - containerPort: 9000
+              name: api
+            - containerPort: 9001
+              name: console
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: {{ $ns }}
+  labels:
+    {{- include "rhai-observability.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  selector:
+    app: minio
+  ports:
+    - port: 9000
+      targetPort: 9000
+      name: api
+    - port: 9001
+      targetPort: 9001
+      name: console
+---
+# Creates the "loki" bucket LokiStack writes to. Idempotent (--ignore-existing); retries until MinIO is up.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-create-bucket
+  namespace: {{ $ns }}
+  labels:
+    {{- include "rhai-observability.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 5
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mc
+          image: {{ $minio.mcImage }}
+          env:
+            # mc writes its alias config under $HOME.
+            - name: HOME
+              value: /tmp
+            - name: MINIO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: access_key_id
+            - name: MINIO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: access_key_secret
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until mc alias set local http://minio.{{ $ns }}.svc:9000 "${MINIO_USER}" "${MINIO_PASSWORD}"; do
+                echo "Waiting for MinIO..."
+                sleep 5
+              done
+              mc mb local/loki --ignore-existing
+              echo "Bucket 'loki' ready"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: usage
+  namespace: {{ $ns }}
+  labels:
+    {{- include "rhai-observability.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+spec:
+  limits:
+    global:
+      otlp:
+        # Promote these OTLP resource attributes to Loki stream labels so usage can be queried per
+        # subscription, model and namespace (e.g. {subscription="gpt-4o-mini-guardrails"}).
+        streamLabels:
+          resourceAttributes:
+            - name: service.name
+            - name: subscription
+            - name: model
+            - name: response_type
+            - name: kubernetes_namespace_name
+  managementState: Managed
+  size: 1x.demo
+  storage:
+    schemas:
+      - effectiveDate: "2024-10-01"
+        version: v13
+    secret:
+      credentialMode: static
+      name: minio-secret
+      type: s3
+  storageClassName: {{ .Values.usageLogging.storageClassName }}
+  tenants:
+    mode: openshift-logging
+{{- end }}
