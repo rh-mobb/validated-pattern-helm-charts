@@ -1916,6 +1916,20 @@ entries:
   maas-additional-config:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-10-21T02:46:53.051036024Z"
+    description: MaaS platform config - PostgreSQL, ExternalSecrets, Authorino TLS,
+      Limitador Redis, and dashboard configuration
+    digest: ce3081b7e1ac48b59b268d8e98261603dc740c07a64327a562787f2516057b89
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: maas-additional-config
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-additional-config-0.3.0/maas-additional-config-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-10-14T21:59:19.340069503Z"
     description: MaaS platform config - PostgreSQL, ExternalSecrets, UWM, and dashboard
       configuration
@@ -1941,6 +1955,19 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-additional-config-0.1.0/maas-additional-config-0.1.0.tgz
     version: 0.1.0
   maas-alerting-additional-config:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-21T02:46:53.227358637Z"
+    deprecated: true
+    description: DEPRECATED - use rhai-observability (telemetry, usage logging) and
+      maas-additional-config (redis.enabled)
+    digest: ed2ecb0fa7a1579707169ff45387c086347a2cb7fc59f5dc7c78daaf632a26ca
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    name: maas-alerting-additional-config
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-alerting-additional-config-0.1.1/maas-alerting-additional-config-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: "1.0"
     created: "2026-10-13T02:42:34.924007237Z"
@@ -3661,4 +3688,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-21T02:45:06.490161629Z"
+generated: "2026-10-21T02:46:53.227651062Z"
