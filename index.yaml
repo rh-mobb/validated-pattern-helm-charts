@@ -1678,6 +1678,20 @@ entries:
   genai-workspace:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-10-21T07:44:31.767906512Z"
+    description: Per-team GenAI workspace on RHOAI - Playground (OGX), pgvector RAG
+      store, NemoGuardrails, and MLflow tracing wired to MaaS models
+    digest: 05cb4eccf55d38b72a6c425a33f15cb87aacfc53c33f381a3b38f782ea23960b
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: genai-workspace
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/genai-workspace-0.1.1/genai-workspace-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-10-21T03:16:02.1823099Z"
     description: Per-team GenAI workspace on RHOAI - Playground (OGX), pgvector RAG
       store, NemoGuardrails, and MLflow tracing wired to MaaS models
@@ -3758,4 +3772,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-21T03:16:02.182662032Z"
+generated: "2026-10-21T07:44:31.768222166Z"
