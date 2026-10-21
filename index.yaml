@@ -1984,6 +1984,20 @@ entries:
   maas-external-model:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-10-21T03:15:25.132993047Z"
+    description: Deploy external AI models (OpenAI, Bedrock, Gemini, Anthropic, Azure
+      OpenAI) via MaaS
+    digest: 2932b9bc4b45c2ce8934d449c07ce3ad06ab785656876d80f3438739a98e4de0
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: maas-external-model
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-external-model-0.2.1/maas-external-model-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-10-21T02:45:06.349576705Z"
     description: Deploy external AI models (OpenAI, Bedrock, Gemini, Anthropic, Azure
       OpenAI) via MaaS
@@ -2023,6 +2037,20 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-external-model-0.1.0/maas-external-model-0.1.0.tgz
     version: 0.1.0
   maas-model:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-21T03:15:25.378199763Z"
+    description: Parameterized chart for deploying RHOAI MaaS models (LLMInferenceService
+      + governance)
+    digest: 4dd4bccb431b6e5dd9e36aa5417f5a995476962d2a2ee85f79ad8035c8373da5
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: maas-model
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-model-0.3.1/maas-model-0.3.1.tgz
+    version: 0.3.1
   - apiVersion: v2
     appVersion: "1.0"
     created: "2026-10-21T02:45:06.489820255Z"
@@ -3286,6 +3314,20 @@ entries:
   rhai-observability:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-10-21T03:15:25.619245914Z"
+    description: RHAI cluster-level observability - user workload monitoring, MLflow
+      trace store, MaaS telemetry and usage logging
+    digest: b5b9673965d6df1085b0e4a02e774fc7419dad15d8fd177a05e49e7d3a7afc36
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: rhai-observability
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/rhai-observability-0.1.1/rhai-observability-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-10-21T02:42:01.075521647Z"
     description: RHAI cluster-level observability - user workload monitoring, MLflow
       trace store, MaaS telemetry and usage logging
@@ -3701,4 +3743,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-21T02:48:02.058634698Z"
+generated: "2026-10-21T03:15:25.619800045Z"
