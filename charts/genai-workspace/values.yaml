@@ -128,6 +128,10 @@ tracing:
   ngrCertPath: /etc/ssl/certs/ca-certificates.crt
   # -- OTEL instrumentors disabled in OGX. Keeps only openai-v2 (LLM calls) and fastapi (request span).
   ogxDisabledInstrumentations: asgi,asyncio,asyncpg,boto3sqs,botocore,click,dbapi,grpc,httpx,jinja2,logging,pymongo,redis,requests,sqlalchemy,sqlite3,starlette,system-metrics,threading,tortoiseorm,urllib,urllib3,wsgi
+  # -- URL patterns (comma-separated regexes) the OGX FastAPI instrumentation must NOT trace. The OGX operator
+  # polls /v1/providers and /v1/version for status every few minutes; without this each poll becomes an empty
+  # MLflow trace and buries real Playground traces.
+  ogxExcludedUrls: v1/health,v1/version,v1/providers
   # -- OTEL instrumentors disabled in NemoGuardrails (fastapi off avoids one trace per health probe)
   ngrDisabledInstrumentations: asgi,fastapi,httpx
 

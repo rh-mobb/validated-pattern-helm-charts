@@ -119,6 +119,10 @@ spec:
           value: span_only
         - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
           value: {{ $t.ogxDisabledInstrumentations | quote }}
+        # Operator status polls (/v1/providers, /v1/version) and health checks would otherwise create an
+        # empty trace each, every few minutes.
+        - name: OTEL_PYTHON_FASTAPI_EXCLUDED_URLS
+          value: {{ $t.ogxExcludedUrls | quote }}
         - name: OTEL_TRACES_EXPORTER
           value: otlp
         - name: OTEL_METRICS_EXPORTER
