@@ -1675,6 +1675,21 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/external-secrets-operator-1.0.0/external-secrets-operator-1.0.0.tgz
     version: 1.0.0
+  genai-workspace:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-21T03:16:02.1823099Z"
+    description: Per-team GenAI workspace on RHOAI - Playground (OGX), pgvector RAG
+      store, NemoGuardrails, and MLflow tracing wired to MaaS models
+    digest: 4df57567493c6761b23309307b1d22e63850c497c3713bc93bd3c6b9acfcca87
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: genai-workspace
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/genai-workspace-0.1.0/genai-workspace-0.1.0.tgz
+    version: 0.1.0
   helper-installplan-approver:
   - apiVersion: v2
     created: "2026-02-19T14:31:01.474841+10:00"
@@ -3743,4 +3758,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-21T03:15:25.619800045Z"
+generated: "2026-10-21T03:16:02.182662032Z"
