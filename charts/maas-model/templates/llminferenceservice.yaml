@@ -1,3 +1,11 @@
+{{- /*
+  llminferenceservice.yaml — the self-hosted model server (KServe LLMInferenceService, e.g. vLLM)
+  Why:       Runs the model pods and attaches them to the MaaS gateway (router.gateway.refs).
+             enable-auth makes the endpoint require auth, so it can only be reached through MaaS.
+             With gpu.enabled: GPU toleration, nvidia.com/gpu requests/limits, a 2Gi /dev/shm (vLLM
+             needs shared memory), and longer probe delays while weights download and load.
+  Ordering:  sync-wave 1 — after the namespace; MaaS governance objects (wave 3) reference it.
+*/ -}}
 apiVersion: serving.kserve.io/v1alpha1
 kind: LLMInferenceService
 metadata:

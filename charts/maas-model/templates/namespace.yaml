@@ -1,3 +1,10 @@
+{{- /*
+  namespace.yaml — namespace the model is served from
+  Why:       gateway-access lets the MaaS gateway route to the model; dashboard and generated-namespace
+             labels make it show up in the RHOAI Dashboard.
+  Gated by:  .Values.createNamespace (set false when several models share one namespace, e.g. llm)
+  Ordering:  sync-wave -1 — before the LLMInferenceService.
+*/ -}}
 {{- if .Values.createNamespace }}
 apiVersion: v1
 kind: Namespace

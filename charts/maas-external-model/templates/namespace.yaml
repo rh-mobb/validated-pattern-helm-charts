@@ -1,3 +1,10 @@
+{{- /*
+  namespace.yaml — namespace holding the ExternalProvider, ExternalModel and provider API key
+  Why:       The maas.opendatahub.io/gateway-access label lets the MaaS gateway route to models in
+             this namespace. One namespace per provider keeps provider credentials isolated.
+  Gated by:  .Values.createNamespace (set false if the namespace is created elsewhere)
+  Ordering:  sync-wave -1 — before everything else in the chart.
+*/ -}}
 {{- if .Values.createNamespace }}
 apiVersion: v1
 kind: Namespace

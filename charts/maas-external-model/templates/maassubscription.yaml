@@ -1,0 +1,42 @@
+{{- /*
+  maassubscription.yaml — one MaaSSubscription (rate-limit tier) per enabled entry
+  Why:       A subscription is a plan on this model: tokenLimit per tokenWindow, plus a priority.
+             API keys are created against ONE subscription (POST /maas-api/v1/api-keys
+             {"subscription":"<model>-<tier>"}), and every call with that key is rate-limited by
+             Limitador and metered against that subscription. Usage is recorded per subscription,
+             so a tier per team gives per-team chargeback.
+               owners  -> spec.owner: who may CREATE keys on this tier (e.g. only [support-team])
+               access  -> maasauthpolicy.yaml: who may call the model at all
+             Example tiers: "free" (low limit, everyone), "guardrails" (higher limit for
+             NemoGuardrails judge calls from genai-workspace), "support" (a team's own budget).
+  Gated by:  .Values.subscriptions.<tier>.enabled, or the legacy .Values.subscription.enabled
+             (rendered as tier "free" — see _helpers.tpl)
+  Ordering:  sync-wave 3 — with the MaaSModelRef it references.
+  Origin:    split out of maas-governance.yaml; multi-tier and owners added in 0.2.0
+*/ -}}
+{{- $tiers := include "maas-external-model.tiers" . | fromYaml }}
+{{- range $tier := keys $tiers | sortAlpha }}
+{{- $t := get $tiers $tier }}
+{{- if $t.enabled }}
+---
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: MaaSSubscription
+metadata:
+  name: {{ $.Values.model.name }}-{{ $tier }}
+  namespace: {{ $.Values.governanceNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+    openshift.io/display-name: {{ default (printf "%s %s Tier" $.Values.model.displayName (title $tier)) $t.displayName | quote }}
+spec:
+  owner:
+    {{- include "maas-external-model.subjects" (default dict $t.owners) | nindent 4 }}
+  modelRefs:
+    - name: {{ $.Values.model.name }}
+      namespace: {{ $.Values.namespace }}
+      tokenRateLimits:
+        - limit: {{ $t.tokenLimit }}
+          window: {{ $t.tokenWindow }}
+  priority: {{ $t.priority }}
+{{- end }}
+{{- end }}

@@ -40,6 +40,25 @@ model:
     enabled: false
     count: 1
 
+# -- Who may call this model at all (MaaSAuthPolicy subjects). Must include every team that owns a tier.
+access:
+  groups:
+    - system:authenticated
+  users: []
+
+# -- Subscription tiers (one MaaSSubscription "<model.name>-<tier>" per enabled entry).
+# When set, the legacy `subscription.free/premium` blocks below are ignored. Per tier:
+#   enabled, tokenLimit, tokenWindow, priority, displayName (optional),
+#   owners: {groups: [], users: []}  -> who may create API keys on this tier (default system:authenticated)
+# Example:
+#   subscriptions:
+#     free:    {enabled: true, tokenLimit: 100,   tokenWindow: 1m, priority: 10}
+#     premium: {enabled: true, tokenLimit: 100000, tokenWindow: 1m, priority: 20}
+#     legal:   {enabled: true, tokenLimit: 50000, tokenWindow: 1m, priority: 20,
+#               owners: {groups: [legal-team]}}
+subscriptions: {}
+
+# -- Legacy fixed tiers (pre-0.3.0). Rendered as "<model.name>-free" / "-premium" when `subscriptions` is empty.
 subscription:
   free:
     enabled: true
