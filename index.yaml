@@ -3215,6 +3215,21 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/portworx-operator-0.1.0/portworx-operator-0.1.0.tgz
     version: 0.1.0
+  rhai-observability:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-21T02:42:01.075521647Z"
+    description: RHAI cluster-level observability - user workload monitoring, MLflow
+      trace store, MaaS telemetry and usage logging
+    digest: 6b1e2d57736027b4ed24bd705677687cf41414f242d8bab17c92b35e4e55a559
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: rhai-observability
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/rhai-observability-0.1.0/rhai-observability-0.1.0.tgz
+    version: 0.1.0
   rhcl-operator:
   - apiVersion: v2
     created: "2026-03-19T00:24:44.893046618Z"
@@ -3618,4 +3633,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-14T21:59:19.340458931Z"
+generated: "2026-10-21T02:42:01.075768123Z"
