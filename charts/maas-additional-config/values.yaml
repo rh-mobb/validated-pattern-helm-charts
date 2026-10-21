@@ -1,10 +1,15 @@
+# -- Namespace for PostgreSQL and the config Jobs (RHOAI applications namespace)
 namespace: redhat-ods-applications
+# -- Namespace where maas-api runs and reads Secret maas-db-config
 gatewayInfraNamespace: redhat-ai-gateway-infra
 
 image:
+  # -- PostgreSQL image (RHEL postgresql-16)
   repository: registry.redhat.io/rhel9/postgresql-16
+  # -- PostgreSQL image tag
   tag: "latest"
 
+# -- PostgreSQL container resources
 resources:
   requests:
     cpu: 250m
@@ -14,26 +19,45 @@ resources:
     memory: 1Gi
 
 storage:
+  # -- PostgreSQL PVC size
   size: 20Gi
+  # -- StorageClass for the PVC ("" = cluster default)
   storageClass: ""
 
 secretStore:
+  # -- ClusterSecretStore name (from the external-secrets-operator chart)
   name: aws-secrets-manager
+  # -- SecretStore kind
   kind: ClusterSecretStore
 
 awsSecret:
+  # -- AWS SM secret with POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB and DB_CONNECTION_URL
   key: ""
+  # -- ESO refresh interval
   refreshInterval: 1h
 
-userWorkloadMonitoring:
-  enabled: false
+# NOTE: userWorkloadMonitoring was removed in 0.3.0 — use the rhai-observability chart.
+# Setting userWorkloadMonitoring.enabled here now fails rendering (see templates/uwm-moved-guard.yaml).
 
 dashboardConfig:
+  # -- Patch OdhDashboardConfig to enable MaaS, GenAI Studio, external models and observability dashboard
   enabled: false
 
 authorinoTls:
+  # -- Annotate the Authorino authorization Service so service-ca issues its TLS cert
   enabled: false
+  # -- Namespace where Authorino runs
   namespace: kuadrant-system
+  # -- Name of the serving-cert Secret Authorino expects
   certSecretName: authorino-server-cert
 
+redis:
+  # -- Deploy Redis as Limitador's counter storage (moved from maas-alerting-additional-config in 0.3.0)
+  enabled: false
+  # -- Namespace for Redis (created by the chart)
+  namespace: redis-limitador
+  # -- Redis image
+  image: registry.redhat.io/rhel9/redis-7
+
+# -- Image used by config Jobs (needs `oc`/`kubectl`)
 jobImage: registry.redhat.io/openshift4/ose-cli:latest

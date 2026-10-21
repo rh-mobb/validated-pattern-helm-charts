@@ -1,0 +1,9 @@
+{{- /*
+  uwm-moved-guard.yaml — fails rendering if the removed userWorkloadMonitoring option is still set
+  Why:       cluster-monitoring-config (user workload monitoring) moved to the rhai-observability
+             chart in 0.3.0. Silently ignoring the old value would leave UWM unmanaged. Failing loudly
+             makes the migration explicit.
+*/ -}}
+{{- if (.Values.userWorkloadMonitoring).enabled }}
+{{- fail "maas-additional-config >= 0.3.0: userWorkloadMonitoring moved to the rhai-observability chart (userWorkloadMonitoring.enabled). Remove it from these values." }}
+{{- end }}

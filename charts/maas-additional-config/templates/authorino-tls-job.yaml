@@ -1,3 +1,14 @@
+{{- /*
+  authorino-tls-job.yaml — makes OpenShift issue a serving certificate for Authorino
+  Why:       With TLS on (rhai-on-openshift-chart dependencies.rhcl.config.tlsEnabled), Authorino
+             expects Secret <certSecretName> in kuadrant-system. The Authorino operator doesn't add
+             the service-ca annotation that would create it. This Job server-side-applies the
+             authorization Service with service.beta.openshift.io/serving-cert-secret-name, then
+             waits for the cert Secret. Without it, MaaS gateway auth fails.
+  Gated by:  .Values.authorinoTls.enabled
+  Ordering:  RBAC at sync-wave 0; Job is a PostSync hook at wave 1. It waits up to 5 min for the
+             kuadrant-system namespace (created by the RHCL operator install).
+*/ -}}
 {{- if .Values.authorinoTls.enabled }}
 apiVersion: v1
 kind: ServiceAccount

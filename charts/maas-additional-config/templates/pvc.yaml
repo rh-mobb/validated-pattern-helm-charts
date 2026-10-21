@@ -1,3 +1,9 @@
+{{- /*
+  pvc.yaml — persistent storage for the MaaS PostgreSQL database
+  Why:       API keys and subscription data must survive pod restarts. storage.storageClass empty
+             means the cluster default StorageClass.
+  Ordering:  sync-wave 1 — before the postgres Deployment (wave 2) mounts it.
+*/ -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

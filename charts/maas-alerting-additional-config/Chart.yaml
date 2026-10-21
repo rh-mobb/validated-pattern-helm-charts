@@ -1,8 +1,8 @@
 apiVersion: v2
 name: maas-alerting-additional-config
-description: MaaS alerting and observability - telemetry, usage logging, Redis for Limitador
+description: "DEPRECATED - use rhai-observability (telemetry, usage logging) and maas-additional-config (redis.enabled)"
 type: application
-version: 0.1.0
+version: 0.1.1
+deprecated: true
 appVersion: "1.0"
-maintainers:
-  - name: rh-mobb
+home: https://rh-mobb.github.io/validated-pattern-helm-charts/
