@@ -1,0 +1,25 @@
+{{- /*
+  uwm-configmap.yaml — enables OpenShift user workload monitoring (UWM)
+  Why:       MaaS (Limitador/Authorino/gateway metrics) and RHOAI model serving expose metrics that
+             are only scraped when UWM is on. Without it the MaaS usage dashboards stay empty.
+  Gated by:  .Values.userWorkloadMonitoring.enabled
+  Ordering:  sync-wave 0 — no dependencies; the openshift-monitoring namespace always exists.
+  Caveat:    cluster-monitoring-config is a cluster-wide singleton. Only one Argo app may own it,
+             and this replaces any existing config.yaml content in full.
+  Origin:    moved from maas-additional-config/templates/uwm-configmap.yaml (unchanged)
+*/ -}}
+{{- if .Values.userWorkloadMonitoring.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+  labels:
+    {{- include "rhai-observability.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+data:
+  config.yaml: |
+    enableUserWorkload: true
+{{- end }}

@@ -1,0 +1,71 @@
+# rhai-observability — one instance per cluster.
+# Owns cluster singletons (cluster-monitoring-config, MLflow CR) and MaaS platform telemetry.
+# Installs NO operators: OpenTelemetry, Tempo, Loki and Cluster Observability operators are
+# installed by rhai-on-openshift-chart (services.monitoring.dependencies).
+
+# -- Namespace for MaaS telemetry Job and usage-logging stack (created by the RHOAI operator)
+monitoringNamespace: redhat-ods-monitoring
+
+# -- Image used by patch/config Jobs (needs the `oc` CLI)
+jobImage: registry.redhat.io/openshift4/ose-cli:latest
+
+userWorkloadMonitoring:
+  # -- Render openshift-monitoring/cluster-monitoring-config with enableUserWorkload: true.
+  # This ConfigMap is a cluster-wide singleton: only ONE Argo app may own it.
+  enabled: false
+
+mlflow:
+  # -- Create the cluster-scoped MLflow CR (trace/experiment store for GenAI workspaces)
+  enabled: false
+  # -- Namespace label that makes a namespace an MLflow workspace. genai-workspace sets it.
+  workspaceLabel: rhai.mobb.io/genai-workspace
+  # -- MLflow backend store (sqlite on the MLflow PVC by default)
+  backendStoreUri: "sqlite:////mlflow/mlflow.db"
+  # -- Where MLflow stores artifacts
+  artifactsDestination: "file:///mlflow/artifacts"
+  # -- Size of the MLflow PVC
+  storageSize: 5Gi
+
+telemetry:
+  # -- Patch MaaSTenantConfig to enable MaaS telemetry (token/usage metrics)
+  enabled: false
+  # -- Record the calling user on MaaS metrics (needed for per-user/per-team chargeback)
+  captureUser: true
+  # -- Namespace holding the MaaS tenant config
+  maasNamespace: models-as-a-service
+  # -- Name of the MaaSTenantConfig to patch
+  tenantConfigName: default-tenant
+
+usageLogging:
+  # -- Enable MaaS usage logging: MinIO object store + LokiStack "usage" that receives OTLP usage logs
+  enabled: false
+  # -- StorageClass for MinIO and LokiStack PVCs
+  storageClassName: gp3-csi
+  minio:
+    # -- MinIO server image
+    image: quay.io/rh-aiservices-bu/minio:RELEASE.2025-09-07T16-13-09Z
+    # -- MinIO client image used by the bucket-creation Job
+    mcImage: quay.io/rh-aiservices-bu/mc:latest
+    # -- MinIO PVC size
+    storageSize: 10Gi
+    # -- Root credentials when secretStore.enabled is false (demo only — plaintext in Git)
+    rootUser: minio
+    rootPassword: minio123
+    secretStore:
+      # -- Source MinIO root credentials from AWS Secrets Manager via ESO instead of plaintext values
+      enabled: false
+      # -- ClusterSecretStore name (from the external-secrets-operator chart)
+      name: aws-secrets-manager
+      # -- SecretStore kind
+      kind: ClusterSecretStore
+    awsSecret:
+      # -- AWS Secrets Manager secret with properties `rootUser` and `rootPassword`
+      key: ""
+      # -- ESO refresh interval
+      refreshInterval: 1h
+
+# Phase 2 (planned, not yet implemented):
+# otelCollector:
+#   # Optional OpenTelemetryCollector fanning GenAI traces out to MLflow AND the DSCI Tempo stack.
+#   # Tempo itself is enabled via rhai-on-openshift-chart `services.monitoring.dsci.traces`.
+#   enabled: false
