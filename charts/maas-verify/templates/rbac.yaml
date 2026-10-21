@@ -1,3 +1,10 @@
+{{- /*
+  rbac.yaml — read-only identity for the verification Job
+  Why:       The Job only reads state (gateway, deployments, MaaS CRs, Authorino, LokiStack, routes).
+             No write verbs. Its SA token is also used as the caller identity for maas-api
+             (list models, create ephemeral 5-minute API keys).
+  Ordering:  sync-wave 0 — before the Job (PostSync wave 10).
+*/ -}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -26,13 +33,16 @@ rules:
     resources: ["llminferenceservices"]
     verbs: ["get", "list"]
   - apiGroups: ["maas.opendatahub.io"]
-    resources: ["maasmodelrefs", "maasauthpolicies", "maassubscriptions"]
+    resources: ["maasmodelrefs", "maasauthpolicies", "maassubscriptions", "maastenantconfigs"]
     verbs: ["get", "list"]
   - apiGroups: ["datasciencecluster.opendatahub.io"]
     resources: ["datascienceclusters"]
     verbs: ["get", "list"]
   - apiGroups: ["operator.authorino.kuadrant.io"]
     resources: ["authorinos"]
+    verbs: ["get", "list"]
+  - apiGroups: ["loki.grafana.com"]
+    resources: ["lokistacks"]
     verbs: ["get", "list"]
   - apiGroups: ["route.openshift.io"]
     resources: ["routes"]

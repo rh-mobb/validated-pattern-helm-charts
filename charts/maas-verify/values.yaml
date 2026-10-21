@@ -17,3 +17,23 @@ model:
   name: simulated
   subscription: simulated-free
   id: "publishers/llm/models/facebook/opt-125m"
+
+# -- External models to check (Phase 5). Per entry: name, namespace (required), subscription
+# (default "<name>-free"), id (optional; resolved from /maas-api/v1/models when empty).
+# Each check sends one real 5-token request to the provider.
+# Example:
+#   externalModels:
+#     - {name: gpt-4o-mini, namespace: external-models-openai, subscription: gpt-4o-mini-free}
+externalModels: []
+
+checkTelemetry:
+  # -- Check MaaS telemetry flag and the usage LokiStack (Phase 6; resources owned by rhai-observability)
+  enabled: false
+  # -- Namespace of the MaaSTenantConfig
+  maasNamespace: models-as-a-service
+  # -- MaaSTenantConfig name
+  tenantConfigName: default-tenant
+  # -- Namespace of the usage LokiStack
+  monitoringNamespace: redhat-ods-monitoring
+  # -- LokiStack name to check ("" skips the LokiStack check)
+  lokiStack: usage
