@@ -1,3 +1,8 @@
+{{- /*
+  usage-logging.yaml — DEPRECATED (chart maas-alerting-additional-config is deprecated)
+  Why:       Kept so existing installs keep working during migration.
+  Replaced:  rhai-observability (usageLogging.enabled). Resource names are identical, so Argo CD hands them over in place.
+*/ -}}
 {{- if .Values.usageLogging.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim

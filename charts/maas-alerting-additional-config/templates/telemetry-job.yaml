@@ -1,3 +1,8 @@
+{{- /*
+  telemetry-job.yaml — DEPRECATED (chart maas-alerting-additional-config is deprecated)
+  Why:       Kept so existing installs keep working during migration.
+  Replaced:  rhai-observability (telemetry.enabled). Resource names are identical, so Argo CD hands them over in place.
+*/ -}}
 {{- if .Values.telemetry.enabled }}
 apiVersion: v1
 kind: ServiceAccount

@@ -1,3 +1,11 @@
+{{- /*
+  deployment.yaml — single-replica PostgreSQL for maas-api
+  Why:       MaaS needs a PostgreSQL backend. RHOAI doesn't ship one, so this chart runs a small
+             instance. Credentials come from the postgres-creds ExternalSecret, data lives on the
+             postgres-data PVC, and pg_isready probes gate readiness.
+             maas-verify checks this Deployment by name ("postgres"), so keep the name stable.
+  Ordering:  sync-wave 2 — after its Secret (wave 0) and PVC (wave 1).
+*/ -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

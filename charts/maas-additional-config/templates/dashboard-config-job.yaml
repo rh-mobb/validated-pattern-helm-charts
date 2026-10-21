@@ -1,3 +1,13 @@
+{{- /*
+  dashboard-config-job.yaml — enables the MaaS and GenAI features in the RHOAI Dashboard
+  Why:       OdhDashboardConfig is owned by the RHOAI operator, so this chart can't render it. A
+             PostSync Job merge-patches only these feature flags:
+               modelAsService, genAiStudio (Playground / GenAI Studio), externalModels,
+               observabilityDashboard
+             It retries 3 times because the CR can appear late on a fresh cluster.
+  Gated by:  .Values.dashboardConfig.enabled
+  Ordering:  RBAC at sync-wave 3; Job is a PostSync hook at wave 4.
+*/ -}}
 {{- if .Values.dashboardConfig.enabled }}
 apiVersion: v1
 kind: ServiceAccount

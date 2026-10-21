@@ -1,0 +1,83 @@
+{{- /*
+  redis.yaml — Redis storage for Limitador (MaaS rate-limit counters)
+  Why:       By default Limitador keeps token-rate counters in memory, so they reset on restart and
+             aren't shared between replicas. Pointing Limitador at Redis (via Secret redis-config
+             in kuadrant-system) makes rate limits consistent. This is MaaS rate-limiting
+             infrastructure, which is why it lives here and not in the observability chart.
+             Redis runs without persistence (--save "" --appendonly no): counters are short-lived.
+  Gated by:  .Values.redis.enabled
+  Ordering:  sync-wave -1 namespace; wave 1 Deployment, Service and the redis-config Secret.
+  Origin:    moved from maas-alerting-additional-config/templates/redis.yaml (unchanged)
+*/ -}}
+{{- if .Values.redis.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.redis.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: {{ .Values.redis.namespace }}
+  labels:
+    app: redis
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: {{ .Values.redis.image }}
+          args:
+            - /usr/bin/run-redis
+            - --save ""
+            - --appendonly no
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 200m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: {{ .Values.redis.namespace }}
+  labels:
+    app: redis
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-config
+  namespace: kuadrant-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+type: Opaque
+stringData:
+  URL: "redis://redis-service.{{ .Values.redis.namespace }}.svc:6379"
+{{- end }}
