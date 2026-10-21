@@ -1,0 +1,32 @@
+{{- /*
+  guardrails/startup-patch.yaml — Python startup hook for the NemoGuardrails pod
+  Why:       Two problems, one sitecustomize.py (files/guardrails/sitecustomize.py, copied verbatim):
+               1. The RHOAI Dashboard sends inline guardrail config in every /v1/guardrail/checks call.
+                  The shipped NemoGuardrails build rejects inline config before doing any work, so
+                  nothing is checked or traced. The hook patches checks.py at startup so inline config
+                  is dropped and the server uses its default config (this chart's ConfigMap).
+               2. NemoGuardrails' CRD has no command override, and the TrustyAI operator reverts
+                  Deployment patches. Python runs sitecustomize.py from PYTHONPATH before the app, so
+                  the hook also initialises the OpenTelemetry SDK (same effect as
+                  opentelemetry-instrument). It is set via the CR's env, so it survives reconciles.
+             Mounted through spec.nemoConfigs (non-default config "startup-patch" ->
+             /app/config/startup-patch) and prepended to PYTHONPATH in the CR.
+             Remove once the product accepts inline config and supports tracing natively.
+  Gated by:  .Values.guardrails.enabled
+  Ordering:  sync-wave 1 — before the NemoGuardrails CR (wave 2).
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 3.4
+*/ -}}
+{{- if .Values.guardrails.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nemoguardrails-startup-patch
+  namespace: {{ include "genai-workspace.namespace" . }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+data:
+  sitecustomize.py: |
+    {{- .Files.Get "files/guardrails/sitecustomize.py" | nindent 4 }}
+{{- end }}

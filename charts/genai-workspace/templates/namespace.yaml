@@ -1,0 +1,23 @@
+{{- /*
+  namespace.yaml — the team's workspace namespace
+  Why:       opendatahub.io/dashboard makes it a Data Science Project in the RHOAI Dashboard (where
+             the Playground appears). <mlflowWorkspaceLabel>=true makes it an MLflow workspace: the
+             rhai-observability MLflow CR selects namespaces by this label, and only users or SAs
+             with RBAC here can read its traces.
+  Gated by:  .Values.createNamespace (false when the team layer creates the namespace; then add
+             both labels there)
+  Ordering:  sync-wave -1 — before everything else.
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 0.a (namespace label) and 1.3 (selector)
+*/ -}}
+{{- if .Values.createNamespace }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "genai-workspace.namespace" . }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+    {{ .Values.mlflowWorkspaceLabel }}: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+    openshift.io/display-name: {{ printf "GenAI workspace %s" .Values.namespace | quote }}
+{{- end }}

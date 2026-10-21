@@ -1,0 +1,119 @@
+{{- /*
+  guardrails/service-fix-job.yaml — makes Service nemoguardrails expose the authenticated HTTPS port
+  Why:       With enable-auth, the pod serves through kube-rbac-proxy on 8443 and the Dashboard expects
+             Service port 443 -> 8443. Some operator versions leave the Service on 80 -> 8000, and the
+             Playground then shows "Guardrail check was not applied". The Service is operator-owned
+             (not tracked by Argo), so a PostSync Job checks it and patches only if it is still on 80.
+             Idempotent: does nothing if already correct. Disable once the operator is fixed.
+  Gated by:  .Values.guardrails.enabled and .Values.guardrails.fixServicePort
+  Ordering:  RBAC at sync-wave 0; Job is a PostSync hook at wave 4. Waits up to 5 min for the operator
+             to create the Service.
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 0.5
+*/ -}}
+{{- if and .Values.guardrails.enabled .Values.guardrails.fixServicePort }}
+{{- $ns := include "genai-workspace.namespace" . }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: genai-ngr-service-fix
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+---
+# Namespace-scoped: only get/patch Services in this workspace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: genai-ngr-service-fix
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+rules:
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: genai-ngr-service-fix
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: genai-ngr-service-fix
+subjects:
+  - kind: ServiceAccount
+    name: genai-ngr-service-fix
+    namespace: {{ $ns }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: genai-ngr-service-fix
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: genai-ngr-service-fix
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: fix
+          image: {{ .Values.jobImage }}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 200m, memory: 256Mi}
+          env:
+            - name: HOME
+              value: /tmp
+          securityContext:
+            {{- include "genai-workspace.jobSecurityContext" . | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+              NS="{{ $ns }}"
+              for i in $(seq 1 60); do
+                PORT=$(oc get svc nemoguardrails -n "$NS" -o jsonpath='{.spec.ports[0].port}' 2>/dev/null || true)
+                [ -n "$PORT" ] && break
+                echo "Waiting for Service nemoguardrails ($i/60)..."; sleep 5
+              done
+              if [ -z "${PORT:-}" ]; then echo "Service nemoguardrails not found"; exit 1; fi
+              TARGET=$(oc get svc nemoguardrails -n "$NS" -o jsonpath='{.spec.ports[0].targetPort}')
+              echo "Service nemoguardrails is ${PORT} -> ${TARGET}"
+              if [ "$PORT" = "443" ] && [ "$TARGET" = "8443" ]; then
+                echo "Already 443 -> 8443, nothing to do"; exit 0
+              fi
+              oc patch svc nemoguardrails -n "$NS" --type json -p '[
+                {"op":"replace","path":"/spec/ports/0/port","value":443},
+                {"op":"replace","path":"/spec/ports/0/targetPort","value":8443}
+              ]'
+              echo "Patched Service nemoguardrails to 443 -> 8443"
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}

@@ -1,0 +1,252 @@
+{{- /*
+  verify/verify-job.yaml — genai-verify: post-sync smoke test of the workspace (maas-verify style)
+  Why:       Proves the whole chain works, not just that resources exist. Exits 1 on any failure so the
+             Argo app shows it.
+               1 Infrastructure: Playground and NemoGuardrails Deployments ready; Playground state PVC
+                 Bound (playground.storage); NGR has the
+                 kube-rbac-proxy sidecar (2 containers); Service nemoguardrails on 443 -> 8443;
+                 key and OTLP Secrets present and non-empty.
+               2 Guardrails: safePrompt is allowed and blockedPrompt is blocked. Calls
+                 /v1/guardrail/checks inside the NGR pod, so the judge model, MaaS API key, subscription
+                 and policies are all exercised.
+               3 Tracing (verify.tracing): MLflow trace count in the workspace experiment rises after
+                 the guardrail checks.
+               4 Playground (verify.playground): one chat completion through the OGX API returns 200.
+             Uses oc exec into the app pods (same commands as the demo guide's troubleshooting), so no
+             extra network exposure is needed.
+  Gated by:  .Values.verify.enabled
+  Ordering:  RBAC at sync-wave 0; Job is a PostSync hook at wave 10, after setup (3) and service fix (4).
+*/ -}}
+{{- if .Values.verify.enabled }}
+{{- $ns := include "genai-workspace.namespace" . }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: genai-verify
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+---
+# Read-only on workload state, plus exec into the app pods for in-pod API calls. Namespace-scoped.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: genai-verify
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods", "services", "secrets", "persistentvolumeclaims"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: genai-verify
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: genai-verify
+subjects:
+  - kind: ServiceAccount
+    name: genai-verify
+    namespace: {{ $ns }}
+---
+# MLflow kubernetes-auth: `view` in this namespace lets the Job read the workspace's traces.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: genai-verify-mlflow-view
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: genai-verify
+    namespace: {{ $ns }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: genai-verify
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: genai-verify
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: verify
+          image: {{ .Values.jobImage }}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          env:
+            - name: HOME
+              value: /tmp
+            - name: SAFE_PROMPT
+              value: {{ .Values.verify.safePrompt | quote }}
+            - name: BLOCKED_PROMPT
+              value: {{ .Values.verify.blockedPrompt | quote }}
+          securityContext:
+            {{- include "genai-workspace.jobSecurityContext" . | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -uo pipefail
+              NS="{{ $ns }}"
+              PASSED=0; FAILED=0
+              pass()  { echo "[PASS] $*"; PASSED=$((PASSED + 1)); }
+              fail()  { echo "[FAIL] $*"; FAILED=$((FAILED + 1)); }
+              info()  { echo "[INFO] $*"; }
+              phase() { echo; echo "== $* =="; }
+              wait_ready() {  # deployment, timeout seconds
+                local d="$1" t="$2" r
+                for i in $(seq 1 $((t / 10))); do
+                  r=$(oc get deployment "$d" -n "$NS" -o jsonpath='{.status.readyReplicas}' 2>/dev/null || true)
+                  [ "${r:-0}" -ge 1 ] 2>/dev/null && return 0
+                  sleep 10
+                done
+                return 1
+              }
+              secret_ok() {
+                local v; v=$(oc get secret "$1" -n "$NS" -o jsonpath="{.data.$2}" 2>/dev/null || true)
+                [ -n "$v" ] && pass "Secret $1 present" || fail "Secret $1 missing or empty (key $2)"
+              }
+
+              info "Waiting {{ .Values.verify.startupDelay }}s for operators to reconcile..."
+              sleep {{ .Values.verify.startupDelay }}
+
+              phase "1. Infrastructure"
+              {{- if .Values.playground.enabled }}
+              wait_ready "{{ .Values.playground.name }}" 600 && pass "Playground {{ .Values.playground.name }} ready" || fail "Playground {{ .Values.playground.name }} not ready after 10m"
+              {{- if .Values.playground.storage.enabled }}
+              PVC=$(oc get pvc "{{ .Values.playground.name }}-pvc" -n "$NS" -o jsonpath='{.status.phase}' 2>/dev/null || true)
+              [ "$PVC" = "Bound" ] && pass "Playground state PVC {{ .Values.playground.name }}-pvc is Bound" || fail "Playground state PVC {{ .Values.playground.name }}-pvc phase '$PVC' (state would not survive restarts)"
+              {{- end }}
+              {{- end }}
+              {{- if .Values.guardrails.enabled }}
+              wait_ready nemoguardrails 600 && pass "NemoGuardrails ready" || fail "NemoGuardrails not ready after 10m"
+              C=$(oc get deployment nemoguardrails -n "$NS" -o jsonpath='{.spec.template.spec.containers[*].name}' 2>/dev/null || true)
+              [[ "$C" == *kube-rbac-proxy* ]] && pass "NemoGuardrails has kube-rbac-proxy (enable-auth)" || fail "NemoGuardrails missing kube-rbac-proxy (containers: $C)"
+              P=$(oc get svc nemoguardrails -n "$NS" -o jsonpath='{.spec.ports[0].port}:{.spec.ports[0].targetPort}' 2>/dev/null || true)
+              [ "$P" = "443:8443" ] && pass "Service nemoguardrails is 443:8443" || fail "Service nemoguardrails is '$P' (want 443:8443; see guardrails.fixServicePort)"
+              secret_ok nemoguardrails-api-key key
+              {{- end }}
+              {{- if .Values.tracing.enabled }}
+              {{- if .Values.playground.enabled }}
+              secret_ok {{ include "genai-workspace.ogxOtelSecret" . }} header
+              {{- end }}
+              {{- if .Values.guardrails.enabled }}
+              secret_ok {{ include "genai-workspace.ngrOtelSecret" . }} header
+              {{- end }}
+              {{- end }}
+
+              {{- if and .Values.tracing.enabled .Values.verify.tracing }}
+              # MLflow trace count before the guardrail calls (phase 3 compares against it).
+              CA=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+              TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+              MLFLOW="{{ .Values.tracing.mlflowEndpoint | trimSuffix "/" }}/mlflow/api/2.0/mlflow"
+              mlflow() { curl -sS --cacert "$CA" -H "Authorization: Bearer ${TOKEN}" -H "X-MLflow-Workspace: ${NS}" "$@"; }
+              EXP_ID=$(mlflow "${MLFLOW}/experiments/get-by-name?experiment_name={{ .Values.tracing.experimentName | urlquery }}" \
+                | python3 -c "import json,sys; print(json.load(sys.stdin)['experiment']['experiment_id'])" 2>/dev/null || true)
+              count_traces() {
+                mlflow "${MLFLOW}/traces?experiment_ids=${EXP_ID}&max_results=500" \
+                  | python3 -c "import json,sys; print(len(json.load(sys.stdin).get('traces',[])))" 2>/dev/null || echo -1
+              }
+              BEFORE=$( [ -n "$EXP_ID" ] && count_traces || echo -1 )
+              info "MLflow experiment id='${EXP_ID}', traces before=${BEFORE}"
+              {{- end }}
+
+              {{- if .Values.guardrails.enabled }}
+              phase "2. Guardrails (judge: {{ .Values.guardrails.judge.model }})"
+              # Runs inside the NGR container against its local port (bypasses kube-rbac-proxy), as in the demo guide.
+              check() {
+                oc exec deployment/nemoguardrails -n "$NS" -c nemo-guardrails -- python3 -c '
+              import json, sys, urllib.request
+              body = json.dumps({"model": sys.argv[1], "messages": [{"role": "user", "content": sys.argv[2]}], "guardrails": {}}).encode()
+              req = urllib.request.Request("http://localhost:8000/v1/guardrail/checks", data=body, headers={"Content-Type": "application/json"})
+              try:
+                  print(json.load(urllib.request.urlopen(req, timeout=90)).get("status", "unknown"))
+              except Exception as e:
+                  print("error:" + str(e)[:200])
+              ' "{{ .Values.guardrails.judge.model }}" "$1" 2>&1 | tail -1
+              }
+              S=$(check "$SAFE_PROMPT")
+              [ "$S" != "blocked" ] && [[ "$S" != error* ]] && pass "Safe prompt allowed (status=$S)" || fail "Safe prompt not allowed (status=$S)"
+              B=$(check "$BLOCKED_PROMPT")
+              [ "$B" = "blocked" ] && pass "Policy-violating prompt blocked" || fail "Policy-violating prompt not blocked (status=$B; check judge model, MaaS key/subscription, NGR logs)"
+              {{- end }}
+
+              {{- if and .Values.tracing.enabled .Values.verify.tracing .Values.guardrails.enabled }}
+              phase "3. Tracing"
+              if [ "$BEFORE" = "-1" ]; then
+                fail "Could not read MLflow traces (experiment '${EXP_ID}'); check MLflow workspace label and RBAC"
+              else
+                AFTER=$BEFORE
+                for i in $(seq 1 12); do AFTER=$(count_traces); [ "$AFTER" -gt "$BEFORE" ] 2>/dev/null && break; sleep 5; done
+                [ "$AFTER" -gt "$BEFORE" ] 2>/dev/null && pass "New traces in MLflow ($BEFORE -> $AFTER)" || fail "No new MLflow traces after guardrail checks ($BEFORE -> $AFTER)"
+              fi
+              {{- end }}
+
+              {{- if and .Values.playground.enabled .Values.verify.playground .Values.playground.models }}
+              phase "4. Playground API"
+              CODE=$(oc exec deployment/{{ .Values.playground.name }} -n "$NS" -- python3 -c '
+              import json, sys, urllib.request
+              body = json.dumps({"model": sys.argv[1], "messages": [{"role": "user", "content": "Say hello"}], "max_tokens": 10}).encode()
+              req = urllib.request.Request("http://localhost:8321/v1/chat/completions", data=body, headers={"Content-Type": "application/json"})
+              try:
+                  print(urllib.request.urlopen(req, timeout=90).status)
+              except urllib.error.HTTPError as e:
+                  print(e.code)
+              except Exception as e:
+                  print("error:" + str(e)[:200])
+              ' "{{ (first .Values.playground.models).id }}" 2>&1 | tail -1)
+              [ "$CODE" = "200" ] && pass "Playground chat completion returned 200" || fail "Playground chat completion returned $CODE"
+              {{- end }}
+
+              phase "Summary"
+              info "Results: ${PASSED} passed, ${FAILED} failed"
+              [ "$FAILED" -eq 0 ] || exit 1
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}

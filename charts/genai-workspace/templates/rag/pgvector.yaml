@@ -1,0 +1,136 @@
+{{- /*
+  rag/pgvector.yaml — the workspace's vector store (PostgreSQL 16 + pgvector)
+  Why:       RAG memory for the Playground. When a user uploads documents, OGX chunks them, embeds
+             each chunk with granite-embedding-125m (inside the OGX pod), and stores the vectors here.
+             At question time the nearest chunks are retrieved and added to the prompt.
+             One store per workspace keeps each team's documents isolated.
+             The gen-ai.opendatahub.io/pgvector label is how the Dashboard recognises the store.
+  Gated by:  .Values.playground.enabled
+  Ordering:  sync-wave 1 — after the credentials Secret (wave 0); OGXServer (wave 2) connects to it.
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 0.2 (init ConfigMap, PVC, Service, Deployment)
+*/ -}}
+{{- if .Values.playground.enabled }}
+{{- $ns := include "genai-workspace.namespace" . }}
+{{- $pg := .Values.rag.pgvector }}
+# Startup hook run by the RHEL postgresql image: enables the vector extension in the database.
+# ${POSTGRESQL_DATABASE} is a shell variable resolved inside the container, not a Helm value.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: genai-pgvector-init
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+data:
+  enable-pgvector.sh: |
+    #!/bin/bash
+    psql -U postgres -d "${POSTGRESQL_DATABASE}" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: genai-pgvector-storage
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- with $pg.storageClass }}
+  storageClassName: {{ . }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $pg.storageSize }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: genai-pgvector
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  selector:
+    app: genai-pgvector
+    gen-ai.opendatahub.io/pgvector: "true"
+  ports:
+    - name: postgresql
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: genai-pgvector
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+    app: genai-pgvector
+    gen-ai.opendatahub.io/pgvector: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  # Recreate: RWO volume can't be mounted by old and new pods at once.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: genai-pgvector
+      gen-ai.opendatahub.io/pgvector: "true"
+  template:
+    metadata:
+      labels:
+        app: genai-pgvector
+        gen-ai.opendatahub.io/pgvector: "true"
+    spec:
+      containers:
+        - name: postgresql
+          image: "{{ $pg.image }}:{{ $pg.tag }}"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRESQL_DATABASE
+              value: {{ $pg.database | quote }}
+            - name: POSTGRESQL_USER
+              value: {{ $pg.user | quote }}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: genai-pgvector-credentials
+                  key: password
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "pg_isready -h 127.0.0.1 -p 5432"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "pg_isready -h 127.0.0.1 -p 5432"]
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/pgsql/data
+            # The RHEL image runs scripts in postgresql-start/ on every start (idempotent here).
+            - name: init-scripts
+              mountPath: /opt/app-root/src/postgresql-start
+              readOnly: true
+          resources:
+            {{- toYaml $pg.resources | nindent 12 }}
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: genai-pgvector-storage
+        - name: init-scripts
+          configMap:
+            name: genai-pgvector-init
+            defaultMode: 0755
+{{- end }}

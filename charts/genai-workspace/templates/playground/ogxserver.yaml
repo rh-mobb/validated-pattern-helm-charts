@@ -1,0 +1,129 @@
+{{- /*
+  playground/ogxserver.yaml — the GenAI Studio Playground (OGX, successor of Llama Stack)
+  Why:       The OGX operator turns this CR into Deployment <playground.name>. It serves the Dashboard
+             Playground chat UI and an OpenAI-compatible API for the team. Config comes from
+             llama-stack-config. Env wires pgvector and the MaaS provider.
+             Tracing (tracing.enabled), all set on the CR so the operator keeps it on reconcile:
+               - command wrapped in `opentelemetry-instrument`. OTEL env vars only configure the SDK;
+                 the wrapper initialises it. Without it, no spans are produced.
+               - OTLP/HTTP export to MLflow with headers from Secret otel-mlflow-auth (Bearer SA token,
+                 X-MLflow-Workspace, X-MLflow-Experiment-Id), written by the tracing setup Job
+               - span_only + gen_ai_latest_experimental: MLflow reads prompt/response from span
+                 attributes. event_only leaves the MLflow Chat tab empty.
+               - metrics and logs exporters off: MLflow only accepts traces (avoids 404 noise)
+             The script patched the Deployment instead, which the operator can revert. Everything is
+             on the CR here.
+             Storage (playground.storage): spec.workload.storage makes the operator create PVC
+             <name>-pvc and mount it at mountPath. llama-stack-config puts every SQLite store and
+             the uploaded-files dir there, so the vector-store registry, files, conversations and
+             saved agents survive restarts (the monthly token refresh restarts this pod). The
+             operator uses Recreate rollouts with a PVC, so the RWO volume never deadlocks. The
+             document chunks themselves live in pgvector. Deleting the OGXServer (e.g. "delete
+             playground" in the UI) deletes the operator-owned PVC.
+  Gated by:  .Values.playground.enabled
+  Ordering:  sync-wave 2 — after llama-stack-config and pgvector (wave 1). With tracing on, the pod
+             waits in CreateContainerConfigError until the PostSync setup Job writes otel-mlflow-auth.
+  Origin:    rhoai-demo-guide setup-mlflow-tracing.sh Phase 0.4, 2.4, 2.5
+*/ -}}
+{{- if .Values.playground.enabled }}
+{{- $ns := include "genai-workspace.namespace" . }}
+{{- $t := .Values.tracing }}
+apiVersion: ogx.io/v1beta1
+kind: OGXServer
+metadata:
+  name: {{ .Values.playground.name }}
+  namespace: {{ $ns }}
+  labels:
+    {{- include "genai-workspace.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Validate=false
+    openshift.io/display-name: {{ .Values.playground.name }}
+spec:
+  distribution:
+    name: rh
+  network:
+    port: 8321
+  overrideConfig:
+    key: config.yaml
+    name: llama-stack-config
+  workload:
+    replicas: 1
+    resources:
+      {{- toYaml .Values.playground.resources | nindent 6 }}
+    {{- if .Values.playground.storage.enabled }}
+    storage:
+      size: {{ .Values.playground.storage.size }}
+      mountPath: {{ .Values.playground.storage.mountPath }}
+    {{- end }}
+    overrides:
+      {{- if $t.enabled }}
+      command:
+        - /bin/sh
+        - -c
+        - opentelemetry-instrument ogx run /etc/ogx/config.yaml --insecure
+      {{- end }}
+      env:
+        - name: VLLM_TLS_VERIFY
+          value: {{ .Values.playground.tlsVerify | quote }}
+        - name: FAISS_STORE_DIR
+          value: ~/.llama/faiss
+        - name: SENTENCE_TRANSFORMERS_HOME
+          value: /opt/app-root/.cache/huggingface/hub
+        # Embedding model ships in the image; never reach out to Hugging Face.
+        - name: HF_HUB_OFFLINE
+          value: "1"
+        - name: TRANSFORMERS_OFFLINE
+          value: "1"
+        - name: HF_DATASETS_OFFLINE
+          value: "1"
+        - name: VLLM_MAX_TOKENS_1
+          value: {{ .Values.playground.maxTokens | quote }}
+        # Placeholder token for the MaaS provider. How the Dashboard authenticates Playground calls
+        # to MaaS is a documented verification item (README "Playground -> MaaS auth").
+        - name: VLLM_API_TOKEN_1
+          value: fake
+        - name: PGVECTOR_HOST
+          value: genai-pgvector.{{ $ns }}.svc.cluster.local
+        - name: PGVECTOR_PORT
+          value: "5432"
+        - name: PGVECTOR_DB
+          value: {{ .Values.rag.pgvector.database | quote }}
+        - name: PGVECTOR_USER
+          value: {{ .Values.rag.pgvector.user | quote }}
+        - name: PGVECTOR_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: genai-pgvector-credentials
+              key: password
+        - name: OGX_CONFIG_DIR
+          value: /opt/app-root/src/.ogx/distributions/rh/
+        {{- if $t.enabled }}
+        - name: OTEL_SERVICE_NAME
+          value: playground
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: {{ $t.mlflowEndpoint | quote }}
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: http/protobuf
+        - name: OTEL_EXPORTER_OTLP_HEADERS
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "genai-workspace.ogxOtelSecret" . }}
+              key: header
+        # MLflow's TLS cert is signed by the OpenShift service CA, which is not in the RHEL system bundle.
+        - name: OTEL_EXPORTER_OTLP_CERTIFICATE
+          value: {{ $t.ogxCertPath | quote }}
+        - name: OTEL_SEMCONV_STABILITY_OPT_IN
+          value: gen_ai_latest_experimental
+        - name: OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT
+          value: span_only
+        - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
+          value: {{ $t.ogxDisabledInstrumentations | quote }}
+        - name: OTEL_TRACES_EXPORTER
+          value: otlp
+        - name: OTEL_METRICS_EXPORTER
+          value: none
+        - name: OTEL_LOGS_EXPORTER
+          value: none
+        {{- end }}
+{{- end }}
