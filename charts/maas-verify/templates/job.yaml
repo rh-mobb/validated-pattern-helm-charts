@@ -1,3 +1,17 @@
+{{- /*
+  job.yaml — post-deploy MaaS smoke test (PostSync hook, re-runs on every sync)
+  Why:       Proves the MaaS platform works end to end after any change, and exits 1 on failure so
+             the Argo app shows the problem:
+               1 Infrastructure: gateway Programmed, postgres, maas-api, Authorino, /health
+               2 Model: model pods, MaaSModelRef Ready, MaaSAuthPolicy Active
+               3 API: list models, create ephemeral key, real inference = 200
+               4 Auth: no key and bad key are both rejected (401/403)
+               5 External models (externalModels[]): Ready + real 5-token completion per model
+               6 Telemetry (checkTelemetry): MaaS telemetry flag and usage LokiStack Ready
+  Ordering:  PostSync wave 10 — after everything else; startupDelay gives the platform time to settle.
+  Coupling:  expects Deployment "postgres" (maas-additional-config) and Authorino "authorino" in
+             kuadrant-system.
+*/ -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -146,6 +160,48 @@ spec:
                 -H "Content-Type: application/json" \
                 -d "{\"model\":\"${MODEL_ID}\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],\"max_tokens\":5}" 2>/dev/null || echo "000")
               [[ "$BAD_KEY" =~ ^(401|403)$ ]] && pass "Invalid key rejected (HTTP $BAD_KEY)" || fail "Invalid key returned HTTP $BAD_KEY (expected 401/403)"
+
+              {{- if .Values.externalModels }}
+              # ── Phase 5: External models ──
+              # For each external model: catalogue entry Ready, then a real 5-token completion through
+              # MaaS on the given subscription (proves provider key, ESO sync, auth and rate-limit path).
+              phase "Phase 5: External models"
+              check_external() {
+                local name="$1" ns="$2" sub="$3" id="$4"
+                local phase key code
+                phase=$(oc get maasmodelref "$name" -n "$ns" -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
+                [ "$phase" = "Ready" ] && pass "MaaSModelRef $ns/$name is Ready" || fail "MaaSModelRef $ns/$name phase: $phase"
+                if [ -z "$id" ]; then
+                  # Resolve the model ID from /maas-api/v1/models when not given explicitly.
+                  id=$(echo "${MODELS_RESP:-}" | python3 -c "import json,sys; d=json.load(sys.stdin); ids=[m.get('id','') for m in d.get('data',d.get('items',[]))]; print(next((i for i in ids if i.endswith('/'+sys.argv[1]) or i==sys.argv[1]),''))" "$name" 2>/dev/null)
+                fi
+                [ -n "$id" ] && info "$name model id: $id" || { fail "$name not found in /maas-api/v1/models"; return; }
+                key=$(curl -sk -X POST "${MAAS_GW}/maas-api/v1/api-keys" \
+                  -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json" \
+                  -d "{\"name\":\"verify-${name}\",\"subscription\":\"${sub}\",\"expiresIn\":\"5m\",\"ephemeral\":true}" 2>/dev/null \
+                  | python3 -c "import json,sys; print(json.load(sys.stdin).get('key',''))" 2>/dev/null)
+                [ -n "$key" ] && pass "API key created on subscription $sub" || { fail "API key creation failed on subscription $sub"; return; }
+                code=$(curl -sk -o /dev/null -w '%{http_code}' -X POST "${MAAS_GW}/v1/chat/completions" \
+                  -H "Authorization: Bearer ${key}" -H "Content-Type: application/json" \
+                  -d "{\"model\":\"${id}\",\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}],\"max_tokens\":5}" 2>/dev/null || echo "000")
+                [ "$code" = "200" ] && pass "External model $name inference returned HTTP 200" || fail "External model $name inference returned HTTP $code"
+              }
+              {{- range .Values.externalModels }}
+              check_external {{ required "externalModels[].name is required" .name | quote }} {{ required "externalModels[].namespace is required" .namespace | quote }} {{ default (printf "%s-free" .name) .subscription | quote }} {{ default "" .id | quote }}
+              {{- end }}
+              {{- end }}
+
+              {{- if .Values.checkTelemetry.enabled }}
+              # ── Phase 6: Telemetry ──
+              # Guards the pieces owned by rhai-observability: MaaS telemetry flag and usage LokiStack.
+              phase "Phase 6: Telemetry"
+              TEL=$(oc get maastenantconfig {{ .Values.checkTelemetry.tenantConfigName }} -n {{ .Values.checkTelemetry.maasNamespace }} -o jsonpath='{.spec.telemetry.enabled}' 2>/dev/null || echo "")
+              [ "$TEL" = "true" ] && pass "MaaS telemetry enabled" || fail "MaaS telemetry not enabled (spec.telemetry.enabled=$TEL)"
+              {{- if .Values.checkTelemetry.lokiStack }}
+              LOKI=$(oc get lokistack {{ .Values.checkTelemetry.lokiStack }} -n {{ .Values.checkTelemetry.monitoringNamespace }} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "")
+              [ "$LOKI" = "True" ] && pass "LokiStack {{ .Values.checkTelemetry.lokiStack }} is Ready" || fail "LokiStack {{ .Values.checkTelemetry.lokiStack }} not Ready ($LOKI)"
+              {{- end }}
+              {{- end }}
 
               # ── Summary ──
               phase "Summary"

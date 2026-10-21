@@ -1,3 +1,8 @@
+{{- /*
+  namespace.yaml — dedicated namespace for the verification Job
+  Why:       Keeps the smoke test (and its ephemeral API keys) out of platform namespaces.
+  Ordering:  sync-wave -1.
+*/ -}}
 apiVersion: v1
 kind: Namespace
 metadata:
