@@ -119,6 +119,7 @@ With tracing on, the Playground and NemoGuardrails pods wait in `CreateContainer
 | `tracing.tokenRefresh.enabled` / `schedule` | `true` / monthly | Re-mint tokens and restart app pods |
 | `tracing.ogxCertPath` / `ngrCertPath` | SA service-ca / Debian bundle | CA used to trust MLflow |
 | `tracing.ogxDisabledInstrumentations` / `ngrDisabledInstrumentations` | see values | Noise filters (keep openai-v2 + fastapi in OGX) |
+| `tracing.ogxExcludedUrls` | `v1/health,v1/version,v1/providers` | Paths never traced in OGX (operator status polls would otherwise create an empty trace every few minutes) |
 | `verify.enabled` / `startupDelay` / `tracing` / `playground` | `true` / `60` / `true` / `false` | Smoke-test options |
 | `verify.safePrompt` / `blockedPrompt` | demo Prompt A / E | Must be allowed / blocked |
 
@@ -193,6 +194,7 @@ oc logs job/genai-verify -n <namespace>
 | `SSL CERTIFICATE_VERIFY_FAILED` | Wrong `tracing.ogxCertPath` / `ngrCertPath` |
 | Empty Chat tab in MLflow | Needs `span_only` + `gen_ai_latest_experimental` (set by the chart on the OGXServer) |
 | Dozens of noisy spans | `tracing.ogxDisabledInstrumentations` trimmed |
+| Steady stream of ~3 ms `playground` traces with no LLM call | Operator status polls being traced; check `tracing.ogxExcludedUrls` covers the polled paths (`oc logs deploy/lsd-genai-playground` shows them) |
 | Model missing from the Playground dropdown | Not in `playground.models` |
 | Vector stores, files or agents disappear after a pod restart | `playground.storage.enabled` false, or the OGXServer was deleted and recreated (new PVC). `oc get pvc <playground.name>-pvc -n <ns>` |
 | pgvector auth failures after reinstall | Generator mode made a new password but the PVC keeps the old DB. Delete the PVC or use `passwordSource: awsSecret` |
