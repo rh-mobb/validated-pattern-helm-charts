@@ -1957,6 +1957,20 @@ entries:
   maas-external-model:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-10-21T02:45:06.349576705Z"
+    description: Deploy external AI models (OpenAI, Bedrock, Gemini, Anthropic, Azure
+      OpenAI) via MaaS
+    digest: eb40d8dcd6126cc22bcec0ea6f09046aabad71e2f5b20f2515f24f22b047aaf3
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: maas-external-model
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-external-model-0.2.0/maas-external-model-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-10-13T06:14:57.82245901Z"
     description: Deploy external AI models (OpenAI, Bedrock, Gemini, Anthropic, Azure
       OpenAI) via MaaS
@@ -1982,6 +1996,20 @@ entries:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-external-model-0.1.0/maas-external-model-0.1.0.tgz
     version: 0.1.0
   maas-model:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-10-21T02:45:06.489820255Z"
+    description: Parameterized chart for deploying RHOAI MaaS models (LLMInferenceService
+      + governance)
+    digest: 603865de09595212fccbe370e3c32d6003fba4b15e8bcb5e7183220f80700184
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: maas-model
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-model-0.3.0/maas-model-0.3.0.tgz
+    version: 0.3.0
   - apiVersion: v2
     appVersion: "1.0"
     created: "2026-10-12T06:16:46.850379423Z"
@@ -3633,4 +3661,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-21T02:42:01.075768123Z"
+generated: "2026-10-21T02:45:06.490161629Z"
