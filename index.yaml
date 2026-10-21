@@ -2128,6 +2128,19 @@ entries:
   maas-verify:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-10-21T02:48:02.058175403Z"
+    description: Post-deploy verification job for RHOAI MaaS platform
+    digest: b80e57c2f665136207a8b6cb3eae9b0c8535781253c903284907ec977991f155
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: maas-verify
+    type: application
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/maas-verify-0.2.0/maas-verify-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-10-12T02:41:06.276852351Z"
     description: Post-deploy verification job for RHOAI MaaS platform
     digest: 431e3bdfac4a85ac36f0f121c0e5abc2fbedbca37a37fea364cc00bf400158a3
@@ -3688,4 +3701,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-21T02:46:53.227651062Z"
+generated: "2026-10-21T02:48:02.058634698Z"
