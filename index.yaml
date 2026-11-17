@@ -1324,6 +1324,28 @@ entries:
     version: 0.4.14
   cluster-logging:
   - apiVersion: v2
+    created: "2026-11-17T05:42:47.980879955Z"
+    dependencies:
+    - name: helper-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~1.1.0
+    - condition: helper-status-checker.enabled
+      name: helper-status-checker
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: 4.4.3
+    - condition: loki-operator.enabled
+      name: loki-operator
+      repository: https://rh-mobb.github.io/validated-pattern-helm-charts/
+      version: ~0.1.5
+    digest: cc639fe2e1df6f7dfe54fbfa97fe4e076f5820baba51122566748790f51a937f
+    home: https://rh-mobb.github.io/validated-pattern-helm-charts/
+    maintainers:
+    - name: rh-mobb
+    name: cluster-logging
+    urls:
+    - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/cluster-logging-0.5.18/cluster-logging-0.5.18.tgz
+    version: 0.5.18
+  - apiVersion: v2
     created: "2026-11-17T05:20:25.512406258Z"
     dependencies:
     - name: helper-operator
@@ -3794,4 +3816,4 @@ entries:
     urls:
     - https://github.com/rh-mobb/validated-pattern-helm-charts/releases/download/web-terminal-operator-1.0.0/web-terminal-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2026-11-17T05:20:25.512621051Z"
+generated: "2026-11-17T05:42:47.981039488Z"
