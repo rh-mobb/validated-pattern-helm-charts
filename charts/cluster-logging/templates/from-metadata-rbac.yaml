@@ -1,0 +1,69 @@
+{{- if .Values.platformMetadata.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logging-from-metadata
+  namespace: openshift-logging
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: logging-from-metadata
+  namespace: openshift-logging
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "patch", "update"]
+  - apiGroups: ["observability.openshift.io"]
+    resources: ["clusterlogforwarders"]
+    verbs: ["get", "create", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: logging-from-metadata
+  namespace: openshift-logging
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: logging-from-metadata
+subjects:
+  - kind: ServiceAccount
+    name: logging-from-metadata
+    namespace: openshift-logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: logging-from-metadata-read
+  namespace: {{ .Values.platformMetadata.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: [{{ .Values.platformMetadata.name | quote }}]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: logging-from-metadata-read
+  namespace: {{ .Values.platformMetadata.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: logging-from-metadata-read
+subjects:
+  - kind: ServiceAccount
+    name: logging-from-metadata
+    namespace: openshift-logging
+{{- end }}

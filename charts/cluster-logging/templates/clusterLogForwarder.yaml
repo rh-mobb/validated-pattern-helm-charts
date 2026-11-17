@@ -1,3 +1,5 @@
+{{- if not .Values.platformMetadata.enabled }}
+
 apiVersion: observability.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
@@ -51,3 +53,4 @@ spec:
     - output-cloudwatch-namespace-all
   serviceAccount:
     name: {{ .Values.serviceAccount }}
+{{- end }}
