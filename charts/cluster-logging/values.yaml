@@ -94,3 +94,15 @@ loki-operator:
     enabled: true
     name: "logging"
     displayName: "Logging"
+
+# Read cloudwatchLoggingRoleArn, clusterName, awsRegion from bootstrap ConfigMap rosa-platform-metadata.
+# Doc: validated-pattern-terraform-rosa docs/architecture/platform-metadata-irsa.md
+platformMetadata:
+  enabled: false
+  name: rosa-platform-metadata
+  namespace: openshift-gitops
+  loggingRoleArnKey: cloudwatchLoggingRoleArn
+  clusterNameKey: clusterName
+  awsRegionKey: awsRegion
+  applyJob:
+    image: registry.redhat.io/openshift4/ose-cli:latest

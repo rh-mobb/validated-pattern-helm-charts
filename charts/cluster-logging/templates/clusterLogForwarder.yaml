@@ -1,3 +1,9 @@
+{{- $clusterName := .Values.clustername }}
+{{- $region := .Values.region }}
+{{- if .Values.platformMetadata.enabled }}
+{{- $clusterName = "pending-platform-metadata" }}
+{{- $region = "pending-platform-metadata" }}
+{{- end }}
 apiVersion: observability.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
@@ -21,8 +27,8 @@ spec:
           token:
             from: serviceAccount
         type: iamRole
-      groupName: /{{ .Values.clustername }}/infrastructure
-      region: {{ .Values.region }}
+      groupName: /{{ $clusterName }}/infrastructure
+      region: {{ $region }}
     name: output-cloudwatch-infrastructure
     type: cloudwatch
   - cloudwatch:
@@ -34,8 +40,8 @@ spec:
           token:
             from: serviceAccount
         type: iamRole
-      groupName: /{{ .Values.clustername }}/{.kubernetes.namespace_name||"unknown"}
-      region: {{ .Values.region }}
+      groupName: /{{ $clusterName }}/{.kubernetes.namespace_name||"unknown"}
+      region: {{ $region }}
     name: output-cloudwatch-namespace-all
     type: cloudwatch
   pipelines:
