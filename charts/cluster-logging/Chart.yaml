@@ -1,5 +1,5 @@
 name: cluster-logging
-version: 0.5.17
+version: 0.5.18
 apiVersion: v2
 home: https://rh-mobb.github.io/validated-pattern-helm-charts/
 maintainers:
