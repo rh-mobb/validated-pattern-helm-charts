@@ -1,5 +1,6 @@
 {{- if .Values.platformMetadata.enabled }}
-# Apply CloudWatch credentials + ClusterLogForwarder from bootstrap ConfigMap.
+# Sync Job: credentials Secret + patch ClusterLogForwarder from rosa-platform-metadata.
+# CLF skeleton is rendered by Helm; this Job fills cluster-specific CloudWatch fields.
 # See: validated-pattern-terraform-rosa docs/architecture/platform-metadata-irsa.md
 apiVersion: batch/v1
 kind: Job
@@ -9,7 +10,7 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-wave: {{ .Values.syncwave | default 3 | quote }}
+    argocd.argoproj.io/sync-wave: {{ add (.Values.syncwave | default 3 | int) 1 | quote }}
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   ttlSecondsAfterFinished: 600
@@ -36,8 +37,8 @@ spec:
               value: {{ .Values.platformMetadata.clusterNameKey | quote }}
             - name: AWS_REGION_KEY
               value: {{ .Values.platformMetadata.awsRegionKey | quote }}
-            - name: LOGGING_SA
-              value: {{ .Values.serviceAccount | quote }}
+            - name: CLF_NAME
+              value: vector
           command:
             - /bin/bash
             - -ec
@@ -68,63 +69,34 @@ spec:
                 exit 1
               fi
 
+              echo "Waiting for ClusterLogForwarder ${CLF_NAME}..."
+              for i in $(seq 1 60); do
+                if oc -n openshift-logging get clusterlogforwarder "${CLF_NAME}" >/dev/null 2>&1; then
+                  break
+                fi
+                sleep 5
+              done
+              oc -n openshift-logging get clusterlogforwarder "${CLF_NAME}" >/dev/null
+
               echo "Applying cloudwatch-credentials from platform metadata"
               oc -n openshift-logging create secret generic cloudwatch-credentials \
                 --from-literal=credentials="${ROLE_ARN}" --dry-run=client -o yaml | oc apply -f -
 
-              clf_file="$(mktemp)"
-              cat >"${clf_file}" <<YAML
-              apiVersion: observability.openshift.io/v1
-              kind: ClusterLogForwarder
-              metadata:
-                name: vector
-                namespace: openshift-logging
-                annotations:
-                  observability.openshift.io/log-level: info
+              patch_file="$(mktemp)"
+              cat >"${patch_file}" <<PATCH
               spec:
-                managementState: Managed
                 outputs:
-                  - cloudwatch:
-                      authentication:
-                        iamRole:
-                          roleARN:
-                            key: credentials
-                            secretName: cloudwatch-credentials
-                          token:
-                            from: serviceAccount
-                        type: iamRole
-                      groupName: /${CLUSTER_NAME}/infrastructure
-                      region: ${AWS_REGION}
-                    name: output-cloudwatch-infrastructure
-                    type: cloudwatch
-                  - cloudwatch:
-                      authentication:
-                        iamRole:
-                          roleARN:
-                            key: credentials
-                            secretName: cloudwatch-credentials
-                          token:
-                            from: serviceAccount
-                        type: iamRole
-                      groupName: /${CLUSTER_NAME}/{.kubernetes.namespace_name||"unknown"}
-                      region: ${AWS_REGION}
-                    name: output-cloudwatch-namespace-all
-                    type: cloudwatch
-                pipelines:
-                  - name: input-cloudwatch-infrastructure
-                    inputRefs:
-                      - infrastructure
-                    outputRefs:
-                      - output-cloudwatch-infrastructure
-                  - name: input-cloudwatch-namespace-all
-                    inputRefs:
-                      - application
-                    outputRefs:
-                      - output-cloudwatch-namespace-all
-                serviceAccount:
-                  name: ${LOGGING_SA}
-              YAML
-              sed -e 's/^              //' "${clf_file}" | oc apply -f -
-              rm -f "${clf_file}"
-              echo "CloudWatch logging applied from platform metadata"
+                - name: output-cloudwatch-infrastructure
+                  cloudwatch:
+                    region: ${AWS_REGION}
+                    groupName: /${CLUSTER_NAME}/infrastructure
+                - name: output-cloudwatch-namespace-all
+                  cloudwatch:
+                    region: ${AWS_REGION}
+                    groupName: /${CLUSTER_NAME}/{.kubernetes.namespace_name||"unknown"}
+              PATCH
+              sed -e 's/^              //' "${patch_file}" >"${patch_file}.clean"
+              oc patch clusterlogforwarder "${CLF_NAME}" -n openshift-logging --type=merge --patch-file="${patch_file}.clean"
+              rm -f "${patch_file}" "${patch_file}.clean"
+              echo "CloudWatch credentials and ClusterLogForwarder patched from platform metadata"
 {{- end }}
