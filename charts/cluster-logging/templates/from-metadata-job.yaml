@@ -82,21 +82,12 @@ spec:
               oc -n openshift-logging create secret generic cloudwatch-credentials \
                 --from-literal=credentials="${ROLE_ARN}" --dry-run=client -o yaml | oc apply -f -
 
-              patch_file="$(mktemp)"
-              cat >"${patch_file}" <<PATCH
-              spec:
-                outputs:
-                - name: output-cloudwatch-infrastructure
-                  cloudwatch:
-                    region: ${AWS_REGION}
-                    groupName: /${CLUSTER_NAME}/infrastructure
-                - name: output-cloudwatch-namespace-all
-                  cloudwatch:
-                    region: ${AWS_REGION}
-                    groupName: /${CLUSTER_NAME}/{.kubernetes.namespace_name||"unknown"}
-              PATCH
-              sed -e 's/^              //' "${patch_file}" >"${patch_file}.clean"
-              oc patch clusterlogforwarder "${CLF_NAME}" -n openshift-logging --type=merge --patch-file="${patch_file}.clean"
-              rm -f "${patch_file}" "${patch_file}.clean"
+              # JSON patch only region/groupName — merge-patch on outputs drops authentication/type.
+              oc patch clusterlogforwarder "${CLF_NAME}" -n openshift-logging --type=json -p="[
+                {\"op\": \"replace\", \"path\": \"/spec/outputs/0/cloudwatch/region\", \"value\": \"${AWS_REGION}\"},
+                {\"op\": \"replace\", \"path\": \"/spec/outputs/0/cloudwatch/groupName\", \"value\": \"/${CLUSTER_NAME}/infrastructure\"},
+                {\"op\": \"replace\", \"path\": \"/spec/outputs/1/cloudwatch/region\", \"value\": \"${AWS_REGION}\"},
+                {\"op\": \"replace\", \"path\": \"/spec/outputs/1/cloudwatch/groupName\", \"value\": \"/${CLUSTER_NAME}/{.kubernetes.namespace_name||\\\"unknown\\\"}\"}
+              ]"
               echo "CloudWatch credentials and ClusterLogForwarder patched from platform metadata"
 {{- end }}
